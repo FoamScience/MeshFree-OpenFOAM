@@ -24,20 +24,22 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "inputModeEntry.H"
+#include "removeEntry.H"
 #include "dictionary.H"
+#include "IStringStream.H"
+#include "OStringStream.H"
 #include "addToMemberFunctionSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::word Foam::functionEntries::inputModeEntry::typeName
+const Foam::word Foam::functionEntries::removeEntry::typeName
 (
-    Foam::functionEntries::inputModeEntry::typeName_()
+    Foam::functionEntries::removeEntry::typeName_()
 );
 
 // Don't lookup the debug switch here as the debug switch dictionary
-// might include inputModeEntries
-int Foam::functionEntries::inputModeEntry::debug(0);
+// might include removeEntry
+int Foam::functionEntries::removeEntry::debug(0);
 
 namespace Foam
 {
@@ -46,88 +48,41 @@ namespace functionEntries
     addToMemberFunctionSelectionTable
     (
         functionEntry,
-        inputModeEntry,
+        removeEntry,
         execute,
         dictionaryIstream
     );
 }
 }
 
-// * * * * * * * * * * * * * * * * Private Data  * * * * * * * * * * * * * * //
-
-Foam::label Foam::functionEntries::inputModeEntry::mode_ = imError;
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-void Foam::functionEntries::inputModeEntry::setMode(Istream& is)
-{
-    clear();
-
-    word mode(is);
-    if (mode == "merge")
-    {
-        mode_ = imMerge;
-    }
-    else if (mode == "overwrite")
-    {
-        mode_ = imOverwrite;
-    }
-    else if (mode == "error" || mode == "default")
-    {
-        mode_ = imError;
-    }
-    else
-    {
-        WarningIn("Foam::functionEntries::inputModeEntry::setMode(Istream&)")
-            << "unsupported input mode " << mode
-            << endl;
-    }
-}
-
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::functionEntries::inputModeEntry::execute
+bool Foam::functionEntries::removeEntry::execute
 (
     dictionary& parentDict,
     Istream& is
 )
 {
-    setMode(is);
+    token currToken(is);
+    is.putBack(currToken);
+
+    if (currToken == token::BEGIN_LIST)
+    {
+        wordList keys(is);
+
+        forAll(keys, keyI)
+        {
+            parentDict.remove(keys[keyI]);
+        }
+    }
+    else
+    {
+        word key(is);
+        parentDict.remove(key);
+    }
+
     return true;
 }
-
-
-void Foam::functionEntries::inputModeEntry::clear()
-{
-    mode_ = imError;
-}
-
-
-bool Foam::functionEntries::inputModeEntry::merge()
-{
-    if (mode_ & imMerge)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-
-bool Foam::functionEntries::inputModeEntry::overwrite()
-{
-    if (mode_ & imOverwrite)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
 
 // ************************************************************************* //
