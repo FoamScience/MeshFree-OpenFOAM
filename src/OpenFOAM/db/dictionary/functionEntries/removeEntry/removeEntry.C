@@ -24,87 +24,65 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "removeEntry.H"
 #include "dictionary.H"
-#include "primitiveEntry.H"
+#include "IStringStream.H"
+#include "OStringStream.H"
+#include "addToMemberFunctionSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+const Foam::word Foam::functionEntries::removeEntry::typeName
+(
+    Foam::functionEntries::removeEntry::typeName_()
+);
+
+// Don't lookup the debug switch here as the debug switch dictionary
+// might include removeEntry
+int Foam::functionEntries::removeEntry::debug(0);
+
+namespace Foam
+{
+namespace functionEntries
+{
+    addToMemberFunctionSelectionTable
+    (
+        functionEntry,
+        removeEntry,
+        execute,
+        dictionaryIstream
+    );
+}
+}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class T>
-T Foam::dictionary::lookupOrDefault
+bool Foam::functionEntries::removeEntry::execute
 (
-    const word& keyword,
-    const T& deflt,
-    bool recursive
-) const
-{
-    const entry* entryPtr = lookupEntryPtr(keyword, recursive);
-
-    if (entryPtr == NULL)
-    {
-        return deflt;
-    }
-    else
-    {
-        return pTraits<T>(entryPtr->stream());
-    }
-}
-
-
-template<class T>
-T Foam::dictionary::lookupOrAddDefault
-(
-    const word& keyword,
-    const T& deflt,
-    bool recursive
+    dictionary& parentDict,
+    Istream& is
 )
 {
-    const entry* entryPtr = lookupEntryPtr(keyword, recursive);
+    token currToken(is);
+    is.putBack(currToken);
 
-    if (entryPtr == NULL)
+    if (currToken == token::BEGIN_LIST)
     {
-        add(new primitiveEntry(keyword, deflt));
-        return deflt;
+        wordList keys(is);
+
+        forAll(keys, keyI)
+        {
+            parentDict.remove(keys[keyI]);
+        }
     }
     else
     {
-        return pTraits<T>(entryPtr->stream());
+        word key(is);
+        parentDict.remove(key);
     }
-}
 
-
-template<class T>
-bool Foam::dictionary::readIfPresent
-(
-    const word& k,
-    T& val,
-    bool recursive
-) const
-{
-    const entry* entryPtr = lookupEntryPtr(k, recursive);
-
-    if (entryPtr == NULL)
-    {
-        return false;
-    }
-    else
-    {
-        entryPtr->stream() >> val;
-        return true;
-    }
-}
-
-
-template<class T>
-void Foam::dictionary::add(const word& k, const T& t, bool overwrite)
-{
-    add(new primitiveEntry(k, t), overwrite);
-}
-
-
-template<class T>
-void Foam::dictionary::set(const word& k, const T& t)
-{
-    set(new primitiveEntry(k, t));
+    return true;
 }
 
 // ************************************************************************* //
