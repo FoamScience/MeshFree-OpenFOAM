@@ -24,43 +24,65 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "PstreamReduceOps.H"
+#include "removeEntry.H"
+#include "dictionary.H"
+#include "IStringStream.H"
+#include "OStringStream.H"
+#include "addToMemberFunctionSelectionTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+const Foam::word Foam::functionEntries::removeEntry::typeName
+(
+    Foam::functionEntries::removeEntry::typeName_()
+);
 
-void Foam::Pstream::addValidParOptions(HashTable<string>& validParOptions)
-{}
+// Don't lookup the debug switch here as the debug switch dictionary
+// might include removeEntry
+int Foam::functionEntries::removeEntry::debug(0);
 
-
-bool Foam::Pstream::init(int& argc, char**& argv)
+namespace Foam
 {
-    FatalErrorIn("Pstream::init(int& argc, char**& argv)")
-        << "Trying to use the dummy Pstream library." << nl
-        << "This dummy library cannot be used in parallel mode"
-        << Foam::exit(FatalError);
-
-    return false;
+namespace functionEntries
+{
+    addToMemberFunctionSelectionTable
+    (
+        functionEntry,
+        removeEntry,
+        execute,
+        dictionaryIstream
+    );
+}
 }
 
 
-void Foam::Pstream::exit(int errnum)
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+bool Foam::functionEntries::removeEntry::execute
+(
+    dictionary& parentDict,
+    Istream& is
+)
 {
-    notImplemented("Pstream::exit(int errnum)");
+    token currToken(is);
+    is.putBack(currToken);
+
+    if (currToken == token::BEGIN_LIST)
+    {
+        wordList keys(is);
+
+        forAll(keys, keyI)
+        {
+            parentDict.remove(keys[keyI]);
+        }
+    }
+    else
+    {
+        word key(is);
+        parentDict.remove(key);
+    }
+
+    return true;
 }
-
-
-void Foam::Pstream::abort()
-{
-    notImplemented("Pstream::abort()");
-}
-
-
-void Foam::reduce(scalar&, const sumOp<scalar>&)
-{}
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //
