@@ -23,88 +23,61 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::LUscalarMatrix
+    Foam::SquareMatrix
 
 Description
-    Foam::LUscalarMatrix
+    A templated 2D square matrix of objects of \<T\>, where the n x n matrix
+    dimension is known and used for subscript bounds checking, etc.
 
 SourceFiles
-    LUscalarMatrix.C
+    SquareMatrixI.H
+    SquareMatrix.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef LUscalarMatrix_H
-#define LUscalarMatrix_H
+#ifndef SquareMatrix_H
+#define SquareMatrix_H
 
-#include "scalarMatrices.H"
-#include "labelList.H"
-#include "FieldField.H"
-#include "lduInterfaceFieldPtrsList.H"
+#include "Matrix.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-class lduMatrix;
-class procLduMatrix;
-
 /*---------------------------------------------------------------------------*\
-                           Class LUscalarMatrix Declaration
+                           Class Matrix Declaration
 \*---------------------------------------------------------------------------*/
 
-class LUscalarMatrix
+template<class Type>
+class SquareMatrix
 :
-    public scalarSquareMatrix
+    public Matrix<SquareMatrix<Type>, Type>
 {
-    // Private data
-
-        //- Processor matrix offsets
-        labelList procOffsets_;
-
-        //- The pivot indices used in the LU decomposition
-        labelList pivotIndices_;
-
-        //- Convert the given lduMatrix into this LUscalarMatrix
-        void convert
-        (
-            const lduMatrix& ldum,
-            const FieldField<Field, scalar>& interfaceCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces
-        );
-
-        //- Convert the given list of procLduMatrix into this LUscalarMatrix
-        //  on the master processor
-        void convert(const PtrList<procLduMatrix>& lduMatrices);
-
-
-        //- Print the ratio of the mag-sum of the off-diagonal coefficients
-        //  to the mag-diagonal
-        void printDiagonalDominance() const;
-
 
 public:
 
     // Constructors
 
-        //- Construct from scalarSquareMatrix and perform LU decomposition
-        LUscalarMatrix(const scalarSquareMatrix&);
+        //- Null constructor.
+        inline SquareMatrix();
 
-        //- Construct from lduMatrix and perform LU decomposition
-        LUscalarMatrix
-        (
-            const lduMatrix&,
-            const FieldField<Field, scalar>& interfaceCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces
-        );
+        //- Construct given number of rows/columns.
+        inline SquareMatrix(const label n);
 
+        //- Construct given number of rows and columns,
+        //  It checks that m == n.
+        inline SquareMatrix(const label m, const label n);
 
-    // Member Functions
+        //- Construct with given number of rows/columns
+        //  and value for all elements.
+        inline SquareMatrix(const label n, const Type&);
 
-        //- Solve the matrix using the LU decomposition with pivoting
-        //  returning the solution in the source
-        template<class T>
-        void solve(Field<T>& source) const;
+        //- Construct from Istream.
+        inline SquareMatrix(Istream&);
+
+        //- Clone
+        inline autoPtr<SquareMatrix<Type> > clone() const;
 };
 
 
@@ -114,9 +87,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
-#   include "LUscalarMatrixTemplates.C"
-#endif
+#   include "SquareMatrixI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
