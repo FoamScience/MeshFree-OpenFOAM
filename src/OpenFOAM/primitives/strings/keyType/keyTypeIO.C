@@ -22,22 +22,66 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Istream constructor and IOstream operators for word.
+
 \*---------------------------------------------------------------------------*/
 
-#include "primitiveEntry.H"
-#include "dictionary.H"
+#include "keyType.H"
+#include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
+Foam::keyType::keyType(Istream& is)
 :
-    entry(keyword),
-    ITstream(keyword, tokenList(10))
+    word()
 {
-    OStringStream os;
-    os << t << token::END_STATEMENT;
-    readEntry(dictionary::null, IStringStream(os.str())());
+    is >> *this;
+}
+
+
+Foam::Istream& Foam::operator>>(Istream& is, keyType& w)
+{
+    token t(is);
+
+    if (!t.good())
+    {
+        is.setBad();
+        return is;
+    }
+
+    if (t.isWord())
+    {
+        w = t.wordToken();
+    }
+    else if (t.isString())
+    {
+        // Assign from string. Sets regular expression.
+        w = t.stringToken();
+    }
+    else
+    {
+        is.setBad();
+        FatalIOErrorIn("operator>>(Istream&, keyType&)", is)
+            << "wrong token type - expected word or string found "
+            << t.info()
+            << exit(FatalIOError);
+
+        return is;
+    }
+
+    // Check state of IOstream
+    is.check("Istream& operator>>(Istream&, keyType&)");
+
+    return is;
+}
+
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const keyType& w)
+{
+    os.write(w);
+    os.check("Ostream& operator<<(Ostream&, const keyType&)");
+    return os;
 }
 
 

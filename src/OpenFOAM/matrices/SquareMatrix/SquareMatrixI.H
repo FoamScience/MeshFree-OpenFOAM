@@ -24,20 +24,65 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "primitiveEntry.H"
-#include "dictionary.H"
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
+template<class Type>
+inline Foam::SquareMatrix<Type>::SquareMatrix()
 :
-    entry(keyword),
-    ITstream(keyword, tokenList(10))
+    Matrix<SquareMatrix<Type>, Type>()
+{}
+
+template<class Type>
+inline Foam::SquareMatrix<Type>::SquareMatrix(const label n)
+:
+    Matrix<SquareMatrix<Type>, Type>(n, n)
+{}
+
+template<class Type>
+inline Foam::SquareMatrix<Type>::SquareMatrix(const label m, const label n)
+:
+    Matrix<SquareMatrix<Type>, Type>(m, n)
 {
-    OStringStream os;
-    os << t << token::END_STATEMENT;
-    readEntry(dictionary::null, IStringStream(os.str())());
+    if (m != n)
+    {
+        FatalErrorIn
+        (
+            "SquareMatrix<Type>::SquareMatrix(const label m, const label n)"
+        ) << "m != n for constructing a square matrix" << exit(FatalError);
+    }
+}
+
+template<class Type>
+inline Foam::SquareMatrix<Type>::SquareMatrix
+(
+    const label m,
+    const label n,
+    const Type& t
+)
+:
+    Matrix<SquareMatrix<Type>, Type>(m, n, t)
+{
+    if (m != n)
+    {
+        FatalErrorIn
+        (
+            "SquareMatrix<Type>::SquareMatrix"
+            "(const label m, const label n, const Type&)"
+        ) << "m != n for constructing a square matrix" << exit(FatalError);
+    }
+}
+
+template<class Type>
+inline Foam::SquareMatrix<Type>::SquareMatrix(Istream& is)
+:
+    Matrix<SquareMatrix<Type>, Type>(is)
+{}
+
+template<class Type>
+inline Foam::autoPtr<Foam::SquareMatrix<Type> >
+Foam::SquareMatrix<Type>::clone() const
+{
+    return autoPtr<SquareMatrix<Type> >(new SquareMatrix<Type>(*this));
 }
 
 

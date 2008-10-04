@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2007 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,20 +24,51 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "primitiveEntry.H"
-#include "dictionary.H"
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * * //
 
 template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
-:
-    entry(keyword),
-    ITstream(keyword, tokenList(10))
+inline const T Foam::SVD::sign(const T& a, const T& b)
 {
-    OStringStream os;
-    os << t << token::END_STATEMENT;
-    readEntry(dictionary::null, IStringStream(os.str())());
+    return b >= 0 ? (a >= 0 ? a : -a) : (a >= 0 ? -a : a);
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+inline const Foam::scalarRectangularMatrix& Foam::SVD::U() const
+{
+    return U_;
+}
+
+inline const Foam::scalarRectangularMatrix& Foam::SVD::V() const
+{
+    return V_;
+}
+
+inline const Foam::scalarDiagonalMatrix& Foam::SVD::S() const
+{
+    return S_;
+}
+
+inline const Foam::scalarRectangularMatrix& Foam::SVD::VSinvUt() const
+{
+    return VSinvUt_;
+}
+
+inline Foam::label Foam::SVD::nZeros() const
+{
+    return nZeros_;
+}
+
+inline Foam::scalar Foam::SVD::minNonZeroS() const
+{
+    scalar minS = S_[0];
+    for(label i = 1; i < S_.size(); i++)
+    {
+        scalar s = S_[i];
+        if (s > VSMALL && s < minS) minS = s;
+    }
+    return minS;
 }
 
 
