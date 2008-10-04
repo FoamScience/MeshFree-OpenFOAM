@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2007 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,96 +23,78 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::regularExpression
+    Foam::DiagonalMatrix<Type>
 
 Description
-    Wrapper around regular expressions.
+    DiagonalMatrix<Type> is a 2D diagonal matrix of objects
+    of type Type, size nxn
 
 SourceFiles
+    DiagonalMatrix.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef regularExpression_H
-#define regularExpression_H
+#ifndef DiagonalMatrix_H
+#define DiagonalMatrix_H
 
-#include <sys/types.h>
-#include <regex.h>
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// * * * * * *  * * * * * * Class Forward declaration  * * * * * * * * * * * //
+
+template<class Form, class Type> class Matrix;
+
 /*---------------------------------------------------------------------------*\
-                           Class regularExpression Declaration
+                           Class DiagonalMatrix Declaration
 \*---------------------------------------------------------------------------*/
 
-class regularExpression
+template<class Type>
+class DiagonalMatrix
+:
+    public List<Type>
 {
-    // Private data
-
-        //- Precompiled regular expression
-        regex_t* preg_;
-
-
-    // Private member functions
-
-        //- Disallow default bitwise copy construct
-        regularExpression(const regularExpression&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const regularExpression&);
-
 public:
-
 
     // Constructors
 
-        //- Construct from string
-        inline regularExpression(const string& s)
-        {
-            preg_ = new regex_t;
+        //- Construct from diagonal component of a Matrix
+        template<class Form>
+        DiagonalMatrix<Type>(const Matrix<Form, Type>&);
 
-            if (regcomp(preg_, s.c_str(), REG_EXTENDED|REG_NOSUB) != 0)
-            {
-                FatalErrorIn
-                (
-                    "regularExpression::regularExpression(const char*)"
-                )   << "Failed to compile regular expression " << s
-                    << exit(FatalError);
-            }
-        }
+        //- Construct empty from size
+        DiagonalMatrix<Type>(const label size);
 
-
-    // Destructor
-
-        //- Construct from string
-        inline ~regularExpression()
-        {
-            if (preg_)
-            {
-                regfree(preg_);
-                delete preg_;
-            }
-        }
+        //- Construct from size and a value
+        DiagonalMatrix<Type>(const label, const Type&);
 
 
     // Member functions
 
-        //- Matches?
-        inline bool matches(const string& s) const
-        {
-            size_t nmatch = 0;
-            regmatch_t *pmatch = NULL;
-
-            return regexec(preg_, s.c_str(), nmatch, pmatch, 0) == 0;
-        }
+        //- Invert the diaganol matrix and return itself
+        DiagonalMatrix<Type>& invert();
 };
+
+
+// Global functions
+
+//- Return the diagonal Matrix inverse
+template<class Type>
+DiagonalMatrix<Type> inv(const DiagonalMatrix<Type>&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "DiagonalMatrix.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
