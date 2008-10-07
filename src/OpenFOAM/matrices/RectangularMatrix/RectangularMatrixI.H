@@ -24,20 +24,46 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "primitiveEntry.H"
-#include "dictionary.H"
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& keyword, const T& t)
+template<class Type>
+inline Foam::RectangularMatrix<Type>::RectangularMatrix()
 :
-    entry(keyword),
-    ITstream(keyword, tokenList(10))
+    Matrix<RectangularMatrix<Type>, Type>()
+{}
+
+template<class Type>
+inline Foam::RectangularMatrix<Type>::RectangularMatrix
+(
+    const label m,
+    const label n
+)
+:
+    Matrix<RectangularMatrix<Type>, Type>(m, n)
+{}
+
+template<class Type>
+inline Foam::RectangularMatrix<Type>::RectangularMatrix
+(
+    const label m,
+    const label n,
+    const Type& t
+)
+:
+    Matrix<RectangularMatrix<Type>, Type>(m, n, t)
+{}
+
+template<class Type>
+inline Foam::RectangularMatrix<Type>::RectangularMatrix(Istream& is)
+:
+    Matrix<RectangularMatrix<Type>, Type>(is)
+{}
+
+template<class Type>
+inline Foam::autoPtr<Foam::RectangularMatrix<Type> >
+Foam::RectangularMatrix<Type>::clone() const
 {
-    OStringStream os;
-    os << t << token::END_STATEMENT;
-    readEntry(dictionary::null, IStringStream(os.str())());
+    return autoPtr<RectangularMatrix<Type> >(new RectangularMatrix<Type>(*this));
 }
 
 

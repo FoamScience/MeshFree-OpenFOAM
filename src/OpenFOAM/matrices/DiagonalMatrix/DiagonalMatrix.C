@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2007 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,58 +24,76 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "word.H"
-#include "Ostream.H"
-#include "token.H"
-#include "keyType.H"
-#include "IOstreams.H"
+#include "DiagonalMatrix.H"
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//- Write keyType
-Foam::Ostream& Foam::Ostream::write(const keyType& s)
+template<class Type>
+template<class Form>
+Foam::DiagonalMatrix<Type>::DiagonalMatrix(const Matrix<Form, Type>& a)
+:
+    List<Type>(min(a.n(), a.m()))
 {
-    // Write as word?
-    if (s.isWildCard())
+    forAll(*this, i)
     {
-        return write(static_cast<const string&>(s));
-    }
-    else
-    {
-        return write(static_cast<const word&>(s));
+        this->operator[](i) = a[i][i];
     }
 }
 
 
-//- Decrememt the indent level
-void Foam::Ostream::decrIndent()
+template<class Type>
+Foam::DiagonalMatrix<Type>::DiagonalMatrix(const label size)
+:
+    List<Type>(size)
+{}
+
+
+template<class Type>
+Foam::DiagonalMatrix<Type>::DiagonalMatrix(const label size, const Type& val)
+:
+    List<Type>(size, val)
+{}
+
+
+template<class Type>
+Foam::DiagonalMatrix<Type>& Foam::DiagonalMatrix<Type>::invert()
 {
-    if (indentLevel_ == 0)
+    forAll(*this, i)
     {
-        cerr<< "Ostream::decrIndent() : attempt to decrement 0 indent level"
-            << std::endl;
+        Type x = this->operator[](i);
+        if (mag(x) < VSMALL)
+        {
+            this->operator[](i) = Type(0);
+        }
+        else
+        {
+            this->operator[](i) = Type(1)/x;
+        }
     }
-    else
-    {
-        indentLevel_--;
-    }
+
+    return this;
 }
 
 
-// Write the keyword to the Ostream followed by appropriate indentation
-Foam::Ostream& Foam::Ostream::writeKeyword(const Foam::keyType& keyword)
+template<class Type>
+Foam::DiagonalMatrix<Type> Foam::inv(const DiagonalMatrix<Type>& A)
 {
-    indent();
-    write(keyword);
+    DiagonalMatrix<Type> Ainv = A;
 
-    label nSpaces = max(entryIndentation_ - label(keyword.size()), 1);
-
-    for (label i=0; i<nSpaces; i++)
+    forAll(A, i)
     {
-        write(char(token::SPACE));
+        Type x = A[i];
+        if (mag(x) < VSMALL)
+        {
+            Ainv[i] = Type(0);
+        }
+        else
+        {
+            Ainv[i] = Type(1)/x;
+        }
     }
 
-    return *this;
+    return Ainv;
 }
 
 
