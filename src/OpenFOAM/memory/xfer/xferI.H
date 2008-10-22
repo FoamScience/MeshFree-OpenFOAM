@@ -22,29 +22,92 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    IOdictionary is derived from dictionary and IOobject to give the
-    dictionary automatic IO functionality via the objectRegistry.  To facilitate
-    IO, IOdictioanry is provided with a constructor from IOobject and writeData
-    and write functions.
-
 \*---------------------------------------------------------------------------*/
 
-#include "IOdictionary.H"
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class T>
+inline Foam::xfer<T>::xfer(T* p)
+:
+    ptr_(p ? p : new T)
+{}
 
-bool Foam::IOdictionary::readData(Istream& is)
+
+template<class T>
+inline Foam::xfer<T>::xfer(T& t, bool allowTransfer)
+:
+    ptr_(new T)
 {
-    is >> *this;
-    return !is.bad();
+    if (allowTransfer)
+    {
+        ptr_->transfer(t);
+    }
+    else
+    {
+        ptr_->operator=(t);
+    }
 }
 
 
-bool Foam::IOdictionary::writeData(Ostream& os) const
+template<class T>
+inline Foam::xfer<T>::xfer(const T& t)
+:
+    ptr_(new T)
 {
-    dictionary::write(os, false);
-    return os.good();
+    ptr_->operator=(t);
+}
+
+
+template<class T>
+inline Foam::xfer<T>::xfer(const xfer<T>& t)
+:
+    ptr_(new T)
+{
+    ptr_->transfer(*(t.ptr_));
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+template<class T>
+inline Foam::xfer<T>::~xfer()
+{
+    delete ptr_;
+    ptr_ = 0;
+}
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+template<class T>
+inline void Foam::xfer<T>::operator=(T& t)
+{
+    ptr_->transfer(t);
+}
+
+
+template<class T>
+inline void Foam::xfer<T>::operator=(const xfer<T>& t)
+{
+    // silently ignore copy to self
+    if (this != &t)
+    {
+        ptr_->transfer(*(t.ptr_));
+    }
+}
+
+
+template<class T>
+inline T& Foam::xfer<T>::operator()() const
+{
+    return *ptr_;
+}
+
+
+template<class T>
+inline T* Foam::xfer<T>::operator->() const
+{
+    return ptr_;
 }
 
 // ************************************************************************* //
