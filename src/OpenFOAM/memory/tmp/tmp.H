@@ -23,21 +23,25 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::autoPtr
+    Foam::tmp
 
 Description
-    An auto-pointer similar to the STL auto_ptr but with automatic casting
-    to a reference to the type and with pointer allocation checking on access.
+    A class for managing temporary objects
 
 SourceFiles
-    autoPtrI.H
+    tmpI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef autoPtr_H
-#define autoPtr_H
+#ifndef tmp_H
+#define tmp_H
 
+#include "refCount.H"
 #include <cstddef>
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   define ConstructFromTmp
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,16 +49,22 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class autoPtr Declaration
+                           Class tmp Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class T>
-class autoPtr
+class tmp
 {
-    // Public data
+    // Private data
 
-        //- Pointer to object
+        //- Flag for whether object is a temporary or a constant object
+        bool isTmp_;
+
+        //- Pointer to temporary object
         mutable T* ptr_;
+
+        // Const reference to constant object
+        const T& ref_;
 
 
 public:
@@ -62,53 +72,51 @@ public:
     // Constructors
 
         //- Store object pointer
-        inline explicit autoPtr(T* = NULL);
+        inline explicit tmp(T* = 0);
 
-        //- Construct as copy by transfering pointer to this autoPtr and
-        //  setting the arguments pointer to NULL
-        inline autoPtr(const autoPtr<T>&);
+        //- Store object const reference
+        inline tmp(const T&);
+
+        //- Construct copy and increment reference count
+        inline tmp(const tmp<T>&);
 
 
     // Destructor
 
-        //- Delete object if pointer is not NULL
-        inline ~autoPtr();
+        //- Delete object when reference count == 0
+        inline ~tmp();
 
 
     // Member Functions
 
-        // Check
+        // Access
 
-            //- Is the autoPtr valid, i.e. is the pointer set
+            //- Is this really a temporary object
+            inline bool isTmp() const;
+
+            //- Is this temporary object valid, i.e. is it a reference
+            //  or a temporary that has been allocated
             inline bool valid() const;
-
 
         // Edit
 
-            //- Return object pointer for reuse
-            inline T* ptr();
-
-            //- Set pointer to that given.
-            //  If object pointer already set issue a FatalError.
-            inline void set(T* p);
-
-            //- If object pointer already set delete object and
-            //  set pointer to that given
-            inline void reset(T* p = NULL);
+            //- Return tmp pointer for reuse
+            inline T* ptr() const;
 
             //- If object pointer points to valid object:
             //  delete object and set pointer to NULL
-            inline void clear();
+            inline void clear() const;
 
 
     // Member operators
 
+        //- Dereference operator
         inline T& operator()();
+
+        //- Const dereference operator
         inline const T& operator()() const;
 
-        //inline Tref operator*();
-        //inline const Tref operator*() const;
-
+        //- Const cast to the underlying type reference
         inline operator const T&() const;
 
         //- Return object pointer
@@ -117,7 +125,8 @@ public:
         //- Return const object pointer
         inline const T* operator->() const;
 
-        inline void operator=(const autoPtr<T>&);
+        //- Assignment operator
+        inline void operator=(const tmp<T>&);
 };
 
 
@@ -127,7 +136,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "autoPtrI.H"
+#include "tmpI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
