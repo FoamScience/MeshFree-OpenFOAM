@@ -22,26 +22,46 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::stringList
+InNamspace
+    Foam
 
 Description
-    List of strings.
+    Operations on lists of strings.
+
+SourceFiles
+    stringListOpsTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef stringList_H
-#define stringList_H
+#ifndef stringListOps_H
+#define stringListOps_H
 
-#include "string.H"
-#include "List.H"
+#include "labelList.H"
+#include "stringList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef List<string> stringList;
+
+    //- Return the indices of the strings in the list
+    //  that match the given regular expression
+    //  partial matches are optional
+    template<class StringType>
+    labelList findStrings
+    (
+        const string& regexpPattern,
+        const UList<StringType>&,
+        bool partialMatch=false
+    );
 }
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "stringListOpsTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
