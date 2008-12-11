@@ -22,84 +22,46 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    Foam::SubList
+InNamspace
+    Foam
 
 Description
-    A List obtained as a section of another List.
-
-    Since the SubList is itself unallocated, no storage is allocated or
-    de-allocated during its use.  To achieve this behaviour, SubList is
-    derived from UList rather than List.
+    Operations on lists of strings.
 
 SourceFiles
-    SubListI.H
+    stringListOpsTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SubList_H
-#define SubList_H
+#ifndef stringListOps_H
+#define stringListOps_H
 
-#include "List.H"
+#include "labelList.H"
+#include "stringList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class SubList Declaration
-\*---------------------------------------------------------------------------*/
-
-template<class T>
-class SubList
-:
-    public UList<T>
-{
-
-public:
-
-    // Constructors
-
-        //- Construct from UList and SubList size
-        inline SubList
-        (
-            const UList<T>& list,
-            const label subSize
-        );
-
-        //- Construct from UList, start and end indices
-        inline SubList
-        (
-            const UList<T>& list,
-            const label subSize,
-            const label startIndex
-        );
-
-
-    // Member functions
-
-        //- Return a null SubList
-        static inline const SubList<T>& null();
-
-
-    // Member operators
-
-        //- Allow cast to a const List<T>&
-        inline operator const Foam::List<T>&() const;
-
-        //- Assignment of all entries to the given value
-        inline void operator=(const T&);
-};
+    //- Return the indices of the strings in the list
+    //  that match the given regular expression
+    //  partial matches are optional
+    template<class StringType>
+    labelList findStrings
+    (
+        const string& regexpPattern,
+        const UList<StringType>&,
+        bool partialMatch=false
+    );
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "SubListI.H"
+#ifdef NoRepository
+#   include "stringListOpsTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
