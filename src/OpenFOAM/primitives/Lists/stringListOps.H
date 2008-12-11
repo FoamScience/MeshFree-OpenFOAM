@@ -22,80 +22,46 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    Foam::DICSmoother
+InNamspace
+    Foam
 
 Description
-    Simplified diagonal-based incomplete Cholesky smoother for symmetric
-    matrices.
-
-    To improve efficiency, the residual is evaluated after every nSweeps
-    sweeps.
+    Operations on lists of strings.
 
 SourceFiles
-    DICSmoother.C
+    stringListOpsTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DICSmoother_H
-#define DICSmoother_H
+#ifndef stringListOps_H
+#define stringListOps_H
 
-#include "lduMatrix.H"
+#include "labelList.H"
+#include "stringList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class DICSmoother Declaration
-\*---------------------------------------------------------------------------*/
-
-class DICSmoother
-:
-    public lduMatrix::smoother
-{
-    // Private data
-
-        //- The reciprocal preconditioned diagonal
-        scalarField rD_;
-
-
-public:
-
-    //- Runtime type information
-    TypeName("DIC");
-
-
-    // Constructors
-
-        //- Construct from matrix components
-        DICSmoother
-        (
-            const word& fieldName,
-            const lduMatrix& matrix,
-            const FieldField<Field, scalar>& interfaceBouCoeffs,
-            const FieldField<Field, scalar>& interfaceIntCoeffs,
-            const lduInterfaceFieldPtrsList& interfaces
-        );
-
-
-    // Member Functions
-
-        //- Smooth the solution for a given number of sweeps
-        void smooth
-        (
-            scalarField& psi,
-            const scalarField& source,
-            const direction cmpt,
-            const label nSweeps
-        ) const;
-};
+    //- Return the indices of the strings in the list
+    //  that match the given regular expression
+    //  partial matches are optional
+    template<class StringType>
+    labelList findStrings
+    (
+        const string& regexpPattern,
+        const UList<StringType>&,
+        bool partialMatch=false
+    );
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+#ifdef NoRepository
+#   include "stringListOpsTemplates.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
