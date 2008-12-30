@@ -23,73 +23,23 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
+    Static initializers for
+        Foam::string::null
+        Foam::word::null
+        Foam::fileName::null.
+    This file is included in global.Cver since these members are required by
+    debug.C.
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-#include "LList.H"
+#include "string.H"
+#include "word.H"
+#include "fileName.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class LListBase, class T>
-Foam::LList<LListBase, T>::LList(const LList<LListBase, T>& lst)
-:
-    LListBase()
-{
-    for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
-    {
-        append(iter());
-    }
-}
-
-
-template<class LListBase, class T>
-Foam::LList<LListBase, T>::~LList()
-{
-    this->clear();
-}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class LListBase, class T>
-void Foam::LList<LListBase, T>::clear()
-{
-    label oldSize = this->size();
-    for (label i=0; i<oldSize; i++)
-    {
-        removeHead();
-    }
-
-    LListBase::clear();
-}
-
-
-template<class LListBase, class T>
-void Foam::LList<LListBase, T>::transfer(LList<LListBase, T>& lst)
-{
-    clear();
-    LListBase::transfer(lst);
-}
-
-
-// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
-
-template<class LListBase, class T>
-void Foam::LList<LListBase, T>::operator=(const LList<LListBase, T>& lst)
-{
-    this->clear();
-
-    for (const_iterator iter = lst.begin(); iter != lst.end(); ++iter)
-    {
-        append(iter());
-    }
-}
-
-
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
-
-#include "LListIO.C"
-
+const Foam::string Foam::string::null;
+const Foam::word Foam::word::null;
+const Foam::fileName Foam::fileName::null;
 
 // ************************************************************************* //
