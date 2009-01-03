@@ -22,45 +22,29 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Typedef
+    Foam::wordReList
+
 Description
-    Istream constructor and IOstream operators for fileName.
+    List of wordRe (word or regular expression)
 
 \*---------------------------------------------------------------------------*/
 
-#include "fileName.H"
-#include "IOstreams.H"
+#ifndef wordReList_H
+#define wordReList_H
+
+#include "wordRe.H"
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::fileName::fileName(Istream& is)
-:
-    string(is)
+namespace Foam
 {
-    stripInvalid();
+    typedef List<wordRe> wordReList;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::Istream& Foam::operator>>(Istream& is, fileName& fn)
-{
-    fileName fName(is);
-
-    // Check state of Istream
-    is.check("Istream& operator>>(Istream&, fileName&)");
-
-    fn = fName;
-
-    return is;
-}
-
-
-Foam::Ostream& Foam::operator<<(Ostream& os, const fileName& fn)
-{
-    os.write(fn);
-    os.check("Ostream& operator<<(Ostream&, const fileName&)");
-    return os;
-}
-
+#endif
 
 // ************************************************************************* //
-
-
