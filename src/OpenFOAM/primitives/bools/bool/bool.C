@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,44 +22,24 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+
+
 \*---------------------------------------------------------------------------*/
 
-#include "ITstream.H"
+#include "bool.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+const char* const Foam::pTraits<bool>::typeName = "bool";
+const bool Foam::pTraits<bool>::zero = 0;
+const bool Foam::pTraits<bool>::one = 1;
+
+const char* Foam::pTraits<bool>::componentNames[] = { "x" };
+
+Foam::pTraits<bool>::pTraits(Istream& is)
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void ITstream::print(Ostream& os) const
-{
-    os  << "ITstream : " << name_.c_str();
-
-    if (size())
-    {
-        if (begin()->lineNumber() == rbegin()->lineNumber())
-        {
-            os  << ", line " << begin()->lineNumber() << ", ";
-        }
-        else
-        {
-            os  << ", lines " << begin()->lineNumber()
-                << '-' << rbegin()->lineNumber() << ", ";
-        }
-    }
-    else
-    {
-        os  << ", line " << lineNumber() << ", ";
-    }
-
-    IOstream::print(os);
+    is >> p_;
 }
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

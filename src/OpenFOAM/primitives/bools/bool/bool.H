@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,7 +50,7 @@ class Ostream;
 Istream& operator>>(Istream&, bool&);
 Ostream& operator<<(Ostream&, const bool);
 
-bool readBool(Istream& is);
+bool readBool(Istream&);
 
 } // End namespace Foam
 

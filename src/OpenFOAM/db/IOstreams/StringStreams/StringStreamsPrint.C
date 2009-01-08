@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,28 +23,31 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Prints out a description of the prefixOSstream to cout.
+    Prints out a description of the StringStream
 
 \*---------------------------------------------------------------------------*/
 
-#include "prefixOSstream.H"
+#include "IStringStream.H"
+#include "OStringStream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+void Foam::IStringStream::print(Ostream& os) const
 {
+    os  << "IStringStream " << name() << " : "
+        << "buffer = \n" << str() << Foam::endl;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void prefixOSstream::print(Ostream& os) const
-{
-    os  << "prefixOSstream ";
-    OSstream::print(os);
+    ISstream::print(os);
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void Foam::OStringStream::print(Ostream& os) const
+{
+    os  << "OStringStream " << name() << " : "
+        << "buffer = \n" << str() << Foam::endl;
 
-} // End namespace Foam
+    OSstream::print(os);
+}
+
 
 // ************************************************************************* //

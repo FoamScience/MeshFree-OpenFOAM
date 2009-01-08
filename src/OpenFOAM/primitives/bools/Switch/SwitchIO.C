@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,41 +22,40 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    Prints out a description of the StringStream to Serr.
-
 \*---------------------------------------------------------------------------*/
 
-#include "IStringStream.H"
-#include "OStringStream.H"
+#include "Switch.H"
+#include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-namespace Foam
+Foam::Switch::Switch(Istream& is)
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void IStringStream::print(Ostream& os) const
-{
-    os  << "IStringStream " << name() << " : "
-        << "buffer = \n" << str() << Foam::endl;
-
-    ISstream::print(os);
+    is >> *this;
 }
 
 
-void OStringStream::print(Ostream& os) const
-{
-    os  << "OStringStream " << name() << " : "
-        << "buffer = \n" << str() << Foam::endl;
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-    OSstream::print(os);
+Foam::Istream& Foam::operator>>(Istream& is, Switch& s)
+{
+    is >> s.word_;
+    s.bool_ = Switch::asBool(s.word_);
+
+    is.check("Istream& operator>>(Istream&, Switch&)");
+
+    return is;
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::Ostream& Foam::operator<<(Ostream& os, const Switch& s)
+{
+    os << s.word_;
 
-} // End namespace Foam
+    os.check("Ostream& operator<<(Ostream&, const Switch&)");
+
+    return os;
+}
+
 
 // ************************************************************************* //

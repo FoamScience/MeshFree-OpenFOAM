@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,40 +23,27 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Prints out a description of the Sstreams to cout.
+    Prints out a description of the streams
 
 \*---------------------------------------------------------------------------*/
 
-#include "ISstream.H"
-#include "OSstream.H"
+#include "IPstream.H"
+#include "OPstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+void Foam::IPstream::print(Ostream& os) const
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void ISstream::print(Ostream& os) const
-{
-    os  << "ISstream: " << name().c_str() << ' ';
-
-    IOstream::print(os);
-    IOstream::print(os, is_.rdstate());
+    os  << "Reading from processor " << fromProcNo_
+        << " to processor " << myProcNo() << Foam::endl;
 }
 
 
-void OSstream::print(Ostream& os) const
+void Foam::OPstream::print(Ostream& os) const
 {
-    os  << "OSstream: " << name().c_str() << ' ';
-
-    IOstream::print(os);
-    IOstream::print(os, os_.rdstate());
+    os  << "Writing from processor " << toProcNo_
+        << " to processor " << myProcNo() << Foam::endl;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

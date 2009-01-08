@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,18 +24,67 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "error.H"
 #include "IPstream.H"
+#include "int.H"
 #include "token.H"
 #include <cctype>
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+// * * * * * * * * * * * * * Private member functions  * * * * * * * * * * * //
+
+inline void Foam::IPstream::checkEof()
 {
+    if (bufPosition_ == messageSize_)
+    {
+        setEof();
+    }
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Istream& IPstream::read(token& t)
+template<class T>
+inline void Foam::IPstream::readFromBuffer(T& t)
+{
+    const size_t align = sizeof(T);
+    bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
+
+    t = reinterpret_cast<T&>(buf_[bufPosition_]);
+    bufPosition_ += sizeof(T);
+    checkEof();
+}
+
+
+inline void Foam::IPstream::readFromBuffer
+(
+    void* data,
+    size_t count,
+    size_t align
+)
+{
+    if (align > 1)
+    {
+        bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
+    }
+
+    register const char* bufPtr = &buf_[bufPosition_];
+    register char* dataPtr = reinterpret_cast<char*>(data);
+    register size_t i = count;
+    while (i--) *dataPtr++ = *bufPtr++;
+    bufPosition_ += count;
+    checkEof();
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::IPstream::~IPstream()
+{}
+
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::Istream& Foam::IPstream::read(token& t)
 {
     // Return the put back token if it exists
     if (Istream::getBack(t))
@@ -81,22 +130,22 @@ Istream& IPstream::read(token& t)
         // Word
         case token::WORD :
         {
-            word* wPtr = new word;
-            if (read(*wPtr))
+            word* pval = new word;
+            if (read(*pval))
             {
-                if (token::compound::isCompound(*wPtr))
+                if (token::compound::isCompound(*pval))
                 {
-                    t = token::compound::New(*wPtr, *this).ptr();
-                    delete wPtr;
+                    t = token::compound::New(*pval, *this).ptr();
+                    delete pval;
                 }
                 else
                 {
-                    t = wPtr;
+                    t = pval;
                 }
             }
             else
             {
-                delete wPtr;
+                delete pval;
                 t.setBad();
             }
             return *this;
@@ -105,14 +154,14 @@ Istream& IPstream::read(token& t)
         // String
         case token::STRING :
         {
-            string* sPtr = new string;
-            if (read(*sPtr))
+            string* pval = new string;
+            if (read(*pval))
             {
-                t = sPtr;
+                t = pval;
             }
             else
             {
-                delete sPtr;
+                delete pval;
                 t.setBad();
             }
             return *this;
@@ -121,10 +170,10 @@ Istream& IPstream::read(token& t)
         // Label
         case token::LABEL :
         {
-            label l;
-            if (read(l))
+            label val;
+            if (read(val))
             {
-                t = l;
+                t = val;
             }
             else
             {
@@ -136,10 +185,10 @@ Istream& IPstream::read(token& t)
         // floatScalar
         case token::FLOAT_SCALAR :
         {
-            floatScalar s;
-            if (read(s))
+            floatScalar val;
+            if (read(val))
             {
-                t = s;
+                t = val;
             }
             else
             {
@@ -151,10 +200,10 @@ Istream& IPstream::read(token& t)
         // doubleScalar
         case token::DOUBLE_SCALAR :
         {
-            doubleScalar s;
-            if (read(s))
+            doubleScalar val;
+            if (read(val))
             {
-                t = s;
+                t = val;
             }
             else
             {
@@ -181,8 +230,77 @@ Istream& IPstream::read(token& t)
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::Istream& Foam::IPstream::read(char& c)
+{
+    c = buf_[bufPosition_];
+    bufPosition_++;
+    checkEof();
+    return *this;
+}
 
-} // End namespace Foam
+
+Foam::Istream& Foam::IPstream::read(word& str)
+{
+    size_t len;
+    readFromBuffer(len);
+    str = &buf_[bufPosition_];
+    bufPosition_ += len + 1;
+    checkEof();
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(string& str)
+{
+    size_t len;
+    readFromBuffer(len);
+    str = &buf_[bufPosition_];
+    bufPosition_ += len + 1;
+    checkEof();
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(label& val)
+{
+    readFromBuffer(val);
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(floatScalar& val)
+{
+    readFromBuffer(val);
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(doubleScalar& val)
+{
+    readFromBuffer(val);
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::read(char* data, std::streamsize count)
+{
+    if (format() != BINARY)
+    {
+        FatalErrorIn("IPstream::read(char*, std::streamsize)")
+            << "stream format not binary"
+            << Foam::abort(FatalError);
+    }
+
+    readFromBuffer(data, count, 8);
+    return *this;
+}
+
+
+Foam::Istream& Foam::IPstream::rewind()
+{
+    bufPosition_ = 0;
+    return *this;
+}
+
 
 // ************************************************************************* //
