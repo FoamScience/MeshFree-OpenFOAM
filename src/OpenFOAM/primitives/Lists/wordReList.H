@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,42 +22,29 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Typedef
+    Foam::wordReList
+
 Description
+    List of wordRe (word or regular expression)
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOstream.H"
+#ifndef wordReList_H
+#define wordReList_H
 
-#include <sstream>
+#include "wordRe.H"
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-string IOstream::versionNumber::str() const
-{
-    std::ostringstream osBuffer;
-    osBuffer.precision(1);
-    osBuffer.setf(ios_base::fixed, ios_base::floatfield);
-    osBuffer << versionNumber_;
-    return osBuffer.str();
+    typedef List<wordRe> wordReList;
 }
-
-
-// * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
-
-Ostream& operator<<(Ostream& os, const IOstream::versionNumber& vn)
-{
-    os << vn.str().c_str();
-    return os;
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+#endif
 
 // ************************************************************************* //

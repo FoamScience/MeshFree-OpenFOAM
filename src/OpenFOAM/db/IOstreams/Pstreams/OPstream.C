@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -35,14 +35,60 @@ Description
 
 #include <cctype>
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private member functions  * * * * * * * * * * * //
 
-namespace Foam
+template<class T>
+inline void Foam::OPstream::writeToBuffer(const T& t)
 {
+    writeToBuffer(&t, sizeof(T), sizeof(T));
+}
+
+
+inline void Foam::OPstream::writeToBuffer(const char& c)
+{
+    if (size_t(buf_.size()) < bufPosition_ + 1U)
+    {
+        enlargeBuffer(1);
+    }
+
+    buf_[bufPosition_] = c;
+    bufPosition_ ++;
+}
+
+
+inline void Foam::OPstream::writeToBuffer
+(
+    const void* data,
+    size_t count,
+    size_t align
+)
+{
+    label oldPos = bufPosition_;
+
+    if (align > 1)
+    {
+        // Align bufPosition. Pads bufPosition_ - oldPos characters.
+        bufPosition_ = align + ((bufPosition_ - 1) & ~(align - 1));
+    }
+
+    if (size_t(buf_.size()) < bufPosition_ + count)
+    {
+        enlargeBuffer(bufPosition_ - oldPos + count);
+    }
+
+    register char* bufPtr = &buf_[bufPosition_];
+    register const char* dataPtr = reinterpret_cast<const char*>(data);
+    register size_t i = count;
+    while (i--) *bufPtr++ = *dataPtr++;
+
+    bufPosition_ += count;
+}
+
+
 
 // * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
-OPstream::OPstream
+Foam::OPstream::OPstream
 (
     const commsTypes commsType,
     const int toProcNo,
@@ -65,9 +111,9 @@ OPstream::OPstream
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Ostream& OPstream::write(const token&)
+Foam::Ostream& Foam::OPstream::write(const token&)
 {
     notImplemented("Ostream& OPstream::write(const token&)");
     setBad();
@@ -75,7 +121,7 @@ Ostream& OPstream::write(const token&)
 }
 
 
-Ostream& OPstream::write(const char c)
+Foam::Ostream& Foam::OPstream::write(const char c)
 {
     if (!isspace(c))
     {
@@ -86,9 +132,9 @@ Ostream& OPstream::write(const char c)
 }
 
 
-Ostream& OPstream::write(const char* s)
+Foam::Ostream& Foam::OPstream::write(const char* str)
 {
-    word nonWhiteChars(string::validate<word>(s));
+    word nonWhiteChars(string::validate<word>(str));
 
     if (nonWhiteChars.size() == 0)
     {
@@ -105,61 +151,55 @@ Ostream& OPstream::write(const char* s)
 }
 
 
-Ostream& OPstream::write(const word& w)
+Foam::Ostream& Foam::OPstream::write(const word& str)
 {
     write(char(token::WORD));
 
-    size_t ws = w.size();
-    writeToBuffer(ws);
-    writeToBuffer(w.c_str(), ws + 1, 1);
+    size_t len = str.size();
+    writeToBuffer(len);
+    writeToBuffer(str.c_str(), len + 1, 1);
 
     return *this;
 }
 
 
-Ostream& OPstream::write(const string& s)
+Foam::Ostream& Foam::OPstream::write(const string& str)
 {
     write(char(token::STRING));
 
-    size_t ss = s.size();
-    writeToBuffer(ss);
-    writeToBuffer(s.c_str(), ss + 1, 1);
+    size_t len = str.size();
+    writeToBuffer(len);
+    writeToBuffer(str.c_str(), len + 1, 1);
 
     return *this;
 }
 
 
-Ostream& OPstream::write(const label l)
+Foam::Ostream& Foam::OPstream::write(const label val)
 {
     write(char(token::LABEL));
-
-    writeToBuffer(l);
-
+    writeToBuffer(val);
     return *this;
 }
 
 
-Ostream& OPstream::write(const floatScalar s)
+Foam::Ostream& Foam::OPstream::write(const floatScalar val)
 {
     write(char(token::FLOAT_SCALAR));
-
-    writeToBuffer(s);
-
+    writeToBuffer(val);
     return *this;
 }
 
 
-Ostream& OPstream::write(const doubleScalar s)
+Foam::Ostream& Foam::OPstream::write(const doubleScalar val)
 {
     write(char(token::DOUBLE_SCALAR));
-
-    writeToBuffer(s);
-
+    writeToBuffer(val);
     return *this;
 }
 
 
-Ostream& OPstream::write(const char* data, std::streamsize count)
+Foam::Ostream& Foam::OPstream::write(const char* data, std::streamsize count)
 {
     if (format() != BINARY)
     {
@@ -173,9 +213,5 @@ Ostream& OPstream::write(const char* data, std::streamsize count)
     return *this;
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,24 +22,15 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    A simple wrapper around bool so that it can
-    be read as on/off, yes/no or y/n.
-
 \*---------------------------------------------------------------------------*/
 
 #include "Switch.H"
 #include "error.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Switch Switch::lookupOrAddToDict
+Foam::Switch Foam::Switch::lookupOrAddToDict
 (
     const word& name,
     dictionary& dict,
@@ -49,55 +40,56 @@ Switch Switch::lookupOrAddToDict
     return dict.lookupOrAddDefault<Switch>(name, defaultValue);
 }
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// NOTE: possible alternative implementation
+// make a direct bool, handle assignments and use switchTypes instead of word
+// for the word representation ...
+//
+//   //- Possible word representions
+//   enum switchTypes
+//   {
+//       OFF = 0, ON = 1,
+//       FALSE = 2, TRUE = 3,
+//       NO = 4, YES = 5
+//   };
 
-word Switch::wordValue(const bool l) const
+
+// * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * * //
+
+bool Foam::Switch::asBool(const word& val)
 {
-    word w("off");
-
-    if (l)
+    if (val == "on" || val == "true" || val == "yes" || val == "y")
     {
-        w = "on";
+        return true;
     }
-
-    return w;
-}
-
-
-bool Switch::boolValue(const word& w) const
-{
-    bool l = true;
-
-    if (w == "on" || w == "yes" || w == "y" || w == "true")
+    else if (val == "off" || val == "false" || val == "no" || val == "n")
     {
-        l = true;
-    }
-    else if (w == "off" || w == "no" || w == "n" || w == "false")
-    {
-        l = false;
+        return false;
     }
     else
     {
-        FatalErrorIn("Switch::boolValue(const word& w) const")
-            << "unknown switch word " << w
+        FatalErrorIn("Switch::asBool(const word&)")
+            << "unknown switch word " << val
             << abort(FatalError);
     }
 
-    return l;
+    return false;
+}
+
+
+Foam::word Foam::Switch::asWord(const bool val)
+{
+    return word((val ? "on" : "off"), false);
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions * * * * * * * * * * * * * * //
 
-bool Switch::readIfPresent(const word& name, const dictionary& dict)
+bool Foam::Switch::readIfPresent(const word& name, const dictionary& dict)
 {
-    return dict.readIfPresent(name, logicalSwitch_);
+    return dict.readIfPresent(name, bool_);
 }
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

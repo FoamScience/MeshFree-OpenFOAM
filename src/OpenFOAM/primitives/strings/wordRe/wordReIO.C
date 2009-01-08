@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,89 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    IOstream check.
-
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-
-#include "IOstream.H"
+#include "wordRe.H"
+#include "IOstreams.H"
+#include "InfoProxy.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+Foam::wordRe::wordRe(Istream& is)
+:
+    word(),
+    re_(NULL)
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-fileName IOstream::name_("IOstream");
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// check file status for given operation
-bool IOstream::check(const char* operation) const
-{
-    if (bad())
-    {
-        FatalIOErrorIn
-        (
-            "IOstream::check(const char* operation) const", *this
-        )   << "IOstream::check(const char* operation) : "
-            << "error in IOstream " << name() << " for operation "
-            << operation
-            << exit(FatalIOError);
-    }
-
-    return !bad();
+    is >> *this;
 }
 
 
-//- Check IOstream status for given operation
-//  print IOstream state if error has occured and exit
-void IOstream::fatalCheck(const char* operation) const
+Foam::Istream& Foam::operator>>(Istream& is, wordRe& w)
 {
-    if (bad())
+    token t(is);
+
+    if (!t.good())
     {
-        FatalIOErrorIn
-        (
-            "IOstream::fatalCheck(const char* operation) const", *this
-        )   << "IOstream::check(const char* operation) : "
-            << "error in IOstream " << name() << " for operation "
-            << operation
-            << exit(FatalIOError);
+        is.setBad();
+        return is;
     }
+
+    if (t.isWord())
+    {
+        w = t.wordToken();
+    }
+    else if (t.isString())
+    {
+        // Auto-tests for regular expression
+        w = t.stringToken();
+    }
+    else
+    {
+        is.setBad();
+        FatalIOErrorIn("operator>>(Istream&, wordRe&)", is)
+            << "wrong token type - expected word or string found "
+            << t.info()
+            << exit(FatalIOError);
+
+        return is;
+    }
+
+    // Check state of IOstream
+    is.check("Istream& operator>>(Istream&, wordRe&)");
+
+    return is;
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::Ostream& Foam::operator<<(Ostream& os, const wordRe& w)
+{
+    if (w.isPattern())
+    {
+        os.write(static_cast<const string&>(w));
+    }
+    else
+    {
+        os.write(static_cast<const word&>(w));
+    }
+    os.check("Ostream& operator<<(Ostream&, const wordRe&)");
+    return os;
+}
 
-} // End namespace Foam
+
+Foam::Ostream& Foam::wordRe::info(Ostream& os) const
+{
+    if (isPattern())
+    {
+        os  << "wordRe(regex) " << *this;
+    }
+    else
+    {
+        os  << "wordRe(plain) '" << *this << "'";
+    }
+    os.flush();
+
+    return os;
+}
+
 
 // ************************************************************************* //

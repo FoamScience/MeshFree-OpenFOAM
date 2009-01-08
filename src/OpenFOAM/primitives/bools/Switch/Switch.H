@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2008 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -26,8 +26,8 @@ Class
     Foam::Switch
 
 Description
-    A simple wrapper around bool so that it can be read as
-    on/off, yes/no or y/n.
+    A simple wrapper around bool so that it can be read as a word:
+    on/off, true/false, yes/no or y/n.
 
 SourceFiles
     Switch.C
@@ -63,31 +63,33 @@ class Switch
 {
     // Private data
 
-        word wordSwitch_;
-        bool logicalSwitch_;
+        bool bool_;
 
-    // Private member functions
-
-        word wordValue(const bool) const;
-        bool boolValue(const word&) const;
-
+        word word_;
 
 public:
+    // Private member functions
+
+        //- Return a bool representation of a word
+        static bool asBool(const word&);
+
+        //- Return a word representation of a bool value
+        static word asWord(const bool);
 
     // Constructors
 
-        //- Construct from components
+        //- Construct from bool
         Switch(const bool value)
         :
-            wordSwitch_(wordValue(value)),
-            logicalSwitch_(value)
+            bool_(value),
+            word_(asWord(value))
         {}
 
         //- Construct from word
-        Switch(const word& w)
+        Switch(const word& value)
         :
-            wordSwitch_(w),
-            logicalSwitch_(boolValue(w))
+            bool_(asBool(value)),
+            word_(value)
         {}
 
         //- Construct from Istream
@@ -105,22 +107,22 @@ public:
 
     // Member Operators
 
-        Switch& operator=(const Switch& s)
+        Switch& operator=(const Switch& rhs)
         {
-            wordSwitch_ = s.wordSwitch_;
-            logicalSwitch_ = s.logicalSwitch_;
+            bool_ = rhs.bool_;
+            word_ = rhs.word_;
 
             return *this;
         }
 
         operator bool() const
         {
-            return logicalSwitch_;
+            return bool_;
         }
 
         operator const word&() const
         {
-            return wordSwitch_;
+            return word_;
         }
 
 
