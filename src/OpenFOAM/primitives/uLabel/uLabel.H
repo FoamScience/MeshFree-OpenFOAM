@@ -22,71 +22,114 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Primitive
-    bool
+Typedef
+    Foam::uLabel
 
 Description
-    System bool
-
-SourceFiles
-    boolIO.C
+    A uLabel is an unsigned label. See label.H.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef bool_H
-#define bool_H
+#ifndef uLabel_H
+#define uLabel_H
+
+#include <climits>
+#include <cstdlib>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+#if FOAM_LABEL64
+#    define WANTEDURANGE 18000000000000000000
+#else
+#    define WANTEDURANGE 4000000000
+#endif
+
+
+#if UINT_MAX > WANTEDURANGE
+
+// Define uLabel as an unsigned int
+
+#include "uint.H"
 
 namespace Foam
 {
+    typedef unsigned int uLabel;
 
-class Istream;
-class Ostream;
+    static const uLabel uLabelMax = UINT_MAX;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-Istream& operator>>(Istream&, bool&);
-Ostream& operator<<(Ostream&, const bool);
-
-bool readBool(Istream&);
+    inline uLabel readULabel(Istream& is)
+    {
+        return readUint(is);
+    }
 
 } // End namespace Foam
+
+
+#elif ULONG_MAX > WANTEDURANGE
+
+// Define uLabel as an unsigned long
+
+#include "uint.H"
+#include "ulong.H"
+
+namespace Foam
+{
+    typedef unsigned long uLabel;
+
+    static const uLabel uLabelMax = LONG_MAX;
+
+    inline uLabel readULabel(Istream& is)
+    {
+        return readUlong(is);
+    }
+
+} // End namespace Foam
+
+
+#elif ULLONG_MAX > WANTEDURANGE
+
+// Define uLabel as an unsigned long long
+
+#error "Not implemented yet"
+
+#endif
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #include "pTraits.H"
+#include "direction.H"
 
 namespace Foam
 {
 
-// template specialisation for pTraits<bool>
+// template specialisation for pTraits<label>
 template<>
-class pTraits<bool>
+class pTraits<uLabel>
 {
-    bool p_;
+    uLabel p_;
 
 public:
 
     //- Component type
-    typedef bool cmptType;
+    typedef uLabel cmptType;
 
     // Member constants
 
         enum
         {
             dim = 3,         // Dimensionality of space
-            rank = 0,        // Rank od bool is 0
-            nComponents = 1  // Number of components in bool is 1
+            rank = 0,        // Rank of uLabel is 0
+            nComponents = 1  // Number of components in uLabel is 1
         };
 
     // Static data members
 
         static const char* const typeName;
         static const char* componentNames[];
-        static const bool zero;
-        static const bool one;
+        static const uLabel zero;
+        static const uLabel one;
 
     // Constructors
 
@@ -95,11 +138,24 @@ public:
 
     // Member Functions
 
-        operator bool() const
+        operator uLabel() const
         {
             return p_;
         }
 };
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+inline uLabel& setComponent(uLabel& l, const direction)
+{
+    return l;
+}
+
+inline uLabel component(const uLabel l, const direction)
+{
+    return l;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

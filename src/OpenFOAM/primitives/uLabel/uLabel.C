@@ -1,4 +1,4 @@
-/*-------------------------------*- C++ -*-----------------------------------*\
+/*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -22,58 +22,35 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    Define the globals used in the OpenFOAM library.
-    It is important that these are constructed in the appropriate order to
-    avoid the use of unconstructed data in the global namespace.
-
-    This file has the extension .Cver to trigger a Makefile rule that converts
-    'VERSION\_STRING' and 'BUILD\_STRING' into the appropriate strings.
-
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "foamVersion.H"
-
-const char* const Foam::FOAMversion = "VERSION_STRING";
-const char* const Foam::FOAMbuild = "BUILD_STRING";
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Setup an error handler for the global new operator
-
-#include "new.C"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Global IO streams
-
-#include "IOstreams.C"
+#include "uLabel.H"
+#include "error.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "JobInfo.H"
-bool Foam::JobInfo::constructed(false);
+namespace Foam
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Global error definitions (initialised by construction)
 
-#include "messageStream.C"
-#include "error.C"
-#include "IOerror.C"
-#include "token.C"
+const char* const pTraits<uLabel>::typeName = "uLabel";
+const uLabel pTraits<uLabel>::zero = 0;
+const uLabel pTraits<uLabel>::one = 1;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Read the debug and info switches
+const char* pTraits<uLabel>::componentNames[] = { "x" };
 
-#include "debug.C"
+pTraits<uLabel>::pTraits(Istream& is)
+{
+    is >> p_;
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Read and set cell models
-
-#include "globalCellModeller.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Create the jobInfo file in the $FOAM_JOB_DIR/runningJobs directory
 
-#include "JobInfo.C"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //
