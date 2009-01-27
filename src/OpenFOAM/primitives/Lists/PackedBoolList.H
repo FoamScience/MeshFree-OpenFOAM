@@ -22,20 +22,29 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Typedef
+    Foam::PackedBoolList
+
 Description
-    Static initializers for
-        Foam::string::null
-        Foam::word::null
-        Foam::fileName::null.
-    This file is included in global.Cver since these members are required by
-    debug.C.
+    A bit-packed bool list
 
 \*---------------------------------------------------------------------------*/
 
-#include "string.H"
-#include "word.H"
-#include "fileName.H"
+#ifndef PackedBoolList_H
+#define PackedBoolList_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "bool.H"
+#include "PackedList.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    typedef PackedList<1> PackedBoolList;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
