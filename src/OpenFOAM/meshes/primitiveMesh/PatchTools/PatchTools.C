@@ -22,29 +22,16 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::PackedBoolList
-
-Description
-    A bit-packed bool list
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef PackedBoolList_H
-#define PackedBoolList_H
+#include "PatchTools.H"
 
-#include "bool.H"
-#include "PackedList.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    typedef PackedList<> PackedBoolList;
-}
+#include "PatchToolsCheck.C"
+#include "PatchToolsEdgeOwner.C"
+#include "PatchToolsSearch.C"
+#include "PatchToolsSortEdges.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#endif
 
 // ************************************************************************* //
