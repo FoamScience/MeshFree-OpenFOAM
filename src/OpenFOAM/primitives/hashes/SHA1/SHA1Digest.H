@@ -22,37 +22,76 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Class
+    Foam::SHA1Digest
+
+Description
+    The SHA1 message digest.
+
+SeeAlso
+    Foam::SHA1
+
+SourceFiles
+    SHA1Digest.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "globalPointPatch.H"
+#ifndef SHA1Digest_H
+#define SHA1Digest_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::globalPointPatch, 0);
+namespace Foam
+{
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// Forward declaration of classes
+class Ostream;
 
-Foam::globalPointPatch::globalPointPatch
-(
-    const pointBoundaryMesh& bm,
-    const label index
-)
-:
-    pointPatch(bm),
-    coupledPointPatch(bm),
-    index_(index)
-{}
+// Forward declaration of friend functions and operators
+class SHA1;
+class SHA1Digest;
+Ostream& operator<<(Ostream&, const SHA1Digest&);
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                        Class SHA1Digest Declaration
+\*---------------------------------------------------------------------------*/
 
-Foam::globalPointPatch::~globalPointPatch()
-{}
+class SHA1Digest
+{
+public:
+    friend class SHA1;
 
+    //- The length of the digest contents
+    static const unsigned length = 20;
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+    //- Construct a zero digest
+    SHA1Digest();
+
+    //- Reset the digest to zero
+    void clear();
+
+    //- Equality operator
+    bool operator==(const SHA1Digest&) const;
+
+    //- Inequality operator
+    bool operator!=(const SHA1Digest&) const;
+
+    friend Ostream& operator<<(Ostream&, const SHA1Digest&);
+
+private:
+
+    //- The digest contents
+    unsigned char v_[length];
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
