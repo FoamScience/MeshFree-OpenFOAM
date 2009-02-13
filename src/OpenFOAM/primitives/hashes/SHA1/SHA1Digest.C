@@ -24,35 +24,71 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "globalPointPatch.H"
+#include "SHA1Digest.H"
+#include "IOstreams.H"
+
+#include <cstring>
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::globalPointPatch, 0);
+//! @cond fileScope
+const char hexChars[] = "0123456789abcdef";
+//! @endcond fileScope
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::globalPointPatch::globalPointPatch
-(
-    const pointBoundaryMesh& bm,
-    const label index
-)
-:
-    pointPatch(bm),
-    coupledPointPatch(bm),
-    index_(index)
-{}
+Foam::SHA1Digest::SHA1Digest()
+{
+    clear();
+}
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Foam::globalPointPatch::~globalPointPatch()
-{}
+void Foam::SHA1Digest::clear()
+{
+    memset(v_, 0, length);
+}
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+bool Foam::SHA1Digest::operator==(const SHA1Digest& rhs) const
+{
+    for (unsigned i = 0; i < length; ++i)
+    {
+        if (v_[i] != rhs.v_[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bool Foam::SHA1Digest::operator!=(const SHA1Digest& rhs) const
+{
+    return !operator==(rhs);
+}
+
+
+// * * * * * * * * * * * * * * Friend Operators * * * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const SHA1Digest& dig)
+{
+    const unsigned char *v = dig.v_;
+
+    for (unsigned i = 0; i < dig.length; ++i)
+    {
+        os.write(hexChars[((v[i] >> 4) & 0xF)]);
+        os.write(hexChars[(v[i] & 0xF)]);
+    }
+
+    os.check("Ostream& operator<<(Ostream&, const SHA1Digest&)");
+    return os;
+}
+
 
 // ************************************************************************* //
