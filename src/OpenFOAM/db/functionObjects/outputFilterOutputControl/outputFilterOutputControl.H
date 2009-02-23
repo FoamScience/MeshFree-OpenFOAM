@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+/*---------------------------------------------------------------------------* \
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
@@ -23,20 +23,21 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::subCycleTime
+    Foam::outputFilterOutputControl
 
 Description
-    A class for managing sub-cycling times
 
 SourceFiles
-    subCycleTime.C
+    outputFilterOutputControl.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef subCycleTime_H
-#define subCycleTime_H
+#ifndef outputFilterOutputControl_H
+#define outputFilterOutputControl_H
 
+#include "dictionary.H"
 #include "Time.H"
+#include "NamedEnum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,48 +45,70 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class subCycleTime Declaration
+                  Class outputFilterOutputControl Declaration
 \*---------------------------------------------------------------------------*/
 
-class subCycleTime
+class outputFilterOutputControl
 {
+public:
+
+    enum outputControls
+    {
+        ocTimeStep,
+        ocOutputTime
+    };
+
+
+private:
+
     // Private data
 
-        Time& time_;
+        //- Time object
+        const Time& time_;
 
-        label nSubCycles_;
-        label subCycleIndex_;
-        TimeState initialTimeState_;
+        //- String representation of outputControls enums
+        static const NamedEnum<outputControls, 2> outputControlNames_;
+
+        //- Type of output
+        outputControls outputControl_;
+
+        //- The execution interval (in time steps) when using TIMESTEP mode
+        //  a value <= 1 means execute at every time step
+        label outputInterval_;
+
+
+    // Private Member Functions
+
+        //- Disallow default bitwise copy construct and assignment
+        outputFilterOutputControl(const outputFilterOutputControl&);
+        void operator=(const outputFilterOutputControl&);
+
 
 public:
 
     // Constructors
 
-        //- Construct from original time and number of sub-cycles
-        subCycleTime(Time&, const label nSubCycles);
+        //- Construct from Time object and dictionary
+        outputFilterOutputControl(const Time&, const dictionary&);
 
 
     // Destructor
-
-        ~subCycleTime();
-
-
-    // Member functions
-
-        //- Return true if the number of sub-cycles has been reached
-        bool end() const;
-
-        //- End the sub-cycling and reset the time-state
-        void endSubCycle();
+        ~outputFilterOutputControl();
 
 
-    // Member operators
+    // Member Functions
 
-        //- Prefix increment
-        subCycleTime& operator++();
+        //- Read from dictionary
+        void read(const dictionary&);
 
-        //- Postfix increment
-        subCycleTime& operator++(int);
+        //- Return const access to the Time object
+        const Time& time() const
+        {
+            return time_;
+        }
+
+        //- Flag to indicate whether to output
+        bool output() const;
 };
 
 
