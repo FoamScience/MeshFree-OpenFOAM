@@ -22,10 +22,23 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Typedef
+    Foam::vector
+
+Description
+    A scalar version of the templated Vector
+
+SourceFiles
+    vector.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-#include "label.H"
+#ifndef vector_H
+#define vector_H
+
+#include "scalar.H"
+#include "Vector.H"
+#include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,59 +47,36 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const char* const pTraits<label>::typeName = "label";
-const label pTraits<label>::zero = 0;
-const label pTraits<label>::one = 1;
-const label pTraits<label>::max = labelMax;
-const label pTraits<label>::min = labelMin;
+typedef Vector<scalar> vector;
 
-const char* pTraits<label>::componentNames[] = { "x" };
 
-pTraits<label>::pTraits(Istream& is)
+//- Data associated with vector type are contiguous
+template<>
+inline bool contiguous<vector>() {return true;}
+
+
+template<class Type>
+class flux
+:
+    public innerProduct<vector, Type>
+{};
+
+
+template<>
+class flux<scalar>
 {
-    is >> p_;
-}
+public:
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Raise one label to the power of another (overloaded function call)
-label pow(label a, label b)
-{
-    register label ans = 1;
-    for (register label i=0; i<b; i++)
-    {
-        ans *= a;
-    }
-
-    return ans;
-}
-
-
-//- Return factorial(n) : 0 <= n <= 12
-label factorial(label n)
-{
-    static label factTable[13] =
-    {
-        1, 1, 2, 6, 24, 120, 720, 5040, 40320,
-        362880, 3628800, 39916800, 479001600
-    };
-
-#   ifdef FULLDEBUG
-    if (n>12 && n<0)
-    {
-        FatalErrorIn("factorial(label n)")
-            << "n value out of range"
-            << abort(FatalError);
-    }
-#   endif
-
-    return factTable[n];
-}
+    typedef scalar type;
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

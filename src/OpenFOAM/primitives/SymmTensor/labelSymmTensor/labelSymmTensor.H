@@ -23,21 +23,20 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Typedef
-    Foam::labelVector
+    Foam::labelSymmTensor
 
 Description
-    labelVector obtained from generic Vector
+    SymmTensor of labels.
 
 SourceFiles
-    labelVector.C
+    labelSymmTensor.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef labelVector_H
-#define labelVector_H
+#ifndef labelSymmTensor_H
+#define labelSymmTensor_H
 
-#include "label.H"
-#include "Vector.H"
+#include "SymmTensor.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,12 +46,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-typedef Vector<label> labelVector;
+typedef SymmTensor<label> labelSymmTensor;
 
-
-//- Data associated with labelVector type are contiguous
+//- Data associated with labelSymmTensor type are contiguous
 template<>
-inline bool contiguous<labelVector>() {return true;}
+inline bool contiguous<labelSymmTensor>() {return true;}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

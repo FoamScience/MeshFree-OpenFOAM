@@ -22,78 +22,80 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    Reads an ulong from an input stream, for a given version
-    number and File format. If an ascii File is being read,
-    then the line numbers are counted and an erroneous read
-    ised.
-
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
-#include "ulong.H"
-#include "IOstreams.H"
-
-#include <sstream>
+#include "label.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::word Foam::name(const unsigned long val)
+namespace Foam
 {
-    std::ostringstream buf;
-    buf << val;
-    return buf.str();
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+const char* const pTraits<label>::typeName = "label";
+const label pTraits<label>::zero = 0;
+const label pTraits<label>::one = 1;
+const label pTraits<label>::min = labelMin;
+const label pTraits<label>::max = labelMax;
+
+const char* pTraits<label>::componentNames[] = { "x" };
+
+pTraits<label>::pTraits(Istream& is)
+{
+    is >> p_;
 }
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-Foam::Istream& Foam::operator>>(Istream& is, unsigned long& i)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Raise one label to the power of another (overloaded function call)
+label pow(label a, label b)
 {
-    token t(is);
-
-    if (!t.good())
+    register label ans = 1;
+    for (register label i=0; i<b; i++)
     {
-        is.setBad();
-        return is;
+        ans *= a;
     }
 
-    if (t.isLabel())
+#   ifdef FULLDEBUG
+    if (b < 0)
     {
-        i = static_cast<unsigned long>(t.labelToken());
+        FatalErrorIn("pow(label a, label b)")
+            << "negative value for b is not supported"
+            << abort(FatalError);
     }
-    else
+#   endif
+
+    return ans;
+}
+
+
+//- Return factorial(n) : 0 <= n <= 12
+label factorial(label n)
+{
+    static label factTable[13] =
     {
-        is.setBad();
-        FatalIOErrorIn("operator>>(Istream&, unsigned long&)", is)
-            << "wrong token type - expected unsigned long found " << t.info()
-            << exit(FatalIOError);
+        1, 1, 2, 6, 24, 120, 720, 5040, 40320,
+        362880, 3628800, 39916800, 479001600
+    };
 
-        return is;
+#   ifdef FULLDEBUG
+    if (n > 12 && n < 0)
+    {
+        FatalErrorIn("factorial(label n)")
+            << "n value out of range"
+            << abort(FatalError);
     }
+#   endif
 
-    // Check state of Istream
-    is.check("Istream& operator>>(Istream&, unsigned long&)");
-
-    return is;
+    return factTable[n];
 }
 
 
-unsigned long Foam::readUlong(Istream& is)
-{
-    unsigned long val;
-    is >> val;
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    return val;
-}
-
-
-Foam::Ostream& Foam::operator<<(Ostream& os, const unsigned long i)
-{
-    os.write(label(i));
-    os.check("Ostream& operator<<(Ostream&, const unsigned long)");
-    return os;
-}
-
+} // End namespace Foam
 
 // ************************************************************************* //

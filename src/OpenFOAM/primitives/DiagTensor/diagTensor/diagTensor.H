@@ -23,21 +23,20 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Typedef
-    Foam::vector
+    Foam::diagTensor
 
 Description
-    vector obtained from generic Vector
+    A scalar version of the templated DiagTensor
 
 SourceFiles
-    vector.C
+    diagTensor.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef vector_H
-#define vector_H
+#ifndef diagTensor_H
+#define diagTensor_H
 
-#include "scalar.H"
-#include "Vector.H"
+#include "DiagTensor.H"
 #include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,28 +46,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-typedef Vector<scalar> vector;
+typedef DiagTensor<scalar> diagTensor;
 
 
-//- Data associated with vector type are contiguous
+//- Data associated with diagTensor type are contiguous
 template<>
-inline bool contiguous<vector>() {return true;}
-
-
-template<class Type>
-class flux
-:
-    public innerProduct<vector, Type>
-{};
-
-
-template<>
-class flux<scalar>
-{
-public:
-
-    typedef scalar type;
-};
+inline bool contiguous<diagTensor>() {return true;}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
