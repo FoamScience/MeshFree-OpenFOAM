@@ -22,37 +22,40 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::diagTensor
+Primitive
+    ulong
 
 Description
-    3D diagTensor obtained from generic Vector
+    System unsigned long
 
 SourceFiles
-    diagTensor.C
+    ulongIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef diagTensor_H
-#define diagTensor_H
+#ifndef ulong_H
+#define ulong_H
 
-#include "DiagTensor.H"
-#include "contiguous.H"
+#include "word.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+class Istream;
+class Ostream;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-typedef DiagTensor<scalar> diagTensor;
+//- Return a string representation of a ulong
+word name(const unsigned long);
 
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-//- Data associated with diagTensor type are contiguous
-template<>
-inline bool contiguous<diagTensor>() {return true;}
-
+unsigned long readUlong(Istream&);
+Istream& operator>>(Istream&, unsigned long&);
+Ostream& operator<<(Ostream&, const unsigned long);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

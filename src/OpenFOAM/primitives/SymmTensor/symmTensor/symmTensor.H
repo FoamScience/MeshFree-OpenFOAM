@@ -22,40 +22,37 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Primitive
-    uint
+Typedef
+    Foam::symmTensor
 
 Description
-    System uinteger
+    SymmTensor of scalars.
 
 SourceFiles
-    uintIO.C
+    symmTensor.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef uint_H
-#define uint_H
+#ifndef symmTensor_H
+#define symmTensor_H
 
-#include "word.H"
+#include "SymmTensor.H"
+#include "vector.H"
+#include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-class Istream;
-class Ostream;
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//- Return a string representation of an uint
-word name(const unsigned int);
+typedef SymmTensor<scalar> symmTensor;
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+//- Data associated with symmTensor type are contiguous
+template<>
+inline bool contiguous<symmTensor>() {return true;}
 
-unsigned int readUint(Istream&);
-Istream& operator>>(Istream&, unsigned int&);
-Ostream& operator<<(Ostream&, const unsigned int);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

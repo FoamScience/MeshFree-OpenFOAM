@@ -22,22 +22,30 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::labelSymmTensor
+InNamespace
+    Foam
 
 Description
-    SymmTensor or labels.
+    Misc. hashing functions, mostly from Bob Jenkins.
+
+    The Jenkins hashing function(s) is similar in speed to Paul Hsieh's
+    SuperFast hash, but is public domain, supports incremental hashing
+    and has been reported to have better characteristics.
+    It is also what postgresql seems to be using.
+
+SeeAlso
+    http://burtleburtle.net/bob/c/lookup3.c
+    and HasherInt.H for a specialized version
 
 SourceFiles
-    labelSymmTensor.C
+    Hasher.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef labelSymmTensor_H
-#define labelSymmTensor_H
+#ifndef Hasher_H
+#define Hasher_H
 
-#include "SymmTensor.H"
-#include "contiguous.H"
+#include <cstddef>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,12 +54,11 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-typedef SymmTensor<label> labelSymmTensor;
-
-//- Data associated with labelSymmTensor type are contiguous
-template<>
-inline bool contiguous<labelSymmTensor>() {return true;}
-
+    //- Bob Jenkins's 96-bit mixer hashing function (lookup3)
+    //  @param[in] data - a character stream
+    //  @param[in] len  - the number of bytes
+    //  @param[in] seed - the previous hash, or an arbitrary value
+    unsigned Hasher(const void* data, size_t len, unsigned seed = 0);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

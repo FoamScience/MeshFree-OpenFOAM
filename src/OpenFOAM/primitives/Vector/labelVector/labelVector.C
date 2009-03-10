@@ -22,44 +22,23 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Typedef
-    Foam::symmTensor
-
-Description
-    SymmTensor or scalars.
-
-SourceFiles
-    symmTensor.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef symmTensor_H
-#define symmTensor_H
+#include "labelVector.H"
 
-#include "SymmTensor.H"
-#include "vector.H"
-#include "contiguous.H"
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-typedef SymmTensor<scalar> symmTensor;
-
-//- Data associated with symmTensor type are contiguous
 template<>
-inline bool contiguous<symmTensor>() {return true;}
+const char* const Foam::labelVector::typeName = "labelVector";
 
+template<>
+const char* Foam::labelVector::componentNames[] = {"x", "y", "z"};
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<>
+const Foam::labelVector Foam::labelVector::zero(0, 0, 0);
 
-} // End namespace Foam
+template<>
+const Foam::labelVector Foam::labelVector::one(1, 1, 1);
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

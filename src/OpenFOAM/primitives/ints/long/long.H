@@ -22,34 +22,47 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Primitive
+    long
+
+Description
+    A long integer
+
+SourceFiles
+    longIO.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "uLabel.H"
-#include "error.H"
+#ifndef long_H
+#define long_H
+
+#include "word.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+class Istream;
+class Ostream;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const char* const pTraits<uLabel>::typeName = "uLabel";
-const uLabel pTraits<uLabel>::zero = 0;
-const uLabel pTraits<uLabel>::one = 1;
-const uLabel pTraits<uLabel>::max = uLabelMax;
-const uLabel pTraits<uLabel>::min = uLabelMin;
+//- Return a string representation of a long
+word name(long);
 
-const char* pTraits<uLabel>::componentNames[] = { "x" };
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-pTraits<uLabel>::pTraits(Istream& is)
-{
-    is >> p_;
-}
-
+long readLong(Istream&);
+Istream& operator>>(Istream&, long&);
+Ostream& operator<<(Ostream&, const long);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

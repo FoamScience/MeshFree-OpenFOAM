@@ -23,26 +23,74 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    Vector of labels.
+    Reads a ulong from an input stream.
 
 \*---------------------------------------------------------------------------*/
 
-#include "labelVector.H"
+#include "error.H"
+
+#include "ulong.H"
+#include "IOstreams.H"
+
+#include <sstream>
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+Foam::word Foam::name(const unsigned long val)
+{
+    std::ostringstream buf;
+    buf << val;
+    return buf.str();
+}
+
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Istream& Foam::operator>>(Istream& is, unsigned long& val)
+{
+    token t(is);
+
+    if (!t.good())
+    {
+        is.setBad();
+        return is;
+    }
+
+    if (t.isLabel())
+    {
+        val = static_cast<unsigned long>(t.labelToken());
+    }
+    else
+    {
+        is.setBad();
+        FatalIOErrorIn("operator>>(Istream&, unsigned long&)", is)
+            << "wrong token type - expected unsigned long found " << t.info()
+            << exit(FatalIOError);
+
+        return is;
+    }
+
+    // Check state of Istream
+    is.check("Istream& operator>>(Istream&, unsigned long&)");
+
+    return is;
+}
 
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+unsigned long Foam::readUlong(Istream& is)
+{
+    unsigned long val;
+    is >> val;
 
-template<>
-const char* const Foam::labelVector::typeName = "labelVector";
+    return val;
+}
 
-template<>
-const char* Foam::labelVector::componentNames[] = {"x", "y", "z"};
 
-template<>
-const Foam::labelVector Foam::labelVector::zero(0, 0, 0);
-
-template<>
-const Foam::labelVector Foam::labelVector::one(1, 1, 1);
+Foam::Ostream& Foam::operator<<(Ostream& os, const unsigned long val)
+{
+    os.write(label(val));
+    os.check("Ostream& operator<<(Ostream&, const unsigned long)");
+    return os;
+}
 
 
 // ************************************************************************* //
