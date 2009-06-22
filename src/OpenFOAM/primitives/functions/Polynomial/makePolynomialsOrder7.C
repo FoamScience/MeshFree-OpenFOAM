@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,68 +22,30 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    Foam::sigInt
-
-Description
-    Signal handler for INT interupt.
-
-    The standard interupt handler is overridden to ensure that the
-    runningJob file is removed.
-
-See Also
-    Foam::JobInfo
-
-SourceFiles
-    sigInt.C
-
 \*---------------------------------------------------------------------------*/
 
-#include "OSspecific.H"
-#include <signal.h>
+#include "Polynomial.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    makePolynomial(2);
+    makePolynomial(3);
+    makePolynomial(4);
+    makePolynomial(5);
+    makePolynomial(6);
+    makePolynomial(7);
+    makePolynomial(8);
 
-/*---------------------------------------------------------------------------*\
-                           Class sigInt Declaration
-\*---------------------------------------------------------------------------*/
+    // explicitly define max order + 1 to define the integrated form
+    defineTemplateTypeNameAndDebugWithName
+    (
+        Polynomial<9>,
+        "Polynomial<9>",
+        0
+    );
+}
 
-class sigInt
-{
-    // Private data
-
-        //- Saved old signal trapping setting
-        static struct sigaction oldAction_;
-
-
-    // Private Member Functions
-
-        static void sigIntHandler(int);
-
-
-public:
-
-    // Constructors
-
-        sigInt();
-
-
-    // Destructor
-
-        ~sigInt();
-
-
-    // Member functions
-
-        void set(const bool verbose);
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
