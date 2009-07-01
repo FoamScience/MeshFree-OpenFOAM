@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,36 +24,89 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "DynamicField.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * Static Members  * * * * * * * * * * * * * * //
+
+template<class Type>
+const char* const DynamicField<Type>::typeName("DynamicField");
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+template<class Type>
+DynamicField<Type>::DynamicField(Istream& is)
+:
+    Field<Type>(is),
+    capacity_(Field<Type>::size())
+{}
 
-// * * * * * * * * * * * * * * * * Destructors * * * * * * * * * * * * * * * //
+
+template<class Type>
+tmp<DynamicField<Type> > DynamicField<Type>::clone() const
+{
+    return tmp<DynamicField<Type> >(new DynamicField<Type>(*this));
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void DynamicField<Type>::setSize(const label nElem)
+{
+    // allocate more capacity?
+    if (nElem > capacity_)
+    {
+        capacity_ = max(nElem, label(1 + capacity_*2));
+
+        Field<Type>::setSize(capacity_);
+    }
+
+    // adjust addressed size
+    Field<Type>::size(nElem);
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * IOstream Operator * * * * * * * * * * * * * //
+
+template<class Type>
+Ostream& operator<<(Ostream& os, const DynamicField<Type>& f)
+{
+    os << static_cast<const Field<Type>&>(f);
+    return os;
+}
 
 
-// * * * * * * * * * * * * * * * Friend Operators  * * * * * * * * * * * * * //
+template<class Type>
+Ostream& operator<<(Ostream& os, const tmp<DynamicField<Type> >& tf)
+{
+    os << tf();
+    tf.clear();
+    return os;
+}
 
 
-// * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * * //
+template<class Type>
+Istream& operator>>(Istream& is, DynamicField<Type>& lst)
+{
+    is >> static_cast<Field<Type>&>(lst);
+    lst.capacity_ = lst.Field<Type>::size();
 
-
-// * * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * //
+    return is;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 
 // ************************************************************************* //

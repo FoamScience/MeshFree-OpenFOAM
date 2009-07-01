@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,14 +22,31 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "PackedList.H"
+#include "Polynomial.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::PackedListName, 0);
+template<int PolySize>
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const Polynomial<PolySize>& poly
+)
+{
+    os  << poly.name_ << token::SPACE
+        << static_cast
+            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
+
+    // Check state of Ostream
+    os.check
+    (
+        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
+    );
+
+    return os;
+}
+
 
 // ************************************************************************* //
