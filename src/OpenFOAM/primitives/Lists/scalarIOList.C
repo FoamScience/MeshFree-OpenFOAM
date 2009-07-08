@@ -23,24 +23,24 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    A List\<Type\> is a 1D array of objects of type 'Type',
-    where the size of the array is known and used for subscript
-    bounds checking, etc.
+    Declaration of scalar IOList containers
 
 \*---------------------------------------------------------------------------*/
 
-#ifdef List_FOR_ALL
+#include "scalarIOList.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#undef List_FOR_ALL
-#undef List_END_FOR_ALL
-#undef List_ELEM
-#undef List_ACCESS
-#undef List_CONST_ACCESS
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
+namespace Foam
+{
+    defineTemplateTypeNameAndDebugWithName(scalarIOList, "scalarList", 0);
+    defineTemplateTypeNameAndDebugWithName
+    (
+        scalarListIOList,
+        "scalarListList",
+        0
+    );
+}
 
 // ************************************************************************* //

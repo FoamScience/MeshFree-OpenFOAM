@@ -22,35 +22,12 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    simple generic PtrList MACROS for looping
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef PtrListLoop_H
-#define PtrListLoop_H
+#include "PackedList.H"
 
-#include "undefListLoopM.H"
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// Element access looping using [] for vector and parallel machines
-
-#define List_FOR_ALL(f, i)      \
-        forAll(f, i)            \
-        {                       \
-
-#define List_END_FOR_ALL  }
-
-#define List_ELEM(f, fp, i) ((f)[i])
-
-#define List_ACCESS(type, f, fp)
-#define List_CONST_ACCESS(type, f, fp)
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
+defineTypeNameAndDebug(Foam::PackedListName, 0);
 
 // ************************************************************************* //
