@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,30 +22,41 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+InClass
+    Foam::UniformDimensionedField
+
+Description
+
+SourceFiles
+    uniformDimensionedFields.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "Polynomial.H"
+#ifndef UniformDimensionedFields_H
+#define UniformDimensionedFields_H
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+#include "UniformDimensionedField.H"
+#include "fieldTypes.H"
 
-template<int PolySize>
-Foam::Ostream& Foam::operator<<
-(
-    Ostream& os,
-    const Polynomial<PolySize>& poly
-)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
 {
-    os  << static_cast
-            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
 
-    // Check state of Ostream
-    os.check
-    (
-        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
-    );
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    return os;
-}
+typedef UniformDimensionedField<scalar> uniformDimensionedScalarField;
+typedef UniformDimensionedField<vector> uniformDimensionedVectorField;
+typedef UniformDimensionedField<sphericalTensor> uniformDimensionedSphericalTensorField;
+typedef UniformDimensionedField<symmTensor> uniformDimensionedSymmTensorField;
+typedef UniformDimensionedField<tensor> uniformDimensionedTensorField;
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

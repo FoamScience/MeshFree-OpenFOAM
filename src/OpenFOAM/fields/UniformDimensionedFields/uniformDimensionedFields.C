@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,28 +24,23 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Polynomial.H"
+#include "uniformDimensionedFields.H"
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<int PolySize>
-Foam::Ostream& Foam::operator<<
-(
-    Ostream& os,
-    const Polynomial<PolySize>& poly
-)
+namespace Foam
 {
-    os  << static_cast
-            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
 
-    // Check state of Ostream
-    os.check
-    (
-        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
-    );
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-    return os;
-}
+defineTemplateTypeNameAndDebug(uniformDimensionedScalarField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedVectorField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedSphericalTensorField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedSymmTensorField, 0);
+defineTemplateTypeNameAndDebug(uniformDimensionedTensorField, 0);
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// ************************************************************************* //
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
