@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,27 +24,48 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef genericPointPatchFields_H
-#define genericPointPatchFields_H
+#include "CLASSNAME.H"
+#include "IOstreams.H"
 
-#include "genericPointPatchField.H"
-#include "fieldTypes.H"
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
+Foam::CLASSNAME::CLASSNAME(Istream& is)
+:
+    base1(is),
+    base2(is),
+    member1(is),
+    member2(is)
 {
+    // Check state of Istream
+    is.check("Foam::CLASSNAME::CLASSNAME(Foam::Istream&)");
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePointPatchFieldTypedefs(generic);
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::Istream& Foam::operator>>(Istream& is, CLASSNAME&)
+{
+    // Check state of Istream
+    is.check
+    (
+        "Foam::Istream& Foam::operator>>(Foam::Istream&, Foam::CLASSNAME&)"
+    );
 
-} // End namespace Foam
+    return is;
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#endif
+Foam::Ostream& Foam::operator<<(Ostream& os, const CLASSNAME&)
+{
+    // Check state of Ostream
+    os.check
+    (
+        "Foam::Ostream& Foam::operator<<(Foam::Ostream&, "
+        "const Foam::CLASSNAME&)"
+    );
+
+    return os;
+}
+
 
 // ************************************************************************* //
