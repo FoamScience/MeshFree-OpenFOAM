@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,47 +22,64 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::phys
+
+Description
+    Physico-chemical constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
+#ifndef physicoChemicalConstants_H
+#define physicoChemicalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
+namespace constant
 {
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
+namespace physicoChemical
+{
 
-template<>
-const labelSymmTensor labelSymmTensor::zero
-(
-    0, 0, 0,
-       0, 0,
-          0
-);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
+    //- Group name for physico-chemical constants
+    extern const char* group;
+
+    //- Universal gas constant: default SI units: [J/mol/K]
+    extern const dimensionedScalar R;
+
+    //- Faraday constant: default SI units: [C/mol]
+    extern const dimensionedScalar F;
+
+    //- Stefan-Boltzmann constant: default SI units: [W/m2/K4]
+    extern const dimensionedScalar sigma;
+
+    //- Wien displacement law constant: default SI units: [m.K]
+    extern const dimensionedScalar b;
+
+    //- First radiation constant: default SI units: [W/m2]
+    extern const dimensionedScalar c1;
+
+    //- Second radiation constant: default SI units: [m.K]
+    extern const dimensionedScalar c2;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace physicoChemical
+} // end namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
+
+
+

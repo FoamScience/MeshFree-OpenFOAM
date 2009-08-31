@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,47 +22,80 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Fundamental dimensioned constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
+#ifndef fundamentalConstants_H
+#define fundamentalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
+namespace constant
 {
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
-
-template<>
-const labelSymmTensor labelSymmTensor::zero
-(
-    0, 0, 0,
-       0, 0,
-          0
-);
-
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace universal
+{
+    //- Speed of light in a vacuum
+    extern const dimensionedScalar c;
+
+    //- Newtonian constant of gravitation
+    extern const dimensionedScalar G;
+
+    //- Planck constant
+    extern const dimensionedScalar h;
+}
+
+namespace electromagnetic
+{
+    //- Elementary charge
+    extern const dimensionedScalar e;
+}
+
+namespace atomic
+{
+    //- Electron mass
+    extern const dimensionedScalar me;
+
+    //- Proton mass
+    extern const dimensionedScalar mp;
+}
+
+namespace physicoChemical
+{
+    //- Atomic mass unit
+    extern const dimensionedScalar mu;
+
+    //- Avagadro number
+    extern const dimensionedScalar NA;
+
+    //- Boltzmann constant
+    extern const dimensionedScalar k;
+}
+
+namespace standard
+{
+    //- Standard pressure
+    extern const dimensionedScalar Pstd;
+
+    //- Standard temperature
+    extern const dimensionedScalar Tstd;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace constant
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

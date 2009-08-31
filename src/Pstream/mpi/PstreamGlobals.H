@@ -23,32 +23,40 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Namespace
-    Foam::mathematicalConstant
+    Foam::PstreamGlobals
 
 Description
-    Mathematical constants such as pi, e.
+    Global functions and variables for working with parallel streams,
+    but principally for gamma/mpi
+
+SourceFiles
+    PstreamGlobals.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef mathematicalConstants_H
-#define mathematicalConstants_H
+#ifndef PstreamGlobals_H
+#define PstreamGlobals_H
 
-#include "scalar.H"
+#include "mpi.h"
+
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class PstreamGlobals Declaration
+\*---------------------------------------------------------------------------*/
 
-namespace mathematicalConstant
+namespace PstreamGlobals
 {
-    const scalar e(M_E);
-    const scalar pi(M_PI);
-    const scalar twoPi(2*pi);
-    const scalar piByTwo(0.5*pi);
-}
+
+extern DynamicList<MPI_Request> outstandingRequests_;
+
+};
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

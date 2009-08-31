@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,47 +22,60 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::atom
+
+Description
+    Atomic constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
+#ifndef atomicConstants_H
+#define atomicConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
+namespace constant
 {
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
+namespace atomic
+{
 
-template<>
-const labelSymmTensor labelSymmTensor::zero
-(
-    0, 0, 0,
-       0, 0,
-          0
-);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
+    //- Group name for atomic constants
+    extern const char* group;
+
+    //- Fine-structure constant: default SI units: []
+    extern const dimensionedScalar alpha;
+
+    //- Rydberg constant: default SI units: [1/m]
+    extern const dimensionedScalar Rinf;
+
+    //- Bohr radius: default SI units: [m]
+    extern const dimensionedScalar a0;
+
+    //- Classical electron radius: default SI units: [m]
+    extern const dimensionedScalar re;
+
+    //- Hartree energy: default SI units: [J]
+    extern const dimensionedScalar Eh;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace atomic
+} // end namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
+
+

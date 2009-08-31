@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,45 +24,30 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
+#include "universalConstants.H"
+#include "mathConstants.H"
+
+#include "dimensionedConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+const char* Foam::constant::universal::group = "universal";
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
-{
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
-
-template<>
-const labelSymmTensor labelSymmTensor::zero
+const Foam::dimensionedScalar Foam::constant::universal::hr
 (
-    0, 0, 0,
-       0, 0,
-          0
+    dimensionedConstant
+    (
+        group,
+        "hr",
+        dimensionedScalar
+        (
+            "hr",
+            h/(dimensionedScalar("C", dimless, constant::math::twoPi))
+        )
+    )
 );
 
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
+

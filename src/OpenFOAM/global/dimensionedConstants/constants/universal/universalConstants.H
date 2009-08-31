@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,47 +22,45 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::uni
+
+Description
+    Universal constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
+#ifndef universalConstants_H
+#define universalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
+namespace constant
 {
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
-
-template<>
-const labelSymmTensor labelSymmTensor::zero
-(
-    0, 0, 0,
-       0, 0,
-          0
-);
-
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
-
+namespace universal
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+    //- Group name for universal constants
+    extern const char* group;
+
+    //- Reduced Planck constant: default SI units: [J/s]
+    extern const dimensionedScalar hr;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace universal
+} // End namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
