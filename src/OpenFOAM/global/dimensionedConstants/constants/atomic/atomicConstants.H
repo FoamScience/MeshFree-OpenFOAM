@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,60 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::atom
+
+Description
+    Atomic constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedConstants.H"
+#ifndef atomicConstants_H
+#define atomicConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace constant
+{
+namespace atomic
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
+    //- Group name for atomic constants
+    extern const char* group;
 
-dictionary& dimensionedConstants()
-{
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
-}
+    //- Fine-structure constant: default SI units: []
+    extern const dimensionedScalar alpha;
 
+    //- Rydberg constant: default SI units: [1/m]
+    extern const dimensionedScalar Rinf;
 
-dimensionedScalar dimensionedConstant
-(
-    const word& group,
-    const word& varName
-)
-{
-    dictionary& dict = dimensionedConstants();
+    //- Bohr radius: default SI units: [m]
+    extern const dimensionedScalar a0;
 
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
+    //- Classical electron radius: default SI units: [m]
+    extern const dimensionedScalar re;
 
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
-
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
-
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
-
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
-}
+    //- Hartree energy: default SI units: [J]
+    extern const dimensionedScalar Eh;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace atomic
+} // end namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
+
+

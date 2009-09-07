@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,68 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::em
+
+Description
+    Electromagnetic constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedConstants.H"
+#ifndef electromagneticConstants_H
+#define electromagneticConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace constant
+{
+namespace electromagnetic
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
+    //- Group name for electromagnetic constants
+    extern const char* group;
 
-dictionary& dimensionedConstants()
-{
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
-}
+    //- Magnetic constant/permeability of free space: default SI units: [H/m]
+    extern const dimensionedScalar mu0;
 
+    //- Electric constant: default SI units: [F/m]
+    extern const dimensionedScalar epsilon0;
 
-dimensionedScalar dimensionedConstant
-(
-    const word& group,
-    const word& varName
-)
-{
-    dictionary& dict = dimensionedConstants();
+    //- Characteristic impedance of a vacuum: default SI units: [ohm]
+    extern const dimensionedScalar Z0;
 
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
+    //- Coulomb constant: default SI units: [N.m2/C2]
+    extern const dimensionedScalar kappa;
 
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
+    //- Conductance quantum: default SI units: [S]
+    extern const dimensionedScalar G0;
 
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
+    //- Josephson constant: default SI units: [Hz/V]
+    extern const dimensionedScalar KJ;
 
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
+    //- Magnetic flux quantum: default SI units: [Wb]
+    extern const dimensionedScalar phi0;
 
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
-}
+    //- von Klitzing constant: default SI units: [ohm]
+    extern const dimensionedScalar RK;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace electromagnetic
+} // end namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
+

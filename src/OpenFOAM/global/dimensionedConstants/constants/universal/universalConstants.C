@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,62 +24,30 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "universalConstants.H"
+#include "mathConstants.H"
+
 #include "dimensionedConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-dictionary* dimensionedConstantsPtr_(NULL);
-
-dictionary& dimensionedConstants()
-{
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
-}
+const char* Foam::constant::universal::group = "universal";
 
 
-dimensionedScalar dimensionedConstant
+const Foam::dimensionedScalar Foam::constant::universal::hr
 (
-    const word& group,
-    const word& varName
-)
-{
-    dictionary& dict = dimensionedConstants();
+    dimensionedConstant
+    (
+        group,
+        "hr",
+        dimensionedScalar
+        (
+            "hr",
+            h/(dimensionedScalar("C", dimless, constant::math::twoPi))
+        )
+    )
+);
 
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
-
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
-
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
-
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
-
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
-}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
+
