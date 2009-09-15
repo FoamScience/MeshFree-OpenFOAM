@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,47 +22,21 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Collection of dimensioned constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "labelSymmTensor.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
+// Constants supplied in the main controlDict
+#include "fundamentalConstants.C"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// Derived constants
+#include "universalConstants.C"
+#include "electromagneticConstants.C"
+#include "atomicConstants.C"
+#include "physicoChemicalConstants.C"
 
-template<>
-const char* const labelSymmTensor::typeName = "labelSymmTensor";
-
-template<>
-const char* labelSymmTensor::componentNames[] =
-{
-    "xx", "xy", "xz",
-          "yy", "yz",
-                "zz"
-};
-
-template<>
-const labelSymmTensor labelSymmTensor::zero
-(
-    0, 0, 0,
-       0, 0,
-          0
-);
-
-template<>
-const labelSymmTensor labelSymmTensor::one
-(
-    1, 1, 1,
-       1, 1,
-          1
-);
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

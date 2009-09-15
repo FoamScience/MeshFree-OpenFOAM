@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,64 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::phys
+
+Description
+    Physico-chemical constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedConstants.H"
+#ifndef physicoChemicalConstants_H
+#define physicoChemicalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace constant
+{
+namespace physicoChemical
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
+    //- Group name for physico-chemical constants
+    extern const char* group;
 
-dictionary& dimensionedConstants()
-{
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
-}
+    //- Universal gas constant: default SI units: [J/mol/K]
+    extern const dimensionedScalar R;
 
+    //- Faraday constant: default SI units: [C/mol]
+    extern const dimensionedScalar F;
 
-dimensionedScalar dimensionedConstant
-(
-    const word& group,
-    const word& varName
-)
-{
-    dictionary& dict = dimensionedConstants();
+    //- Stefan-Boltzmann constant: default SI units: [W/m2/K4]
+    extern const dimensionedScalar sigma;
 
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
+    //- Wien displacement law constant: default SI units: [m.K]
+    extern const dimensionedScalar b;
 
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
+    //- First radiation constant: default SI units: [W/m2]
+    extern const dimensionedScalar c1;
 
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
-
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
-
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
-}
+    //- Second radiation constant: default SI units: [m.K]
+    extern const dimensionedScalar c2;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace physicoChemical
+} // end namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+
+
+
+

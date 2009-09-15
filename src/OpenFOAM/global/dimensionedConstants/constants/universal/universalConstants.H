@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,45 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::uni
+
+Description
+    Universal constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedConstants.H"
+#ifndef universalConstants_H
+#define universalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace constant
+{
+namespace universal
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
+    //- Group name for universal constants
+    extern const char* group;
 
-dictionary& dimensionedConstants()
-{
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
-}
-
-
-dimensionedScalar dimensionedConstant
-(
-    const word& group,
-    const word& varName
-)
-{
-    dictionary& dict = dimensionedConstants();
-
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
-
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
-
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
-
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
-
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
-}
-
+    //- Reduced Planck constant: default SI units: [J/s]
+    extern const dimensionedScalar hr;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace universal
+} // End namespace constant
 } // End namespace Foam
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
 // ************************************************************************* //
+

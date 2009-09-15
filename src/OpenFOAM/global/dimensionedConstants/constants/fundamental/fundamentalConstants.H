@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,64 +22,80 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Fundamental dimensioned constants
+
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedConstants.H"
+#ifndef fundamentalConstants_H
+#define fundamentalConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace constant
+{
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dictionary* dimensionedConstantsPtr_(NULL);
-
-dictionary& dimensionedConstants()
+namespace universal
 {
-    return debug::switchSet
-    (
-        "DimensionedConstants",
-        dimensionedConstantsPtr_
-    );
+    //- Speed of light in a vacuum
+    extern const dimensionedScalar c;
+
+    //- Newtonian constant of gravitation
+    extern const dimensionedScalar G;
+
+    //- Planck constant
+    extern const dimensionedScalar h;
 }
 
-
-dimensionedScalar dimensionedConstant
-(
-    const word& group,
-    const word& varName
-)
+namespace electromagnetic
 {
-    dictionary& dict = dimensionedConstants();
-
-    // Check that the entries exist.
-    // Note: should make FatalError robust instead!
-
-    if (!dict.found("unitSet"))
-    {
-        std::cerr<< "Cannot find unitSet in dictionary " << dict.name()
-            << std::endl;
-    }
-
-    const word unitSetCoeffs(word(dict.lookup("unitSet")) + "Coeffs");
-
-    if (!dict.found(unitSetCoeffs))
-    {
-        std::cerr<< "Cannot find " << unitSetCoeffs << " in dictionary "
-            << dict.name() << std::endl;
-    }
-
-    dictionary& unitDict = dict.subDict(unitSetCoeffs);
-
-    dictionary& groupDict = unitDict.subDict(group);
-
-    return dimensionedScalar(groupDict.lookup(varName));
+    //- Elementary charge
+    extern const dimensionedScalar e;
 }
 
+namespace atomic
+{
+    //- Electron mass
+    extern const dimensionedScalar me;
+
+    //- Proton mass
+    extern const dimensionedScalar mp;
+}
+
+namespace physicoChemical
+{
+    //- Atomic mass unit
+    extern const dimensionedScalar mu;
+
+    //- Avagadro number
+    extern const dimensionedScalar NA;
+
+    //- Boltzmann constant
+    extern const dimensionedScalar k;
+}
+
+namespace standard
+{
+    //- Standard pressure
+    extern const dimensionedScalar Pstd;
+
+    //- Standard temperature
+    extern const dimensionedScalar Tstd;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace constant
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
