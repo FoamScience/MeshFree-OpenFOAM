@@ -23,20 +23,25 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::TimeState
+    Foam::wordReListMatcher
 
 Description
-    The time value with time-stepping information, user-defined remapping, etc.
+    A wrapper for matching a List of wordRe.
+
+Note
+    The constructor should remain non-explicit. This allows automatic
+    conversion from UList\<wordRe\> to wordReListMatcher in search
+    functions.
 
 SourceFiles
-    TimeState.C
+    wordReListMatcherI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TimeState_H
-#define TimeState_H
+#ifndef wordReListMatcher_H
+#define wordReListMatcher_H
 
-#include "dimensionedScalar.H"
+#include "wordReList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,77 +49,42 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class TimeState Declaration
+                      Class wordReListMatcher Declaration
 \*---------------------------------------------------------------------------*/
 
-
-class TimeState
-:
-    public dimensionedScalar
+class wordReListMatcher
 {
+    // Private data
 
-protected:
-
-        label timeIndex_;
-        scalar deltaT_;
-        scalar deltaTSave_;
-        scalar deltaT0_;
-        bool deltaTchanged_;
-
-        label outputTimeIndex_;
-        bool  outputTime_;
-
+        //- Reference to underlying list
+        const UList<wordRe>& reList_;
 
 public:
 
     // Constructors
 
-        TimeState();
+        //- Construct from a List of wordRe
+        inline wordReListMatcher(const UList<wordRe>&);
 
 
-    //- Destructor
-    virtual ~TimeState();
-
-
-    // Member functions
+    // Member Functions
 
         // Access
 
-            //- Convert the user-time (e.g. CA deg) to real-time (s).
-            virtual scalar userTimeToTime(const scalar theta) const;
+            inline label size() const;
+            inline bool  empty() const;
 
-            //- Convert the real-time (s) into user-time (e.g. CA deg)
-            virtual scalar timeToUserTime(const scalar t) const;
-
-            //- Return current time value
-            scalar timeOutputValue() const;
-
-            //- Return current time index
-            label timeIndex() const;
-
-            //- Return time step value
-            inline scalar deltaTValue() const
-            {
-                return deltaT_;
-            }
-
-            //- Return old time step value
-            inline scalar deltaT0Value() const
-            {
-                return deltaT0_;
-            }
-
-            //- Return time step
-            dimensionedScalar deltaT() const;
-
-            //- Return old time step
-            dimensionedScalar deltaT0() const;
+            //- Return underlying list of wordRe
+            inline const UList<wordRe>& operator()() const;
 
 
-        // Check
+    // Searching
 
-            //- Return true if this is an output time
-            bool outputTime() const;
+            //- Return true if string matches any of the regular expressions
+            //  Smart match as regular expression or as a string.
+            //  Optionally specify a literal match only.
+            inline bool match(const string&, bool literalMatch=false) const;
+
 };
 
 
@@ -123,6 +93,8 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "wordReListMatcherI.H"
 
 #endif
 

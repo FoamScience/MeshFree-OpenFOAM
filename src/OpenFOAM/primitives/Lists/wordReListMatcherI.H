@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,30 +24,56 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "universalConstants.H"
-#include "mathConstants.H"
 
-#include "dimensionedConstants.H"
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-const char* Foam::constant::universal::group = "universal";
-
-
-const Foam::dimensionedScalar Foam::constant::universal::hr
+inline Foam::wordReListMatcher::wordReListMatcher
 (
-    dimensionedConstant
-    (
-        group,
-        "hr",
-        dimensionedScalar
-        (
-            "hr",
-            h/(dimensionedScalar("C", dimless, constant::math::twoPi))
-        )
-    )
-);
+    const UList<wordRe>& lst
+)
+:
+    reList_(lst)
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+inline Foam::label Foam::wordReListMatcher::size() const
+{
+    return reList_.size();
+}
+
+
+inline bool Foam::wordReListMatcher::empty() const
+{
+    return reList_.empty();
+}
+
+
+inline const Foam::UList<Foam::wordRe>&
+Foam::wordReListMatcher::operator()() const
+{
+    return reList_;
+}
+
+
+inline bool Foam::wordReListMatcher::match
+(
+    const string& str,
+    bool literalMatch
+) const
+{
+    const label nElem = reList_.size();
+    for (label elemI = 0; elemI < nElem; ++elemI)
+    {
+        if (reList_[elemI].match(str, literalMatch))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
 // ************************************************************************* //
-
