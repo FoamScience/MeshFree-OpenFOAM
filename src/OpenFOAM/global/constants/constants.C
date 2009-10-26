@@ -22,38 +22,18 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Namespace
-    Foam::constant
-
-Description
-    Collection of constants
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef constants_H
-#define constants_H
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// Dimensionless coefficents
-
-// Mathematical constants
-#include "mathConstants.H"
-
-
-// Dimensioned constants
-
-// Fundamental constants
-#include "fundamentalConstants.H"
+// Constants supplied in the main controlDict
+#include "fundamentalConstants.C"
 
 // Derived constants
-#include "universalConstants.H"
-#include "electromagneticConstants.H"
-#include "atomicConstants.H"
-#include "physicoChemicalConstants.H"
+#include "universalConstants.C"
+#include "electromagneticConstants.C"
+#include "atomicConstants.C"
+#include "physicoChemicalConstants.C"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

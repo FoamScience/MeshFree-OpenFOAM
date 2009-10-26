@@ -22,32 +22,48 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::mathematical
+
+Description
+    mathematical constants.
+
 \*---------------------------------------------------------------------------*/
 
-#include "universalConstants.H"
-#include "mathConstants.H"
+#ifndef mathematicalConstants_H
+#define mathematicalConstants_H
 
-#include "dimensionedConstants.H"
+#include "scalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const char* Foam::constant::universal::group = "universal";
+namespace Foam
+{
+namespace constant
+{
+namespace mathematical
+{
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-const Foam::dimensionedScalar Foam::constant::universal::hr
-(
-    dimensionedConstant
-    (
-        group,
-        "hr",
-        dimensionedScalar
-        (
-            "hr",
-            h/(dimensionedScalar("C", dimless, constant::math::twoPi))
-        )
-    )
-);
+    static word group = "mathematical";
 
+    const scalar e(M_E);
+    const scalar pi(M_PI);
+    const scalar twoPi(2*pi);
+    const scalar piByTwo(0.5*pi);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace mathematical
+} // End namespace constant
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
-

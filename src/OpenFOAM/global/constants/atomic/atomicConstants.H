@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,76 +22,60 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::constant::atomic
+
+Description
+    Atomic constants
+
 \*---------------------------------------------------------------------------*/
+
+#ifndef atomicConstants_H
+#define atomicConstants_H
+
+#include "dimensionedScalar.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<class Matcher, class StringType>
-Foam::labelList Foam::findMatchingStrings
-(
-    const Matcher& matcher,
-    const UList<StringType>& lst,
-    const bool invert
-)
+namespace Foam
 {
-    labelList indices(lst.size());
-
-    label nElem = 0;
-    forAll(lst, elemI)
-    {
-        if (matcher.match(lst[elemI]) ? !invert : invert)
-        {
-            indices[nElem++] = elemI;
-        }
-    }
-    indices.setSize(nElem);
-
-    return indices;
-}
-
-
-template<class Matcher, class StringListType>
-StringListType Foam::subsetMatchingStrings
-(
-    const Matcher& matcher,
-    const StringListType& lst,
-    const bool invert
-)
+namespace constant
 {
-    StringListType newLst(lst.size());
-
-    label nElem = 0;
-    forAll(lst, elemI)
-    {
-        if (matcher.match(lst[elemI]) ? !invert : invert)
-        {
-            newLst[nElem++] = lst[elemI];
-        }
-    }
-    newLst.setSize(nElem);
-
-    return newLst;
-}
-
-
-template<class Matcher, class StringListType>
-void Foam::inplaceSubsetMatchingStrings
-(
-    const Matcher& matcher,
-    StringListType& lst,
-    const bool invert
-)
+namespace atomic
 {
-    label nElem = 0;
-    forAll(lst, elemI)
-    {
-        if (matcher.match(lst[elemI]) ? !invert : invert)
-        {
-            lst[nElem++] = lst[elemI];
-        }
-    }
-    lst.setSize(nElem);
-}
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    //- Group name for atomic constants
+    extern const char* group;
+
+    //- Fine-structure constant: default SI units: []
+    extern const dimensionedScalar alpha;
+
+    //- Rydberg constant: default SI units: [1/m]
+    extern const dimensionedScalar Rinf;
+
+    //- Bohr radius: default SI units: [m]
+    extern const dimensionedScalar a0;
+
+    //- Classical electron radius: default SI units: [m]
+    extern const dimensionedScalar re;
+
+    //- Hartree energy: default SI units: [J]
+    extern const dimensionedScalar Eh;
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace atomic
+} // End namespace constant
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
+
+
+

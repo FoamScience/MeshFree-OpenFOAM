@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,60 +22,58 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Namespace
-    Foam::constant::atom
-
-Description
-    Atomic constants
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef atomicConstants_H
-#define atomicConstants_H
 
-#include "dimensionedScalar.H"
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+inline Foam::wordReListMatcher::wordReListMatcher
+(
+    const UList<wordRe>& lst
+)
+:
+    reList_(lst)
+{}
 
-namespace Foam
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+inline Foam::label Foam::wordReListMatcher::size() const
 {
-namespace constant
+    return reList_.size();
+}
+
+
+inline bool Foam::wordReListMatcher::empty() const
 {
-namespace atomic
+    return reList_.empty();
+}
+
+
+inline const Foam::UList<Foam::wordRe>&
+Foam::wordReListMatcher::operator()() const
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-    //- Group name for atomic constants
-    extern const char* group;
-
-    //- Fine-structure constant: default SI units: []
-    extern const dimensionedScalar alpha;
-
-    //- Rydberg constant: default SI units: [1/m]
-    extern const dimensionedScalar Rinf;
-
-    //- Bohr radius: default SI units: [m]
-    extern const dimensionedScalar a0;
-
-    //- Classical electron radius: default SI units: [m]
-    extern const dimensionedScalar re;
-
-    //- Hartree energy: default SI units: [J]
-    extern const dimensionedScalar Eh;
+    return reList_;
+}
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+inline bool Foam::wordReListMatcher::match
+(
+    const string& str,
+    bool literalMatch
+) const
+{
+    const label nElem = reList_.size();
+    for (label elemI = 0; elemI < nElem; ++elemI)
+    {
+        if (reList_[elemI].match(str, literalMatch))
+        {
+            return true;
+        }
+    }
 
-} // End namespace atomic
-} // end namespace constant
-} // End namespace Foam
+    return false;
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //
-
-
-
