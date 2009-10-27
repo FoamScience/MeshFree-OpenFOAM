@@ -22,44 +22,76 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-InNamespace
-    Foam
-
-Description
-    Unit conversion functions
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef unitConversion_H
-#define unitConversion_H
-
-#include "mathematicalConstants.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::x0() const
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-//- Conversion from degrees to radians
-inline scalar degToRad(const scalar deg)
-{
-    return (deg * constant::mathematical::pi/180.0);
+    return x0_;
 }
 
-//- Conversion from radians to degrees
-inline scalar radToDeg(const scalar rad)
+
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::dx() const
 {
-    return (rad * 180.0/constant::mathematical::pi);
+    return dx_;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+template <class Type>
+const Foam::Switch& Foam::uniformInterpolationTable<Type>::log10() const
+{
+    return log10_;
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#endif
+template <class Type>
+const Foam::Switch& Foam::uniformInterpolationTable<Type>::bound() const
+{
+    return bound_;
+}
+
+
+template <class Type>
+Foam::scalar& Foam::uniformInterpolationTable<Type>::x0()
+{
+    return x0_;
+}
+
+
+template <class Type>
+Foam::scalar& Foam::uniformInterpolationTable<Type>::dx()
+{
+    return dx_;
+}
+
+
+template <class Type>
+Foam::Switch& Foam::uniformInterpolationTable<Type>::log10()
+{
+    return log10_;
+}
+
+
+template <class Type>
+Foam::Switch& Foam::uniformInterpolationTable<Type>::bound()
+{
+    return bound_;
+}
+
+
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::xMin() const
+{
+    return x0_;
+}
+
+
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::xMax() const
+{
+    return x0_ + dx_*(size() - 1);
+}
+
 
 // ************************************************************************* //
