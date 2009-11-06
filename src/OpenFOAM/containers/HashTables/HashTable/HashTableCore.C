@@ -28,6 +28,40 @@ License
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::HashTableName, 0);
+defineTypeNameAndDebug(Foam::HashTableCore, 0);
+
+const Foam::label Foam::HashTableCore::maxTableSize
+(
+    Foam::HashTableCore::canonicalSize
+    (
+        Foam::labelMax/2
+    )
+);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::label Foam::HashTableCore::canonicalSize(const label size)
+{
+    if (size < 1)
+    {
+        return 0;
+    }
+
+    // enforce power of two
+    unsigned int goodSize = size;
+
+    if (goodSize & (goodSize - 1))
+    {
+        // brute-force is fast enough
+        goodSize = 1;
+        while (goodSize < unsigned(size))
+        {
+            goodSize <<= 1;
+        }
+    }
+
+    return goodSize;
+}
+
 
 // ************************************************************************* //
