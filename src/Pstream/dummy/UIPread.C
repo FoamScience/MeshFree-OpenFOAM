@@ -22,12 +22,72 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Read from UIPstream
+
 \*---------------------------------------------------------------------------*/
 
-#include "StaticHashTable.H"
+#include "UIPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::StaticHashTableName, 0);
+Foam::UIPstream::UIPstream
+(
+    const commsTypes commsType,
+    const int fromProcNo,
+    DynamicList<char>& externalBuf,
+    const int tag,
+    streamFormat format,
+    versionNumber version
+)
+:
+    UPstream(commsType),
+    Istream(format, version),
+    fromProcNo_(fromProcNo),
+    externalBuf_(externalBuf),
+    externalBufPosition_(0),
+    tag_(tag),
+    messageSize_(0)
+{
+    notImplemented
+    (
+        "UIPstream::UIPstream"
+        "("
+            "const commsTypes,"
+            "const int fromProcNo,"
+            "DynamicList<char>&,"
+            "const int tag,"
+            "streamFormat, versionNumber"
+        ")"
+    );
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::label Foam::UIPstream::read
+(
+    const commsTypes commsType,
+    const int fromProcNo,
+    char* buf,
+    const std::streamsize bufSize,
+    const int tag
+)
+{
+    notImplemented
+    (
+        "UIPstream::read"
+        "("
+            "const commsTypes,"
+            "const int fromProcNo,"
+            "char* buf,"
+            "const label bufSize,"
+            "const int tag"
+        ")"
+     );
+
+     return 0;
+}
+
 
 // ************************************************************************* //

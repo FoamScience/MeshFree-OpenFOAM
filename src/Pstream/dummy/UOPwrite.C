@@ -22,54 +22,36 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Write primitive and binary block from OPstream
+
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "PstreamReduceOps.H"
+#include "UOPstream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void Foam::Pstream::addValidParOptions(HashTable<string>& validParOptions)
-{}
-
-
-bool Foam::Pstream::init(int& argc, char**& argv)
+bool Foam::UOPstream::write
+(
+    const commsTypes commsType,
+    const int toProcNo,
+    const char* buf,
+    const std::streamsize bufSize,
+    const int tag
+)
 {
-    FatalErrorIn("Pstream::init(int& argc, char**& argv)")
-        << "Trying to use the dummy Pstream library." << nl
-        << "This dummy library cannot be used in parallel mode"
-        << Foam::exit(FatalError);
+    notImplemented
+    (
+        "UOPstream::write"
+        "("
+            "const commsTypes commsType,"
+            "const int fromProcNo,"
+            "char* buf,"
+            "const label bufSize,"
+            "const int tag"
+        ")"
+    );
 
-    return false;
-}
-
-
-void Foam::Pstream::exit(int errnum)
-{
-    notImplemented("Pstream::exit(int errnum)");
-}
-
-
-void Foam::Pstream::abort()
-{
-    notImplemented("Pstream::abort()");
-}
-
-
-void Foam::reduce(scalar&, const sumOp<scalar>&)
-{}
-
-
-
-void Foam::Pstream::waitRequests()
-{}
-
-
-bool Foam::Pstream::finishedRequest(const label i)
-{
-    notImplemented("Pstream::finishedRequest()");
     return false;
 }
 

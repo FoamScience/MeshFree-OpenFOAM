@@ -22,27 +22,45 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Description
-    Prints out a description of the streams
-
 \*---------------------------------------------------------------------------*/
 
-#include "IPstream.H"
-#include "OPstream.H"
+#include "HashTable.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-void Foam::IPstream::print(Ostream& os) const
+defineTypeNameAndDebug(Foam::HashTableCore, 0);
+
+const Foam::label Foam::HashTableCore::maxTableSize
+(
+    Foam::HashTableCore::canonicalSize
+    (
+        Foam::labelMax/2
+    )
+);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::label Foam::HashTableCore::canonicalSize(const label size)
 {
-    os  << "Reading from processor " << fromProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
-}
+    if (size < 1)
+    {
+        return 0;
+    }
 
+    // enforce power of two
+    unsigned int goodSize = size;
 
-void Foam::OPstream::print(Ostream& os) const
-{
-    os  << "Writing from processor " << toProcNo_
-        << " to processor " << myProcNo() << Foam::endl;
+    if (goodSize & (goodSize - 1))
+    {
+        // brute-force is fast enough
+        goodSize = 1;
+        while (goodSize < unsigned(size))
+        {
+            goodSize <<= 1;
+        }
+    }
+
+    return goodSize;
 }
 
 
