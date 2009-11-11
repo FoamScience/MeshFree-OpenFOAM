@@ -22,12 +22,38 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Write primitive and binary block from OPstream
+
 \*---------------------------------------------------------------------------*/
 
-#include "StaticHashTable.H"
+#include "UOPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::StaticHashTableName, 0);
+bool Foam::UOPstream::write
+(
+    const commsTypes commsType,
+    const int toProcNo,
+    const char* buf,
+    const std::streamsize bufSize,
+    const int tag
+)
+{
+    notImplemented
+    (
+        "UOPstream::write"
+        "("
+            "const commsTypes commsType,"
+            "const int fromProcNo,"
+            "char* buf,"
+            "const label bufSize,"
+            "const int tag"
+        ")"
+    );
+
+    return false;
+}
+
 
 // ************************************************************************* //

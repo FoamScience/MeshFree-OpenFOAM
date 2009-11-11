@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,10 +24,74 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "HashTable.H"
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::x0() const
+{
+    return x0_;
+}
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::HashTableName, 0);
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::dx() const
+{
+    return dx_;
+}
+
+
+template <class Type>
+const Foam::Switch& Foam::uniformInterpolationTable<Type>::log10() const
+{
+    return log10_;
+}
+
+
+template <class Type>
+const Foam::Switch& Foam::uniformInterpolationTable<Type>::bound() const
+{
+    return bound_;
+}
+
+
+template <class Type>
+Foam::scalar& Foam::uniformInterpolationTable<Type>::x0()
+{
+    return x0_;
+}
+
+
+template <class Type>
+Foam::scalar& Foam::uniformInterpolationTable<Type>::dx()
+{
+    return dx_;
+}
+
+
+template <class Type>
+Foam::Switch& Foam::uniformInterpolationTable<Type>::log10()
+{
+    return log10_;
+}
+
+
+template <class Type>
+Foam::Switch& Foam::uniformInterpolationTable<Type>::bound()
+{
+    return bound_;
+}
+
+
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::xMin() const
+{
+    return x0_;
+}
+
+
+template <class Type>
+Foam::scalar Foam::uniformInterpolationTable<Type>::xMax() const
+{
+    return x0_ + dx_*(size() - 1);
+}
+
 
 // ************************************************************************* //
