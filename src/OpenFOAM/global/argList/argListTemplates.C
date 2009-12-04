@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,64 +24,26 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOOutputFilter.H"
-#include "Time.H"
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::IOOutputFilter
-(
-    const word& outputFilterName,
-    const IOobject& ioDict,
-    const bool readFromFiles
-)
-:
-    IOdictionary(ioDict),
-    OutputFilter(outputFilterName, ioDict.db(), *this, readFromFiles)
-{}
-
-
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::IOOutputFilter
-(
-    const word& outputFilterName,
-    const objectRegistry& obr,
-    const fileName& dictName,
-    const IOobject::readOption rOpt,
-    const bool readFromFiles
-)
-:
-    IOdictionary
-    (
-        IOobject
-        (
-            dictName,
-            obr.time().system(),
-            obr,
-            rOpt,
-            IOobject::NO_WRITE
-        )
-    ),
-    OutputFilter(outputFilterName, obr, *this, readFromFiles)
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::~IOOutputFilter()
-{}
-
+#include "argList.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class OutputFilter>
-bool Foam::IOOutputFilter<OutputFilter>::read()
+template<class T>
+T Foam::argList::optionRead(const word& opt) const
 {
-    if (regIOobject::read())
+    T val;
+
+    optionLookup(opt)() >> val;
+    return val;
+}
+
+
+template<class T>
+bool Foam::argList::optionReadIfPresent(const word& opt, T& val) const
+{
+    if (optionFound(opt))
     {
-        OutputFilter::read(*this);
+        val = optionRead<T>(opt);
         return true;
     }
     else
@@ -91,10 +53,10 @@ bool Foam::IOOutputFilter<OutputFilter>::read()
 }
 
 
-template<class OutputFilter>
-void Foam::IOOutputFilter<OutputFilter>::write()
+template<class T>
+Foam::List<T> Foam::argList::optionReadList(const word& opt) const
 {
-    OutputFilter::write();
+    return readList<T>(optionLookup(opt)());
 }
 
 
