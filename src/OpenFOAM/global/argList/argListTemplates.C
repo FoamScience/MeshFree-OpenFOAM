@@ -22,27 +22,41 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Application
-    CLASSNAME
-
-Description
-
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
+#include "argList.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-// Main program:
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-int main(int argc, char *argv[])
+template<class T>
+T Foam::argList::optionRead(const word& opt) const
 {
-    #include "setRootCase.H"
-    #include "createTime.H"
+    T val;
 
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    optionLookup(opt)() >> val;
+    return val;
+}
 
-    Info<< "\nEnd\n" << endl;
-    return 0;
+
+template<class T>
+bool Foam::argList::optionReadIfPresent(const word& opt, T& val) const
+{
+    if (optionFound(opt))
+    {
+        val = optionRead<T>(opt);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+template<class T>
+Foam::List<T> Foam::argList::optionReadList(const word& opt) const
+{
+    return readList<T>(optionLookup(opt)());
 }
 
 
