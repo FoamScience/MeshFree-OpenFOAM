@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2009-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,23 +22,45 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Primitive
+    wchar_t
+
+Description
+    A wide-character and a pointer to a wide-character string.
+
+SourceFiles
+    wcharIO.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "primitiveEntry.H"
-#include "dictionary.H"
+#ifndef wchar_H
+#define wchar_H
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+#include <cwchar>
 
-template<class T>
-Foam::primitiveEntry::primitiveEntry(const keyType& key, const T& t)
-:
-    entry(key),
-    ITstream(key, tokenList(10))
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
 {
-    OStringStream os;
-    os  << t << token::END_STATEMENT;
-    readEntry(dictionary::null, IStringStream(os.str())());
-}
 
+class Istream;
+class Ostream;
+
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+//- Output via a normal char
+Ostream& operator<<(Ostream&, const wchar_t);
+
+//- Output string via normal char
+Ostream& operator<<(Ostream&, const wchar_t*);
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
