@@ -22,41 +22,40 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Description
+    Reads a char from an input stream, for a given version
+    number and File format. If an ascii File is being read, then the line
+    numbers are counted and an erroneous read is reported.
+
 \*---------------------------------------------------------------------------*/
 
-#include "argList.H"
+#include "error.H"
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+#include "wchar.H"
+#include "IOstreams.H"
 
-template<class T>
-T Foam::argList::optionRead(const word& opt) const
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const wchar_t wc)
 {
-    T val;
+    os.write(char(wc));
 
-    optionLookup(opt)() >> val;
-    return val;
+    os.check("Ostream& operator<<(Ostream&, const wchar_t)");
+    return os;
 }
 
 
-template<class T>
-bool Foam::argList::optionReadIfPresent(const word& opt, T& val) const
+Foam::Ostream& Foam::operator<<(Ostream& os, const wchar_t* ws)
 {
-    if (optionFound(opt))
+    if (ws)
     {
-        val = optionRead<T>(opt);
-        return true;
+        for (const wchar_t* p = ws; *p; ++p)
+        {
+            os.write(char(*p));
+        }
     }
-    else
-    {
-        return false;
-    }
-}
-
-
-template<class T>
-Foam::List<T> Foam::argList::optionReadList(const word& opt) const
-{
-    return readList<T>(optionLookup(opt)());
+    os.check("Ostream& operator<<(Ostream&, const wchar_t*)");
+    return os;
 }
 
 
