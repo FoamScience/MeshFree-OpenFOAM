@@ -23,26 +23,22 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::processorPolyPatch
+    Foam::processorCyclicPolyPatch
 
 Description
     Neighbour processor patch.
 
-    Note: morph patch face ordering tries to do a geometric ordering.
-    (assumes faces coincident) Hence will have problems when cyclics
-    are present. 
+    Note: morph patch face ordering is geometric.
 
 SourceFiles
-    processorPolyPatch.C
+    processorCyclicPolyPatch.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef processorPolyPatch_H
-#define processorPolyPatch_H
+#ifndef processorCyclicPolyPatch_H
+#define processorCyclicPolyPatch_H
 
-#include "coupledPolyPatch.H"
-#include "polyBoundaryMesh.H"
-#include "faceListFwd.H"
+#include "processorPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,34 +46,24 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class processorPolyPatch Declaration
+                           Class processorCyclicPolyPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class processorPolyPatch
+class processorCyclicPolyPatch
 :
-    public coupledPolyPatch
+    public processorPolyPatch
 {
     // Private data
 
-        int myProcNo_;
-        int neighbProcNo_;
+        //- Name of originating patch
+        const word referPatchName_;
 
-        //- Processor-neighbbour patch face centres
-        vectorField neighbFaceCentres_;
+        //- Index of originating patch
+        mutable label referPatchID_;
 
-        //- Processor-neighbbour patch face areas
-        vectorField neighbFaceAreas_;
 
-        //- Processor-neighbbour patch neighbour cell centres
-        vectorField neighbFaceCellCentres_;
+    // Private member functions
 
-        //- Corresponding neighbouring local point label for every local point
-        //  (so localPoints()[i] == neighb.localPoints()[neighbPoints_[i]])
-        mutable autoPtr<labelList> neighbPointsPtr_;
-
-        //- Corresponding neighbouring local edge label for every local edge
-        //  (so edges()[i] == neighb.edges()[neighbEdges_[i]])
-        mutable autoPtr<labelList> neighbEdgesPtr_;
 
 protected:
 
@@ -96,7 +82,7 @@ protected:
 //            UList<point>&
 //        )
 //        {
-//            notImplemented("processorPolyPatch::initGeometry(..)");
+//            notImplemented("processorCyclicPolyPatch::initGeometry(..)");
 //        }
 
         //- Calculate the patch geometry
@@ -115,7 +101,7 @@ protected:
             const UList<point>& nbrCc
         )
         {
-            notImplemented("processorPolyPatch::calcGeometry(..)");
+            notImplemented("processorCyclicPolyPatch::calcGeometry(..)");
         }
 
         //- Initialise the patches for moving points
@@ -134,13 +120,13 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("processor");
+    TypeName("processorCyclic");
 
 
     // Constructors
 
         //- Construct from components
-        processorPolyPatch
+        processorCyclicPolyPatch
         (
             const word& name,
             const label size,
@@ -148,11 +134,12 @@ public:
             const label index,
             const polyBoundaryMesh& bm,
             const int myProcNo,
-            const int neighbProcNo
+            const int neighbProcNo,
+            const word& referPatchName
         );
 
         //- Construct from dictionary
-        processorPolyPatch
+        processorCyclicPolyPatch
         (
             const word& name,
             const dictionary& dict,
@@ -161,33 +148,28 @@ public:
         );
 
         //- Construct as copy, resetting the boundary mesh
-        processorPolyPatch(const processorPolyPatch&, const polyBoundaryMesh&);
+        processorCyclicPolyPatch
+        (
+            const processorCyclicPolyPatch&,
+            const polyBoundaryMesh&
+        );
 
         //- Construct as given the original patch and resetting the
         //  face list and boundary mesh information
-        processorPolyPatch
+        processorCyclicPolyPatch
         (
-            const processorPolyPatch& pp,
+            const processorCyclicPolyPatch& pp,
             const polyBoundaryMesh& bm,
             const label index,
             const label newSize,
-            const label newStart
-        );
-
-        //- Construct given the original patch and a map
-        processorPolyPatch
-        (
-            const processorPolyPatch& pp,
-            const polyBoundaryMesh& bm,
-            const label index,
-            const unallocLabelList& mapAddressing,
-            const label newStart
+            const label newStart,
+            const word& referPatchName
         );
 
         //- Construct and return a clone, resetting the boundary mesh
         virtual autoPtr<polyPatch> clone(const polyBoundaryMesh& bm) const
         {
-            return autoPtr<polyPatch>(new processorPolyPatch(*this, bm));
+            return autoPtr<polyPatch>(new processorCyclicPolyPatch(*this, bm));
         }
 
         //- Construct and return a clone, resetting the face list
@@ -197,41 +179,20 @@ public:
             const polyBoundaryMesh& bm,
             const label index,
             const label newSize,
-            const label newStart
+            const label newStart,
+            const word& referPatchName
         ) const
         {
             return autoPtr<polyPatch>
             (
-                new processorPolyPatch
+                new processorCyclicPolyPatch
                 (
-                    *this,
+                    refCast<const processorCyclicPolyPatch>(*this),
                     bm,
                     index,
                     newSize,
-                    newStart
-                )
-            );
-        }
-
-        //- Construct and return a clone, resetting the face list
-        //  and boundary mesh
-        virtual autoPtr<polyPatch> clone
-        (
-            const polyBoundaryMesh& bm,
-            const label index,
-            const unallocLabelList& mapAddressing,
-            const label newStart
-        ) const
-        {
-            return autoPtr<polyPatch>
-            (
-                new processorPolyPatch
-                (
-                    *this,
-                    bm,
-                    index,
-                    mapAddressing,
-                    newStart
+                    newStart,
+                    referPatchName
                 )
             );
         }
@@ -239,114 +200,109 @@ public:
 
     // Destructor
 
-        virtual ~processorPolyPatch();
+        virtual ~processorCyclicPolyPatch();
 
 
     // Member functions
 
-        //- Return processor number
-        int myProcNo() const
+        const word& referPatchName() const
         {
-            return myProcNo_;
+            return referPatchName_;
         }
 
-        //- Return neigbour processor number
-        int neighbProcNo() const
+        //- Referring patchID.
+        label referPatchID() const
         {
-            return neighbProcNo_;
+            if (referPatchID_ == -1)
+            {
+                referPatchID_ = this->boundaryMesh().findPatchID
+                (
+                    referPatchName_
+                );
+                if (referPatchID_ == -1)
+                {
+                    FatalErrorIn
+                    (
+                        "processorCyclicPolyPatch::referPatchID() const"
+                    )   << "Illegal referPatch name " << referPatchName_
+                        << endl << "Valid patch names are "
+                        << this->boundaryMesh().names()
+                        << exit(FatalError);
+                }
+            }
+            return referPatchID_;
         }
 
-        //- Does the processor own the patch ?
-        bool owner() const
+        const coupledPolyPatch& referPatch() const
         {
-            return (myProcNo_ < neighbProcNo_);
+            const polyPatch& pp = this->boundaryMesh()[referPatchID()];
+            return refCast<const processorCyclicPolyPatch>(pp);
         }
-
-        //- Is the processor the patch neighbour ?
-        bool neighbour() const
-        {
-            return !owner();
-        }
-
-        //- Return processor-neighbbour patch face centres
-        const vectorField& neighbFaceCentres() const
-        {
-            return neighbFaceCentres_;
-        }
-
-        //- Return processor-neighbbour patch face areas
-        const vectorField& neighbFaceAreas() const
-        {
-            return neighbFaceAreas_;
-        }
-
-        //- Return processor-neighbbour patch neighbour cell centres
-        const vectorField& neighbFaceCellCentres() const
-        {
-            return neighbFaceCellCentres_;
-        }
-
-        //- Return neighbour point labels. WIP.
-        const labelList& neighbPoints() const;
-
-        //- Return neighbour edge labels. WIP.
-        const labelList& neighbEdges() const;
 
         //- Transform a patch-based field from other side to this side.
         virtual bool doTransform() const
         {
-            return false;
+            return referPatch().doTransform();
         }
         virtual void transform(scalarField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
         virtual void transform(vectorField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
         virtual void transform(sphericalTensorField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
         virtual void transform(diagTensorField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
         virtual void transform(symmTensorField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
         virtual void transform(tensorField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
 
         //- Transform a patch-based position from other side to this side
         virtual void transformPosition(pointField& l) const
-        {}
+        {
+            referPatch().transform(l);
+        }
 
         //- Are the planes separated.
         virtual bool separated() const
         {
-            notImplemented("processorPolyPatch::separated(..)");
-            return false;
+            return referPatch().separated();
         }
 
         //- If the planes are separated the separation vector.
         virtual const vector& separation() const
         {
-            notImplemented("processorPolyPatch::separation(..)");
-            return vector::zero;
+            return referPatch().separation();
         }
 
         //- Are the cyclic planes parallel.
         virtual bool parallel() const
         {
-            notImplemented("processorPolyPatch::parallel()");
-            return true;
+            return referPatch().parallel();
         }
 
         //- Return face transformation tensor.
         virtual const tensor& forwardT() const
         {
-            notImplemented("processorPolyPatch::forwardT(..)");
-            return tensor::zero;
+            return referPatch().forwardT();
         }
 
         //- Return neighbour-cell transformation tensor.
         virtual const tensor& reverseT() const
         {
-            notImplemented("processorPolyPatch::reverseT(..)");
-            return tensor::zero;
+            return referPatch().reverseT();
         }
 
         //- Initialize ordering for primitivePatch. Does not

@@ -24,36 +24,21 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "processorLduInterfaceField.H"
-#include "diagTensorField.H"
+#include "processorCyclicPointPatchFields.H"
+#include "pointPatchFields.H"
+#include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(processorLduInterfaceField, 0);
-}
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+makePointPatchFields(processorCyclic);
 
-Foam::processorLduInterfaceField::~processorLduInterfaceField()
-{}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::processorLduInterfaceField::transformCoupleField
-(
-    scalarField& f,
-    const direction cmpt
-) const
-{
-    if (doTransform())
-    {
-        f *= pow(diag(forwardT()).component(cmpt), rank());
-    }
-}
-
+} // End namespace Foam
 
 // ************************************************************************* //

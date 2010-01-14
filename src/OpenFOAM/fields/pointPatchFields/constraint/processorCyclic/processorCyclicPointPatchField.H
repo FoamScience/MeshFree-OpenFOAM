@@ -23,21 +23,21 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::processorPointPatchField
+    Foam::processorCyclicPointPatchField
 
 Description
-    Foam::processorPointPatchField
+    Foam::processorCyclicPointPatchField
 
 SourceFiles
-    processorPointPatchField.C
+    processorCyclicPointPatchField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef processorPointPatchField_H
-#define processorPointPatchField_H
+#ifndef processorCyclicPointPatchField_H
+#define processorCyclicPointPatchField_H
 
 #include "coupledPointPatchField.H"
-#include "processorPointPatch.H"
+#include "processorCyclicPointPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,37 +45,37 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                 Class processorPointPatchField Declaration
+                 Class processorCyclicPointPatchField Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class processorPointPatchField
+class processorCyclicPointPatchField
 :
     public coupledPointPatchField<Type>
 {
     // Private data
 
         //- Local reference to processor patch
-        const processorPointPatch& procPatch_;
+        const processorCyclicPointPatch& procPatch_;
 
 
 public:
 
     //- Runtime type information
-    TypeName(processorPointPatch::typeName_());
+    TypeName(processorCyclicPointPatch::typeName_());
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        processorPointPatchField
+        processorCyclicPointPatchField
         (
             const pointPatch&,
             const DimensionedField<Type, pointMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        processorPointPatchField
+        processorCyclicPointPatchField
         (
             const pointPatch&,
             const DimensionedField<Type, pointMesh>&,
@@ -83,9 +83,9 @@ public:
         );
 
         //- Construct by mapping given patchField<Type> onto a new patch
-        processorPointPatchField
+        processorCyclicPointPatchField
         (
-            const processorPointPatchField<Type>&,
+            const processorCyclicPointPatchField<Type>&,
             const pointPatch&,
             const DimensionedField<Type, pointMesh>&,
             const pointPatchFieldMapper&
@@ -96,7 +96,7 @@ public:
         {
             return autoPtr<pointPatchField<Type> >
             (
-                new processorPointPatchField<Type>
+                new processorCyclicPointPatchField<Type>
                 (
                     *this
                 )
@@ -104,9 +104,9 @@ public:
         }
 
         //- Construct as copy setting internal field reference
-        processorPointPatchField
+        processorCyclicPointPatchField
         (
-            const processorPointPatchField<Type>&,
+            const processorCyclicPointPatchField<Type>&,
             const DimensionedField<Type, pointMesh>&
         );
 
@@ -118,7 +118,7 @@ public:
         {
             return autoPtr<pointPatchField<Type> >
             (
-                new processorPointPatchField<Type>
+                new processorCyclicPointPatchField<Type>
                 (
                     *this,
                     iF
@@ -129,7 +129,7 @@ public:
 
     // Destructor
 
-        ~processorPointPatchField();
+        ~processorCyclicPointPatchField();
 
 
     // Member functions
@@ -149,13 +149,13 @@ public:
                 }
             }
 
-            //- Does the patch field perform the transformation
+            //- Does the patch field perform the transfromation
             virtual bool doTransform() const
             {
                 return
                    !(
                         pTraits<Type>::rank == 0
-                     || procPatch_.procPolyPatch().doTransform()
+                     || procPatch_.procPolyPatch().parallel()
                     );
             }
 
@@ -184,7 +184,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#    include "processorPointPatchField.C"
+#    include "processorCyclicPointPatchField.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
