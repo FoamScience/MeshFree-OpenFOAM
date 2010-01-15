@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,49 +22,42 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Primitive
-    wchar_t
-
-Description
-    A wide-character and a pointer to a wide-character string.
-
-SourceFiles
-    wcharIO.C
-
-SeeAlso
-    http://en.wikipedia.org/wiki/UTF-8
-    http://en.wikibooks.org/wiki/Unicode/Character_reference
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef wchar_H
-#define wchar_H
+#include "NASCore.H"
+#include "IStringStream.H"
 
-#include <cwchar>
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Foam::fileFormats::NASCore::NASCore()
+{}
 
-namespace Foam
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::scalar Foam::fileFormats::NASCore::parseNASCoord
+(
+    const string& s
+)
 {
+    size_t expSign = s.find_last_of("+-");
 
-class Istream;
-class Ostream;
+    if (expSign != string::npos && expSign > 0 && !isspace(s[expSign-1]))
+    {
+        scalar mantissa = readScalar(IStringStream(s.substr(0, expSign))());
+        scalar exponent = readScalar(IStringStream(s.substr(expSign+1))());
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+        if (s[expSign] == '-')
+        {
+            exponent = -exponent;
+        }
+        return mantissa * pow(10, exponent);
+    }
+    else
+    {
+        return readScalar(IStringStream(s)());
+    }
+}
 
-//- Output wide character (Unicode) as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t);
-
-//- Output wide character (Unicode) string as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t*);
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

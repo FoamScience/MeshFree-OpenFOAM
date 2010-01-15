@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,45 +22,56 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Primitive
-    wchar_t
+Class
+    Foam::fileFormats::NASCore
 
 Description
-    A wide-character and a pointer to a wide-character string.
+    Core routines used when reading/writing NASTRAN files.
 
 SourceFiles
-    wcharIO.C
-
-SeeAlso
-    http://en.wikipedia.org/wiki/UTF-8
-    http://en.wikibooks.org/wiki/Unicode/Character_reference
+    NASCore.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wchar_H
-#define wchar_H
+#ifndef NASCore_H
+#define NASCore_H
 
-#include <cwchar>
+#include "scalar.H"
+#include "string.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace fileFormats
+{
 
-class Istream;
-class Ostream;
+/*---------------------------------------------------------------------------*\
+                    Class fileFormats::NASCore Declaration
+\*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+class NASCore
+{
+public:
 
-//- Output wide character (Unicode) as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t);
+    // Public Member Functions
 
-//- Output wide character (Unicode) string as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t*);
+        //- Do weird things to extract number
+        static scalar parseNASCoord(const string&);
+
+
+    // Constructors
+
+        //- Construct null
+        NASCore();
+
+
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace fileFormats
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
