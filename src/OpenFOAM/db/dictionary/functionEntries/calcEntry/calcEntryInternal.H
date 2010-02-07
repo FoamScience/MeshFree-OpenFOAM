@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,49 +22,56 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Primitive
-    wchar_t
+Namespace
+    Foam::functionEntries::calcEntryInternal
 
 Description
-    A wide-character and a pointer to a wide-character string.
+    Contains global functions and classes for the calcEntry.
 
 SourceFiles
-    wcharIO.C
-
-SeeAlso
-    http://en.wikipedia.org/wiki/UTF-8
-    http://en.wikibooks.org/wiki/Unicode/Character_reference
+    calcEntryInternal.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wchar_H
-#define wchar_H
+#ifndef calcEntryInternal_H
+#define calcEntryInternal_H
 
-#include <cwchar>
-#include <string>
+#include "error.H"
+#include "scalar.H"
+#include "DynamicList.H"
+#include "globalFunctionSelectionTables.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace functionEntries
+{
+namespace calcEntryInternal
+{
 
-class Istream;
-class Ostream;
+    // Global Function Selectors
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+    declareGlobalFunctionSelectionTable
+    (
+        scalar,
+        dispatch,
+        ParamList,
+        (
+            const UList<scalar>& param
+        ),
+        (param)
+    );
 
-//- Output wide character (Unicode) as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t);
 
-//- Output wide character (Unicode) string as UTF-8
-Ostream& operator<<(Ostream&, const wchar_t*);
-
-//- Output wide character (Unicode) string as UTF-8
-Ostream& operator<<(Ostream&, const std::wstring&);
+    //- Dispatch calculation to the named function
+    scalar dispatch(const word&, const UList<scalar>&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace calcEntryInternal
+} // End namespace functionEntries
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
