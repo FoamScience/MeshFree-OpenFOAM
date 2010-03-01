@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,37 +22,60 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Namespace
+    Foam::functionEntries::calcEntryInternal
+
+Description
+    Contains global functions and classes for the calcEntry.
+
+SourceFiles
+    calcEntryInternal.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "globalPointPatch.H"
+#ifndef calcEntryInternal_H
+#define calcEntryInternal_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "error.H"
+#include "scalar.H"
+#include "DynamicList.H"
+#include "globalFunctionSelectionTables.H"
 
-defineTypeNameAndDebug(Foam::globalPointPatch, 0);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+namespace Foam
+{
+namespace functionEntries
+{
+namespace calcEntryInternal
+{
 
-Foam::globalPointPatch::globalPointPatch
-(
-    const pointBoundaryMesh& bm,
-    const label index
-)
-:
-    pointPatch(bm),
-    coupledPointPatch(bm),
-    index_(index)
-{}
+    // Global Function Selectors
+
+    declareGlobalFunctionSelectionTable
+    (
+        scalar,
+        dispatch,
+        ParamList,
+        (
+            const UList<scalar>& param
+        ),
+        (param)
+    );
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::globalPointPatch::~globalPointPatch()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+    //- Dispatch calculation to the named function
+    scalar dispatch(const word&, const UList<scalar>&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace calcEntryInternal
+} // End namespace functionEntries
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -24,21 +24,40 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "globalPointPatchFields.H"
-#include "pointPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#include "NASCore.H"
+#include "IStringStream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-namespace Foam
+Foam::fileFormats::NASCore::NASCore()
+{}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::scalar Foam::fileFormats::NASCore::parseNASCoord
+(
+    const string& s
+)
 {
+    size_t expSign = s.find_last_of("+-");
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+    if (expSign != string::npos && expSign > 0 && !isspace(s[expSign-1]))
+    {
+        scalar mantissa = readScalar(IStringStream(s.substr(0, expSign))());
+        scalar exponent = readScalar(IStringStream(s.substr(expSign+1))());
 
-makePointPatchFields(global);
+        if (s[expSign] == '-')
+        {
+            exponent = -exponent;
+        }
+        return mantissa * pow(10, exponent);
+    }
+    else
+    {
+        return readScalar(IStringStream(s)());
+    }
+}
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
