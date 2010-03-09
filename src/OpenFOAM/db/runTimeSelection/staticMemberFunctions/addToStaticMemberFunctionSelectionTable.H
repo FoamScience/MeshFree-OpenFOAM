@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,23 +22,32 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+@file Foam::addToStaticMemberFunctionSelectionTable
+
+Description
+    Macros for easy insertion into member function selection tables
+
 \*---------------------------------------------------------------------------*/
 
-#include "globalPointPatchFields.H"
-#include "pointPatchFields.H"
-#include "addToRunTimeSelectionTable.H"
+#ifndef addToStaticMemberFunctionSelectionTable_H
+#define addToStaticMemberFunctionSelectionTable_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// add to hash-table of functions with 'lookup' as the key
+#define addNamedToStaticMemberFunctionSelectionTable\
+(baseType,thisType,memberFunction,argNames,lookup,functionPtr)                \
+                                                                              \
+    /* Add the thisType memberFunction to the table, find by lookup name */   \
+    baseType::add##memberFunction##argNames##StaticMemberFunctionToTable<thisType>  \
+    add_##lookup##_##thisType##memberFunction##argNames##StaticMemberFunctionTo##baseType##Table_\
+    (#lookup, functionPtr)
 
-makePointPatchFields(global);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+
+#endif
 
 // ************************************************************************* //

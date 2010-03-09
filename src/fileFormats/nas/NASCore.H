@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,26 +22,54 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+Class
+    Foam::fileFormats::NASCore
+
+Description
+    Core routines used when reading/writing NASTRAN files.
+
+SourceFiles
+    NASCore.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef globalPointPatchFields_H
-#define globalPointPatchFields_H
+#ifndef NASCore_H
+#define NASCore_H
 
-#include "globalPointPatchField.H"
-
-#include "fieldTypes.H"
+#include "scalar.H"
+#include "string.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace fileFormats
+{
+
+/*---------------------------------------------------------------------------*\
+                    Class fileFormats::NASCore Declaration
+\*---------------------------------------------------------------------------*/
+
+class NASCore
+{
+public:
+
+    // Public Member Functions
+
+        //- Do weird things to extract number
+        static scalar parseNASCoord(const string&);
+
+
+    // Constructors
+
+        //- Construct null
+        NASCore();
+};
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePointPatchFieldTypedefs(global);
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+} // End namespace fileFormats
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
