@@ -3,7 +3,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
 # License
@@ -24,66 +24,78 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     foamPackThirdPartyBin <archOptions> [outputDir]
+#     foamNewSource
 #
 # Description
-#     Packs and compresses binary version of OpenFOAM ThirdParty for release
+#     Create a new standard OpenFOAM source file
 #
 #------------------------------------------------------------------------------
+Script=${0##*/}
+Template="$WM_PROJECT_DIR/etc/codeTemplates/source/_Template"
 
-if [ $# -eq 0 ]
+usage() {
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
+Usage: $Script <type> <ClassName>
+
+* create a new standard OpenFOAM source file
+
+type: (C|H|I|IO|App)
+
+USAGE
+    exit 1
+}
+
+
+# this implicitly covers a lone -help
+[ "$#" -gt 1 ] || usage
+
+className="$2"
+unset subType Type
+
+case "$1" in
+-h | -help)
+    usage
+    ;;
+C|H)
+    Type=".$1"
+    ;;
+I)
+    Type="$1.H"
+    ;;
+IO)
+    Type="$1.C"
+    ;;
+app|App)
+    subType=App
+    Type=".C"
+    ;;
+*)
+    usage "unknown type"
+    ;;
+esac
+[ "$#" -eq 2 ] || usage "wrong number of arguments"
+shift 2
+
+
+fileName="$className$Type"
+
+
+echo "$Script: Creating new interface file $fileName"
+if [ -e "$fileName" ]
 then
-    echo "Error: archOptions type expected, exiting"
-    echo
-    echo "Usage : ${0##*/} <archOptions> [outputDir]"
-    echo
+    echo "   Error: file exists"
     exit 1
 fi
-archOptions=$1
-arch=${archOptions%%G*}  # TODO: works for Gcc only
-arch3264=$(echo "$arch" | sed -e 's@64@-64@')
 
-echo "archOptions=$archOptions"
-echo "arch=$arch"
-echo "arch3264=$arch3264"
 
-timeStamp=$(date +%Y-%m-%d)
-packDir=${WM_THIRD_PARTY_DIR:-ThirdParty}
-packDir=${packDir##*/}
-packFile=${packDir}.${archOptions}_${timeStamp}.gtgz
+# process class name
+sed "s/CLASSNAME/$className/g" $Template$subType$Type > $fileName
 
-if [ ! -d $packDir ]
+
+if [ "$subType" = App -a ! -d Make ]
 then
-    echo "Error: directory $packDir does not exist"
-    exit 1
-fi
-
-# add optional output directory
-if [ -d "$2" ]
-then
-    packFile="$2/$packFile"
-fi
-
-if [ -f $packFile ]
-then
-    echo "Error: $packFile already exists"
-    exit 1
-fi
-
-# get list of directories
-dirList=`find $packDir -type d -name $arch -o -type d -name $archOptions'*' -o -type l -name $arch3264`
-echo
-echo "Packing $archOptions port of $packDir into $packFile"
-echo
-
-tar czpf $packFile $dirList
-
-if [ $? -eq 0 ]
-then
-    echo "Finished packing and compressing file $packFile"
-else
-    echo "Error: failure packing $packFile"
-    rm -f $packFile 2>/dev/null
+    wmakeFilesAndOptions
 fi
 
 #------------------------------------------------------------------------------
