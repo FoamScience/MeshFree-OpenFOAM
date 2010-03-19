@@ -1,11 +1,10 @@
-#!/bin/sh
-#------------------------------------------------------------------------------
+#----------------------------------*-sh-*--------------------------------------
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
 #    \\/     M anipulation  |
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -24,24 +23,31 @@
 #     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 # Script
-#     foamPackBinAll [outputDir]
+#     etc/prefs.csh
 #
 # Description
-#     Packs and compresses all binary versions of foam for release
+#     Preset variables for the OpenFOAM configuration - C-Shell shell syntax.
+#
+#     The prefs.csh file will be sourced by the OpenFOAM etc/cshrc when it is
+#     found by foamEtcFile.
+#
+# See Also
+#     'foamEtcFile -help' or 'foamEtcFile -list' for information about the
+#     paths searched
 #
 #------------------------------------------------------------------------------
-packDir=$WM_PROJECT-$WM_PROJECT_VERSION
 
-if [ ! -d $packDir ]
-then
-    echo "Error: directory $packDir does not exist"
-    exit 1
-fi
+## Specify system compiler
+## ~~~~~~~~~~~~~~~~~~~~~~~
+#set compilerInstall=system
 
-# obtain arch types from lib/
-for bin in $packDir/lib/*
-do
-    foamPackBin ${bin##*/} $@
-done
+## Specify system openmpi
+## ~~~~~~~~~~~~~~~~~~~~~~
+#setenv WM_MPLIB SYSTEMOPENMPI
 
-#------------------------------------------------------------------------------
+# Specify ParaView version
+# ~~~~~~~~~~~~~~~~~~~~~~~~
+setenv ParaView_VERSION git        # eg, cvs/git version
+setenv ParaView_MAJOR 3.7
+
+# -----------------------------------------------------------------------------
