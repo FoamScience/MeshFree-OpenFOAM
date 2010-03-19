@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,22 +23,22 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Class
-    Foam::zeroField
+    Foam::oneFieldField
 
 Description
-    A class representing the concept of a field of 0 used to avoid unnecessary
-    manipulations for objects which are known to be zero at compile-time.
+    A class representing the concept of a field of oneFields used to
+    avoid unnecessary manipulations for objects which are known to be one at
+    compile-time.
 
-    Used for example as the argument to a function in which certain terms are
-    optional, see source terms in the MULES solvers.
+    Used for example as the density argument to a function written for
+    compressible to be used for incompressible flow.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef zeroField_H
-#define zeroField_H
+#ifndef oneFieldField_H
+#define oneFieldField_H
 
-#include "zero.H"
-#include "scalar.H"
+#include "oneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,25 +46,26 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class zeroField Declaration
+                           Class oneField Declaration
 \*---------------------------------------------------------------------------*/
 
-class zeroField
+class oneFieldField
 :
-    public zero
+    public one
 {
+
 public:
 
     // Constructors
 
         //- Construct null
-        zeroField()
+        oneFieldField()
         {}
 
 
     // Member Operators
 
-        inline scalar operator[](const label) const;
+        inline oneField operator[](const label) const;
 };
 
 
@@ -74,7 +75,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "zeroFieldI.H"
+#   include "oneFieldFieldI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
