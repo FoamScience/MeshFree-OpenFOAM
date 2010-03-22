@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,62 +22,31 @@ License
     along with OpenFOAM; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-Class
-    Foam::zeroField
-
-Description
-    A class representing the concept of a field of 0 used to avoid unnecessary
-    manipulations for objects which are known to be zero at compile-time.
-
-    Used for example as the argument to a function in which certain terms are
-    optional, see source terms in the MULES solvers.
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef zeroField_H
-#define zeroField_H
-
-#include "zero.H"
-#include "scalar.H"
+#include "geometricOneField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+inline Foam::scalar Foam::geometricOneField::operator[](const label) const
 {
+    return scalar(1);
+}
 
-/*---------------------------------------------------------------------------*\
-                           Class zeroField Declaration
-\*---------------------------------------------------------------------------*/
-
-class zeroField
-:
-    public zero
+inline Foam::oneField Foam::geometricOneField::field() const
 {
-public:
+    return oneField();
+}
 
-    // Constructors
+inline Foam::oneField Foam::geometricOneField::oldTime() const
+{
+    return oneField();
+}
 
-        //- Construct null
-        zeroField()
-        {}
+inline Foam::oneFieldField Foam::geometricOneField::boundaryField() const
+{
+    return oneFieldField();
+}
 
-
-    // Member Operators
-
-        inline scalar operator[](const label) const;
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "zeroFieldI.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //
