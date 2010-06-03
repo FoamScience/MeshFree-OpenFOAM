@@ -3,7 +3,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
 # License
@@ -23,68 +23,35 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Script
-#     org-batch
+#     wmakeFindEmptyMake
 #
 # Description
-#     Batch process emacs org-mode files to create html/LaTeX etc.
+#     Find 'Make/' directories without 'files' or 'options'.
+#     These typically correspond to (partially) removed applications.
 #
 #------------------------------------------------------------------------------
-Script=${0##*/}
-
 usage() {
     while [ "$#" -ge 1 ]; do echo "$1"; shift; done
     cat<<USAGE
 
-Usage: ${0##*/} [OPTIONS] file1 [.. fileN]
-options:
-  -html      create html (default)
-  -latex     create LaTeX
-  -pdflatex  create pdf via pdflatex
+usage: ${0##*/} [dir1 .. dirN]
 
-* Batch process emacs org-mode files to create html/LaTeX etc.
+    Find 'Make/' directories without 'files' or 'options'.
+    These typically correspond to (partially) removed applications.
 
 USAGE
     exit 1
 }
 
+#------------------------------------------------------------------------------
+findName=lnInclude
 
-# default is html export:
-mode=html
-unset makePDF
-
-echo "have $Script"
-case $Script in
-*pdflatex)
-    mode=latex
-    makePDF=pdflatex
-    ;;
-*latex)
-    mode=latex
-    ;;
-*html)
-    mode=html
-    ;;
-esac
-
-# parse options
+# simple parse options
 while [ "$#" -gt 0 ]
 do
     case "$1" in
-    -h | -help)
+    -h | -help)   # provide immediate help
         usage
-        ;;
-    -html)
-        mode=html
-        shift
-        ;;
-    -latex)
-        mode=latex
-        shift
-        ;;
-    -pdflatex)
-        mode=latex
-        makePDF=pdflatex
-        shift
         ;;
     -*)
         usage "unknown option: '$*'"
@@ -95,39 +62,26 @@ do
     esac
 done
 
-# default is the current directory
-[ "$#" -gt 0 ] || usage "No files specified"
 
-type emacs >/dev/null 2>&1 || usage "No emacs found in PATH"
+# default to searching from pwd
+[ "$#" -gt 0 ] || set -- .
 
-
-for org
+for checkDir
 do
-    echo "Processing: $org"
-    echo "----------"
-    if [ -f "$org" ]
+    if [ -d $checkDir ]
     then
-        emacs --batch -l org --visit=$org \
-              --funcall org-export-as-$mode-batch
-
-        # post-processing step to create pdf
-        case "$makePDF" in
-        pdflatex)
-            input="${org%.org}.tex"
-
-            if [ -f "$input" ]
-            then
-                pdflatex "$input"
-            else
-                echo "No $input to convert to pdf"
-            fi
-            ;;
-        esac
-
+        echo "searching: $checkDir for 'Make' directories without 'files' or 'options'" 1>&2
+        echo "---------" 1>&2
     else
-        echo "File not found"
+        echo "skipping non-dir: $checkDir" 1>&2
+        echo "----------------" 1>&2
+        continue
     fi
-    echo "----------"
+
+    find $checkDir -depth -type d -name Make -print | while read MakeDir
+    do
+        [ -f "$MakeDir/files" -o -f "$MakeDir/options" ] || echo $MakeDir
+    done
 done
 
 #------------------------------------------------------------------------------
