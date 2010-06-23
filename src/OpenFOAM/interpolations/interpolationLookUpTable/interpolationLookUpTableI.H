@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,38 +23,70 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "uLabel.H"
-#include "error.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
+template<class Type>
+inline Foam::label
+Foam::interpolationLookUpTable<Type>::findFieldIndex
+(
+    const word& fieldName
+) const
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-const char* const pTraits<uLabel>::typeName = "uLabel";
-const uLabel pTraits<uLabel>::zero = 0;
-const uLabel pTraits<uLabel>::one = 1;
-const uLabel pTraits<uLabel>::min = uLabelMin;
-const uLabel pTraits<uLabel>::max = uLabelMax;
-
-const char* pTraits<uLabel>::componentNames[] = { "x" };
-
-pTraits<uLabel>::pTraits(const uLabel& p)
-:
-    p_(p)
-{}
-
-
-pTraits<uLabel>::pTraits(Istream& is)
-{
-    is >> p_;
+    return fieldIndices_[fieldName];
 }
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class Type>
+inline const Foam::List<Foam::dictionary>&
+Foam::interpolationLookUpTable<Type>::output() const
+{
+    return output_;
+}
 
-} // End namespace Foam
+
+template<class Type>
+inline const Foam::List<Foam::dictionary>&
+Foam::interpolationLookUpTable<Type>::entries() const
+{
+    return entries_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::min() const
+{
+    return min_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::label>&
+Foam::interpolationLookUpTable<Type>::dim() const
+{
+    return dim_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::delta() const
+{
+    return delta_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::max() const
+{
+    return max_;
+}
+
+
+template<class Type>
+inline Foam::word Foam::interpolationLookUpTable<Type>::tableName() const
+{
+    return fileName_.name();
+}
+
 
 // ************************************************************************* //
