@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2008-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,19 +23,69 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "oneField.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-inline Foam::scalar Foam::oneField::operator[](const label) const
+template<class Type>
+inline Foam::label
+Foam::interpolationLookUpTable<Type>::findFieldIndex
+(
+    const word& fieldName
+) const
 {
-    return scalar(1);
+    return fieldIndices_[fieldName];
 }
 
 
-inline Foam::oneField Foam::oneField::field() const
+template<class Type>
+inline const Foam::List<Foam::dictionary>&
+Foam::interpolationLookUpTable<Type>::output() const
 {
-    return oneField();
+    return output_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::dictionary>&
+Foam::interpolationLookUpTable<Type>::entries() const
+{
+    return entries_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::min() const
+{
+    return min_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::label>&
+Foam::interpolationLookUpTable<Type>::dim() const
+{
+    return dim_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::delta() const
+{
+    return delta_;
+}
+
+
+template<class Type>
+inline const Foam::List<Foam::scalar>&
+Foam::interpolationLookUpTable<Type>::max() const
+{
+    return max_;
+}
+
+
+template<class Type>
+inline Foam::word Foam::interpolationLookUpTable<Type>::tableName() const
+{
+    return fileName_.name();
 }
 
 
