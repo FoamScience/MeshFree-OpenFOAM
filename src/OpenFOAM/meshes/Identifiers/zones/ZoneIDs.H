@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,10 +23,33 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PackedList.H"
+#ifndef ZoneIDs_H
+#define ZoneIDs_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "DynamicID.H"
 
-defineTypeNameAndDebug(Foam::PackedListName, 0);
+#include "cellZoneMeshFwd.H"
+#include "faceZoneMeshFwd.H"
+#include "pointZoneMeshFwd.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+    //- Foam::cellZoneID
+    typedef DynamicID<cellZoneMesh> cellZoneID;
+
+    //- Foam::faceZoneID
+    typedef DynamicID<faceZoneMesh> faceZoneID;
+
+    //- Foam::pointZoneID
+    typedef DynamicID<pointZoneMesh> pointZoneID;
+
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 1991-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,25 +21,20 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Typedef
-    Foam::PackedBoolList
-
-Description
-    A bit-packed bool list
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef PackedBoolList_H
-#define PackedBoolList_H
+#ifndef polyPatchID_H
+#define polyPatchID_H
 
-#include "bool.H"
-#include "PackedList.H"
+#include "DynamicID.H"
+#include "polyBoundaryMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef PackedList<> PackedBoolList;
+    //- Foam::polyPatchID
+    typedef DynamicID<polyBoundaryMesh> polyPatchID;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
