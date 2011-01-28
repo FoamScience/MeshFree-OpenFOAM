@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,28 +23,54 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Polynomial.H"
+#include "Constant.H"
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<int PolySize>
-Foam::Ostream& Foam::operator<<
-(
-    Ostream& os,
-    const Polynomial<PolySize>& poly
-)
+template<class Type>
+Foam::Constant<Type>::Constant(const word& entryName, Istream& is)
+:
+    DataEntry<Type>(entryName),
+    value_(pTraits<Type>::zero)
 {
-    os  << static_cast
-            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
-
-    // Check state of Ostream
-    os.check
-    (
-        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
-    );
-
-    return os;
+    is  >> value_;
 }
+
+
+template<class Type>
+Foam::Constant<Type>::Constant(const Constant<Type>& cnst)
+:
+    DataEntry<Type>(cnst),
+    value_(cnst.value_)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::Constant<Type>::~Constant()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+Type Foam::Constant<Type>::value(const scalar x) const
+{
+    return value_;
+}
+
+
+template<class Type>
+Type Foam::Constant<Type>::integrate(const scalar x1, const scalar x2) const
+{
+    return (x2 - x1)*value_;
+}
+
+
+// * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * * * //
+
+#include "ConstantIO.C"
 
 
 // ************************************************************************* //

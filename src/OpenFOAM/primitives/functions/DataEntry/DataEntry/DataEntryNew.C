@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,27 +23,38 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Polynomial.H"
+#include "DataEntry.H"
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<int PolySize>
-Foam::Ostream& Foam::operator<<
+template<class Type>
+Foam::autoPtr<Foam::DataEntry<Type> > Foam::DataEntry<Type>::New
 (
-    Ostream& os,
-    const Polynomial<PolySize>& poly
+    const word& entryName,
+    const dictionary& dict
 )
 {
-    os  << static_cast
-            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
+    Istream& is(dict.lookup(entryName));
 
-    // Check state of Ostream
-    os.check
-    (
-        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
-    );
+    word DataEntryType(is);
 
-    return os;
+    typename dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(DataEntryType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "DataEntry<Type>::New(Istream&)"
+        )   << "Unknown DataEntry type "
+            << DataEntryType << " for DataEntry "
+            << entryName << nl << nl
+            << "Valid DataEntry types are:" << nl
+            << dictionaryConstructorTablePtr_->sortedToc() << nl
+            << exit(FatalError);
+    }
+
+    return autoPtr<DataEntry<Type> >(cstrIter()(entryName, is));
 }
 
 

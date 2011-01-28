@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2008-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,24 +23,35 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Polynomial.H"
+#include "polynomial.H"
 
 // * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
-template<int PolySize>
 Foam::Ostream& Foam::operator<<
 (
     Ostream& os,
-    const Polynomial<PolySize>& poly
+    const polynomial& poly
 )
 {
-    os  << static_cast
-            <VectorSpace<Polynomial<PolySize>, scalar, PolySize> >(poly);
+    if (os.format() == IOstream::ASCII)
+    {
+        os  << static_cast<const DataEntry<scalar>& >(poly)
+            << token::SPACE << poly.coeffs_;
+    }
+    else
+    {
+        os  << static_cast<const DataEntry<scalar>& >(poly);
+        os.write
+        (
+            reinterpret_cast<const char*>(&poly.coeffs_),
+            sizeof(poly.coeffs_)
+        );
+    }
 
     // Check state of Ostream
     os.check
     (
-        "Ostream& operator<<(Ostream&, const Polynomial<PolySize>&)"
+        "Ostream& operator<<(Ostream&, const polynomial&)"
     );
 
     return os;
