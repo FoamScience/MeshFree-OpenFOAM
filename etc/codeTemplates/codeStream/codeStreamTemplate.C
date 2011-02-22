@@ -21,9 +21,14 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Description
+    Template for use with codeStream.
+
 \*---------------------------------------------------------------------------*/
 
+//{{{ begin codeInclude
 ${codeInclude}
+//}}} end codeInclude
 
 using namespace Foam;
 
@@ -39,7 +44,9 @@ void ${typeName}
     Ostream& os
 )
 {
+//{{{ begin code
 ${code};
+//}}} end code
 }
 }
 
