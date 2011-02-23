@@ -39,20 +39,16 @@ SourceFiles
 #include "Tuple2.H"
 #include "Pair.H"
 #include "SHA1Digest.H"
+#include "HashTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-
-typedef List<Pair<string> > stringPairList;
-typedef Tuple2<fileName, List<Pair<string> > > fileAndVars;
-typedef Tuple2<fileName, string> fileAndContent;
-
-
-class OSstream;
+// Forward declaration of classes
 class ISstream;
+class OSstream;
 
 /*---------------------------------------------------------------------------*\
                         Class codeStreamTools Declaration
@@ -60,24 +56,72 @@ class ISstream;
 
 class codeStreamTools
 {
+public:
+    typedef Tuple2<fileName, string> fileAndContent;
+
+    //- Helper class for managing file and variables
+    class fileAndVars
+    :
+        public HashTable<string>
+    {
+        // Private data
+        fileName file_;
+
+    public:
+        //- Construct null
+        fileAndVars()
+        {}
+
+        //- Return the file name
+        const fileName& file() const
+        {
+            return file_;
+        }
+
+        //- Return the file name
+        fileName& file()
+        {
+            return file_;
+        }
+    };
+
+
+private:
     // Private data
 
         //- Name for underlying set
         word name_;
 
         //- Files to copy
-        List<fileAndVars> copyFiles_;
+        List<codeStreamTools::fileAndVars> copyFiles_;
 
         //- Direct contents for files
         List<fileAndContent> filesContents_;
 
 protected:
 
-        void copyAndExpand(ISstream&, OSstream&) const;
+        void copyAndExpand
+        (
+            ISstream&,
+            OSstream&,
+            const HashTable<string>& mapping
+        ) const;
 
 public:
 
-    static int allowSystemOperations;
+    // Static data members
+
+        //- Name of the code template environment variable
+        //  Used to located the codeTemplateName
+        static const word codeTemplateEnvName;
+
+        //- Name of the code template sub-directory
+        //  Used when locating the codeTemplateName via Foam::findEtcFile
+        static const fileName codeTemplateDirName;
+
+
+        static int allowSystemOperations;
+
 
     // Constructors
 
@@ -96,12 +140,46 @@ public:
         );
 
         //- Construct copy
-        codeStreamTools(const codeStreamTools& otf);
+        codeStreamTools(const codeStreamTools&);
 
 
     // Member functions
 
-        const List<Tuple2<fileName, List<Pair<string> > > >& copyFiles() const
+        //- Directory for compile/link (case-specific)
+        //  Expanded from \$FOAM_CASE/codeStream
+        static fileName baseDir();
+
+        //- Subdirectory name for library
+        //  Expanded from platforms/\$WM_OPTIONS/lib
+        static fileName libSubDir();
+
+        //- Local path for specified code name
+        //  Expanded from \$FOAM_CASE/codeStream
+        static fileName codePath(const word& subDirName);
+
+        //- Local library path for specified code name
+        //  Expanded from \$FOAM_CASE/platforms/\$WM_OPTIONS/lib
+        static fileName libPath(const word& codeName);
+
+        //- The library target path for Make/files
+        static string libTarget(const word& codeName);
+
+
+        //- Find a code-template via the codeTemplateEnvName
+        //  alternatively in the codeTemplateDirName via Foam::findEtcFile
+        static fileName findTemplate(const word& templateName);
+
+        //- List searched locations in a format suitable for display an error
+        static string searchedLocations();
+
+
+
+        const word& name() const
+        {
+            return name_;
+        }
+
+        const List<fileAndVars>& copyFiles() const
         {
             return copyFiles_;
         }
@@ -111,16 +189,10 @@ public:
             return filesContents_;
         }
 
-        const word& name() const
-        {
-            return name_;
-        }
-
         bool copyFilesContents(const fileName& dir) const;
 
-        static void* findLibrary(const fileName& libPath);
 
-        static string stripLeading(const string&);
+        static void* findLibrary(const fileName& libPath);
 
         static bool writeDigest(const fileName& dir, const SHA1Digest& sha1);
         static SHA1Digest readDigest(const fileName& dir);
