@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,60 +21,39 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Namespace
-    Foam::functionEntries::calcEntryInternal
-
 Description
-    Contains global functions and classes for the calcEntry.
-
-SourceFiles
-    calcEntryInternal.C
+    Template for use with codeStream.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef calcEntryInternal_H
-#define calcEntryInternal_H
+#include "dictionary.H"
+#include "Ostream.H"
+#include "Pstream.H"
 
-#include "error.H"
-#include "scalar.H"
-#include "DynamicList.H"
-#include "globalFunctionSelectionTables.H"
+//{{{ begin codeInclude
+${codeInclude}
+//}}} end codeInclude
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
-{
-namespace functionEntries
-{
-namespace calcEntryInternal
-{
-
-    // Global Function Selectors
-
-    declareGlobalFunctionSelectionTable
-    (
-        scalar,
-        dispatch,
-        ParamList,
-        (
-            const UList<scalar>& param
-        ),
-        (param)
-    );
-
-
-    //- Dispatch calculation to the named function
-    scalar dispatch(const word&, const UList<scalar>&);
-
+using namespace Foam;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace calcEntryInternal
-} // End namespace functionEntries
-} // End namespace Foam
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+extern "C"
+{
+void ${typeName}
+(
+    const dictionary& dict,
+    Ostream& os
+)
+{
+//{{{ begin code
+${code};
+//}}} end code
+}
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //
