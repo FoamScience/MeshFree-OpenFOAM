@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,47 +23,34 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "cloud.H"
-#include "Time.H"
+#include "treeBoundBox.H"
+#include "FixedList.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-defineTypeNameAndDebug(Foam::cloud, 0);
-
-const Foam::word Foam::cloud::prefix("lagrangian");
-Foam::word Foam::cloud::defaultName("defaultCloud");
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::cloud::cloud(const objectRegistry& obr, const word& cloudName)
+
+template<unsigned Size>
+Foam::treeBoundBox::treeBoundBox
+(
+    const UList<point>& points,
+    const FixedList<label, Size>& indices
+)
 :
-    objectRegistry
-    (
-        IOobject
-        (
-            (cloudName.size() ? cloudName : defaultName),
-            obr.time().timeName(),
-            prefix,
-            obr,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        )
-    )
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::cloud::~cloud()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::cloud::autoMap(const mapPolyMesh&)
+    boundBox(points, indices, false)
 {
-    notImplemented("cloud::autoMap(const mapPolyMesh&)");
-}
+    // points may be empty, but a FixedList is never empty
+    if (points.empty())
+    {
+        WarningIn
+        (
+            "treeBoundBox::treeBoundBox"
+            "(const UList<point>&, const FixedList<label, Size>&)"
+        )   << "cannot find bounding box for zero-sized pointField, "
+            << "returning zero" << endl;
 
+        return;
+    }
+}
 
 // ************************************************************************* //
