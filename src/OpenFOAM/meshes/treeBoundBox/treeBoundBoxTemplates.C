@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,39 +21,36 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    Template for use with codeStream.
-
 \*---------------------------------------------------------------------------*/
 
-#include "dictionary.H"
-#include "Ostream.H"
-#include "Pstream.H"
+#include "treeBoundBox.H"
+#include "FixedList.H"
 
-//{{{ begin codeInclude
-${codeInclude}
-//}}} end codeInclude
 
-using namespace Foam;
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-extern "C"
-{
-void ${typeName}
+template<unsigned Size>
+Foam::treeBoundBox::treeBoundBox
 (
-    const dictionary& dict,
-    Ostream& os
+    const UList<point>& points,
+    const FixedList<label, Size>& indices
 )
+:
+    boundBox(points, indices, false)
 {
-//{{{ begin code
-${code};
-//}}} end code
-}
-}
+    // points may be empty, but a FixedList is never empty
+    if (points.empty())
+    {
+        WarningIn
+        (
+            "treeBoundBox::treeBoundBox"
+            "(const UList<point>&, const FixedList<label, Size>&)"
+        )   << "cannot find bounding box for zero-sized pointField, "
+            << "returning zero" << endl;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+        return;
+    }
+}
 
 // ************************************************************************* //

@@ -23,47 +23,10 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "cloud.H"
-#include "Time.H"
+#include "indexedOctree.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::cloud, 0);
-
-const Foam::word Foam::cloud::prefix("lagrangian");
-Foam::word Foam::cloud::defaultName("defaultCloud");
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::cloud::cloud(const objectRegistry& obr, const word& cloudName)
-:
-    objectRegistry
-    (
-        IOobject
-        (
-            (cloudName.size() ? cloudName : defaultName),
-            obr.time().timeName(),
-            prefix,
-            obr,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        )
-    )
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::cloud::~cloud()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void Foam::cloud::autoMap(const mapPolyMesh&)
-{
-    notImplemented("cloud::autoMap(const mapPolyMesh&)");
-}
-
+defineTypeNameAndDebug(Foam::indexedOctreeName, 0);
 
 // ************************************************************************* //

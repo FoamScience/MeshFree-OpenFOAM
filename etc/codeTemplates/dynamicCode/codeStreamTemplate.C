@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,49 +21,39 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Description
+    Template for use with codeStream.
+
 \*---------------------------------------------------------------------------*/
 
-#include "cloud.H"
-#include "Time.H"
+#include "dictionary.H"
+#include "Ostream.H"
+#include "Pstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+//{{{ begin codeInclude
+${codeInclude}
+//}}} end codeInclude
 
-defineTypeNameAndDebug(Foam::cloud, 0);
+using namespace Foam;
 
-const Foam::word Foam::cloud::prefix("lagrangian");
-Foam::word Foam::cloud::defaultName("defaultCloud");
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::cloud::cloud(const objectRegistry& obr, const word& cloudName)
-:
-    objectRegistry
-    (
-        IOobject
-        (
-            (cloudName.size() ? cloudName : defaultName),
-            obr.time().timeName(),
-            prefix,
-            obr,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        )
-    )
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::cloud::~cloud()
-{}
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::cloud::autoMap(const mapPolyMesh&)
+extern "C"
 {
-    notImplemented("cloud::autoMap(const mapPolyMesh&)");
+void ${typeName}
+(
+    Ostream& os,
+    const dictionary& dict
+)
+{
+//{{{ begin code
+${code};
+//}}} end code
+}
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // ************************************************************************* //

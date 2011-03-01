@@ -21,83 +21,28 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::cloud
+Typedef
+    Foam::treeBoundBoxList
 
 Description
-    A cloud is a collection of lagrangian particles
+    List of bounding boxes.
 
 SourceFiles
-    cloud.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cloud_H
-#define cloud_H
+#ifndef treeBoundBoxList_H
+#define treeBoundBoxList_H
 
-#include "objectRegistry.H"
+#include "treeBoundBox.H"
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-// Forward declaration of classes
-class mapPolyMesh;
-
-/*---------------------------------------------------------------------------*\
-                            Class cloud Declaration
-\*---------------------------------------------------------------------------*/
-
-class cloud
-:
-    public objectRegistry
-{
-
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        cloud(const cloud&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const cloud&);
-
-
-public:
-
-    //- Runtime type information
-    TypeName("cloud");
-
-        //- The prefix to local: %lagrangian
-        static const word prefix;
-
-        //- The default cloud name: %defaultCloud
-        static word defaultName;
-
-
-    // Constructors
-
-        //- Construct for the given objectRegistry and named cloud instance
-        cloud(const objectRegistry&, const word& cloudName = "");
-
-
-    //- Destructor
-    virtual ~cloud();
-
-
-    // Member Functions
-
-        // Edit
-
-            //- Remap the cells of particles corresponding to the
-            //  mesh topology change
-            virtual void autoMap(const mapPolyMesh&);
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
+    typedef List<treeBoundBox> treeBoundBoxList;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
