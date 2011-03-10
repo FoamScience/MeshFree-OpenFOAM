@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,68 +21,28 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::functionEntries::calcEntry
+Typedef
+    Foam::treeBoundBoxList
 
 Description
-    This dictionary function entry may or may not do anything particularly
-    useful - depending upon what is currently being used to test.
+    List of bounding boxes.
 
 SourceFiles
-    calcEntry.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef calcEntry_H
-#define calcEntry_H
+#ifndef treeBoundBoxList_H
+#define treeBoundBoxList_H
 
-#include "functionEntry.H"
+#include "treeBoundBox.H"
+#include "List.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace functionEntries
-{
-
-/*---------------------------------------------------------------------------*\
-                          Class calcEntry Declaration
-\*---------------------------------------------------------------------------*/
-
-class calcEntry
-:
-    public functionEntry
-{
-    // Private Member Functions
-
-        //- Disallow default bitwise copy construct
-        calcEntry(const calcEntry&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const calcEntry&);
-
-
-public:
-
-    //- Runtime type information
-    ClassName("calc");
-
-
-    // Member Functions
-
-        static bool execute
-        (
-            const dictionary& parentDict,
-            primitiveEntry& entry,
-            Istream& is
-        );
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace functionEntries
-} // End namespace Foam
+    typedef List<treeBoundBox> treeBoundBoxList;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

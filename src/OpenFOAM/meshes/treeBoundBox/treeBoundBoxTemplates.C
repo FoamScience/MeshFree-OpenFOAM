@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2010 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,60 +21,36 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Namespace
-    Foam::functionEntries::calcEntryInternal
-
-Description
-    Contains global functions and classes for the calcEntry.
-
-SourceFiles
-    calcEntryInternal.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef calcEntryInternal_H
-#define calcEntryInternal_H
+#include "treeBoundBox.H"
+#include "FixedList.H"
 
-#include "error.H"
-#include "scalar.H"
-#include "DynamicList.H"
-#include "globalFunctionSelectionTables.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-namespace Foam
+
+template<unsigned Size>
+Foam::treeBoundBox::treeBoundBox
+(
+    const UList<point>& points,
+    const FixedList<label, Size>& indices
+)
+:
+    boundBox(points, indices, false)
 {
-namespace functionEntries
-{
-namespace calcEntryInternal
-{
-
-    // Global Function Selectors
-
-    declareGlobalFunctionSelectionTable
-    (
-        scalar,
-        dispatch,
-        ParamList,
+    // points may be empty, but a FixedList is never empty
+    if (points.empty())
+    {
+        WarningIn
         (
-            const UList<scalar>& param
-        ),
-        (param)
-    );
+            "treeBoundBox::treeBoundBox"
+            "(const UList<point>&, const FixedList<label, Size>&)"
+        )   << "cannot find bounding box for zero-sized pointField, "
+            << "returning zero" << endl;
 
-
-    //- Dispatch calculation to the named function
-    scalar dispatch(const word&, const UList<scalar>&);
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace calcEntryInternal
-} // End namespace functionEntries
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
+        return;
+    }
+}
 
 // ************************************************************************* //
