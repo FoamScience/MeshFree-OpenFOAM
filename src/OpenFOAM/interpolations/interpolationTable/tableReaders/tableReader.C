@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2009-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,77 +23,66 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOOutputFilter.H"
-#include "Time.H"
+#include "tableReader.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::autoPtr<Foam::tableReader<Type> > Foam::tableReader<Type>::New
+(
+    const dictionary& spec
+)
+{
+    const word readerType = spec.lookupOrDefault<word>
+    (
+        "readerType",
+        "openFoam"
+    );
+
+    typename dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_
+            ->find(readerType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalErrorIn
+        (
+            "tableReader::New(const dictionary&)"
+        )   << "Unknown reader type " << readerType
+            << nl << nl
+            << "Valid reader types : " << nl
+            << dictionaryConstructorTablePtr_->sortedToc()
+            << exit(FatalError);
+    }
+
+    return autoPtr<tableReader<Type> >(cstrIter()(spec));
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::IOOutputFilter
-(
-    const word& outputFilterName,
-    const IOobject& ioDict,
-    const bool readFromFiles
-)
-:
-    IOdictionary(ioDict),
-    OutputFilter(outputFilterName, ioDict.db(), *this, readFromFiles)
-{}
-
-
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::IOOutputFilter
-(
-    const word& outputFilterName,
-    const objectRegistry& obr,
-    const fileName& dictName,
-    const IOobject::readOption rOpt,
-    const bool readFromFiles
-)
-:
-    IOdictionary
-    (
-        IOobject
-        (
-            dictName,
-            obr.time().system(),
-            obr,
-            rOpt,
-            IOobject::NO_WRITE
-        )
-    ),
-    OutputFilter(outputFilterName, obr, *this, readFromFiles)
+template<class Type>
+Foam::tableReader<Type>::tableReader(const dictionary&)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class OutputFilter>
-Foam::IOOutputFilter<OutputFilter>::~IOOutputFilter()
+template<class Type>
+Foam::tableReader<Type>::~tableReader()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class OutputFilter>
-bool Foam::IOOutputFilter<OutputFilter>::read()
+template<class Type>
+void Foam::tableReader<Type>::write(Ostream& os) const
 {
-    if (regIOobject::read())
+    if (this->type() != "openFoam")
     {
-        OutputFilter::read(*this);
-        return true;
+        os.writeKeyword("readerType")
+            << this->type() << token::END_STATEMENT << nl;
     }
-    else
-    {
-        return false;
-    }
-}
-
-
-template<class OutputFilter>
-void Foam::IOOutputFilter<OutputFilter>::write()
-{
-    OutputFilter::write();
 }
 
 

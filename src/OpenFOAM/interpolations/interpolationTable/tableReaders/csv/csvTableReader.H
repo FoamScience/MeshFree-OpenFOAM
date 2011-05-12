@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,23 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::GeometricField
+    Foam::csvTableReader
 
 Description
-    A class representing the concept of a GeometricField of 1 used to avoid
-    unnecessary manipulations for objects which are known to be one at
-    compile-time.
+    Reads an interpolation table from a file - CSV-format
 
-    Used for example as the density argument to a function written for
-    compressible to be used for incompressible flow.
+SourceFiles
+    tableReader.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef geometricOneField_H
-#define geometricOneField_H
+#ifndef csvTableReader_H
+#define csvTableReader_H
 
-#include "oneFieldField.H"
-#include "scalar.H"
+#include "tableReader.H"
+#include "labelList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,32 +44,67 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class geometricOneField Declaration
+                        Class csvTableReader Declaration
 \*---------------------------------------------------------------------------*/
 
-class geometricOneField
+template<class Type>
+class csvTableReader
 :
-    public one
+    public tableReader<Type>
 {
+    // Private data
+
+        //- Does the file have a header line?
+        const bool headerLine_;
+
+        //- Column of the time
+        const label timeColumn_;
+
+        //- Labels of the components
+        const labelList componentColumns_;
+
+        //- Read the next value from the splitted string
+        Type readValue(const List<string>&);
+
+        //- Separator character
+        const char separator_;
+
 
 public:
 
+    //- Runtime type information
+    TypeName("csv");
+
+
     // Constructors
 
-        //- Construct null
-        geometricOneField()
-        {}
+        //- Construct from dictionary
+        csvTableReader(const dictionary& dict);
+
+        //- Construct and return a copy
+        virtual autoPtr<tableReader<Type> > clone() const
+        {
+            return autoPtr<tableReader<Type> >
+            (
+                new csvTableReader<Type>
+                (
+                    *this
+                )
+            );
+        }
 
 
-    // Member Operators
+    //- Destructor
+    virtual ~csvTableReader();
 
-        inline scalar operator[](const label) const;
 
-        inline oneField field() const;
+    // Member Functions
 
-        inline oneField oldTime() const;
+        //- Read the table
+        virtual void operator()(const fileName&, List<Tuple2<scalar, Type> >&);
 
-        inline oneFieldField boundaryField() const;
+        //- write the remaining parameters
+        virtual void write(Ostream& os) const;
 };
 
 
@@ -81,7 +114,9 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#   include "geometricOneFieldI.H"
+#ifdef NoRepository
+#   include "csvTableReader.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

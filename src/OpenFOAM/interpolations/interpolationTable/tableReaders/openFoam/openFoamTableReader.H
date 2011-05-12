@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,23 +22,20 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::GeometricField
+    Foam::openFoamTableReader
 
 Description
-    A class representing the concept of a GeometricField of 1 used to avoid
-    unnecessary manipulations for objects which are known to be one at
-    compile-time.
+    Reads an interpolation table from a file - OpenFOAM-format
 
-    Used for example as the density argument to a function written for
-    compressible to be used for incompressible flow.
+SourceFiles
+    openFoamTableReader.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef geometricOneField_H
-#define geometricOneField_H
+#ifndef openFoamTableReader_H
+#define openFoamTableReader_H
 
-#include "oneFieldField.H"
-#include "scalar.H"
+#include "tableReader.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,32 +43,47 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class geometricOneField Declaration
+                     Class openFoamTableReader Declaration
 \*---------------------------------------------------------------------------*/
 
-class geometricOneField
+template<class Type>
+class openFoamTableReader
 :
-    public one
+    public tableReader<Type>
 {
 
 public:
 
+    //- Runtime type information
+    TypeName("openFoam");
+
+
     // Constructors
 
-        //- Construct null
-        geometricOneField()
-        {}
+        //- Construct from dictionary
+        openFoamTableReader(const dictionary &dict);
+
+        //- Construct and return a copy
+        virtual autoPtr<tableReader<Type> > clone() const
+        {
+            return autoPtr<tableReader<Type> >
+            (
+                new openFoamTableReader<Type>
+                (
+                    *this
+                )
+            );
+        }
 
 
-    // Member Operators
+    //- Destructor
+    virtual ~openFoamTableReader();
 
-        inline scalar operator[](const label) const;
 
-        inline oneField field() const;
+    // Member functions
 
-        inline oneField oldTime() const;
-
-        inline oneFieldField boundaryField() const;
+        //- Read the table
+        virtual void operator()(const fileName&, List<Tuple2<scalar, Type> > &);
 };
 
 
@@ -81,7 +93,10 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#   include "geometricOneFieldI.H"
+#ifdef NoRepository
+#   include "openFoamTableReader.C"
+#endif
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

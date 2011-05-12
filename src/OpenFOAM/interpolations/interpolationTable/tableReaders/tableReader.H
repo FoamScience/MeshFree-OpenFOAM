@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,23 +22,28 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::GeometricField
+    Foam::tableReader
 
 Description
-    A class representing the concept of a GeometricField of 1 used to avoid
-    unnecessary manipulations for objects which are known to be one at
-    compile-time.
+    Base class to read table data for the interpolationTable
 
-    Used for example as the density argument to a function written for
-    compressible to be used for incompressible flow.
+SourceFiles
+    tableReader.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef geometricOneField_H
-#define geometricOneField_H
+#ifndef tableReader_H
+#define tableReader_H
 
-#include "oneFieldField.H"
-#include "scalar.H"
+#include "fileName.H"
+#include "wordList.H"
+#include "vector.H"
+#include "tensor.H"
+#include "typeInfo.H"
+#include "runTimeSelectionTables.H"
+#include "autoPtr.H"
+#include "dictionary.H"
+#include "Tuple2.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,32 +51,60 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class geometricOneField Declaration
+                         Class tableReader Declaration
 \*---------------------------------------------------------------------------*/
 
-class geometricOneField
-:
-    public one
+template<class Type>
+class tableReader
 {
 
 public:
 
+    //- Runtime type information
+    TypeName("tableReader");
+
+    // Declare run-time constructor selection table
+
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            tableReader,
+            dictionary,
+            (const dictionary& dict),
+            (dict)
+        );
+
+
     // Constructors
 
-        //- Construct null
-        geometricOneField()
-        {}
+        //- Construct from dictionary
+        tableReader(const dictionary& dict);
+
+        //- Construct and return a clone
+        virtual autoPtr<tableReader<Type> > clone() const = 0;
 
 
-    // Member Operators
+    // Selectors
 
-        inline scalar operator[](const label) const;
+        //- Return a reference to the selected tableReader
+        static autoPtr<tableReader> New(const dictionary& spec);
 
-        inline oneField field() const;
 
-        inline oneField oldTime() const;
+    //- Destructor
+    virtual ~tableReader();
 
-        inline oneFieldField boundaryField() const;
+
+    // Member functions
+
+        //- Read the table
+        virtual void operator()
+        (
+            const fileName&,
+            List<Tuple2<scalar, Type> >&
+        ) = 0;
+
+        //- Write additional information
+        virtual void write(Ostream& os) const;
 };
 
 
@@ -81,7 +114,10 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#   include "geometricOneFieldI.H"
+#ifdef NoRepository
+#   include "tableReader.C"
+#endif
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

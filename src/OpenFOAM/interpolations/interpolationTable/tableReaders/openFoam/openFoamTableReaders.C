@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,30 +21,17 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    scalarField with IO.
-
 \*---------------------------------------------------------------------------*/
 
-#include "scalarFieldIOField.H"
+#include "openFoamTableReader.H"
+#include "tableReaders.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTemplateTypeNameAndDebugWithName
-    (
-        scalarFieldIOField,
-        "scalarFieldField",
-        0
-    );
-
-    defineTemplateTypeNameAndDebugWithName
-    (
-        scalarFieldCompactIOField,
-        "scalarFieldCompactField",
-        0
-    );
+    makeTableReaders(openFoamTableReader);
 }
 
 // ************************************************************************* //

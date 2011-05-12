@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,30 +21,39 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    scalarField with IO.
-
 \*---------------------------------------------------------------------------*/
 
-#include "scalarFieldIOField.H"
+#include "openFoamTableReader.H"
+#include "IFstream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+Foam::openFoamTableReader<Type>::openFoamTableReader(const dictionary& dict)
+:
+    tableReader<Type>(dict)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+template<class Type>
+Foam::openFoamTableReader<Type>::~openFoamTableReader()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Type>
+void Foam::openFoamTableReader<Type>::operator()
+(
+    const fileName& fName,
+    List<Tuple2<scalar, Type> >& data
+)
 {
-    defineTemplateTypeNameAndDebugWithName
-    (
-        scalarFieldIOField,
-        "scalarFieldField",
-        0
-    );
-
-    defineTemplateTypeNameAndDebugWithName
-    (
-        scalarFieldCompactIOField,
-        "scalarFieldCompactField",
-        0
-    );
+    // Read data from file
+    IFstream(fName)() >> data;
 }
+
 
 // ************************************************************************* //
