@@ -22,7 +22,7 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     paraview3/cshrc
+#     config/paraview.csh
 #
 # Description
 #     Setup file for paraview-3.x
@@ -49,7 +49,7 @@ foreach cmake ( cmake-2.8.4 cmake-2.8.3 cmake-2.8.1 )
 end
 
 #- ParaView version, automatically determine major version:
-setenv ParaView_VERSION 3.8.0
+setenv ParaView_VERSION 3.10.1
 setenv ParaView_MAJOR detect
 
 

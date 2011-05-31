@@ -1,8 +1,8 @@
-#----------------------------------*-sh-*--------------------------------------
+#-------------------------------*- makefile -*---------------------------------
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
@@ -22,28 +22,21 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     config/compiler.sh
+#     MakefileDirs
 #
 # Description
-#     Fine tuning of ThirdParty compiler settings for OpenFOAM
-#     Sourced from OpenFOAM-<VERSION>/etc/settings.sh
+#     Makefile used by
+#         foamRunTutorials
+#     to call some script in subdirectories.
 #
 #------------------------------------------------------------------------------
 
-# Modified compiler settings
-case "$WM_COMPILER" in
-Gcc46 | Gcc46++0x)
-    gcc_version=gcc-4.6.0
-    gmp_version=gmp-5.0.1
-    mpfr_version=mpfr-2.4.2
-    mpc_version=mpc-0.8.1
-    ;;
-Gcc45 | Gcc45++0x)
-    gcc_version=gcc-4.5.2
-    gmp_version=gmp-5.0.1
-    mpfr_version=mpfr-2.4.2
-    mpc_version=mpc-0.8.1
-    ;;
-esac
+.PHONY: application $(FOAM_TARGETS)
 
-# ----------------------------------------------------------------- end-of-file
+application: $(FOAM_TARGETS)
+
+$(FOAM_TARGETS):
+	@(cd $@ && $(FOAM_APP))
+
+
+#------------------------------------------------------------------------------

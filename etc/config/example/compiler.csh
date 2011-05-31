@@ -22,15 +22,30 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     config/openmpi.sh
+#     config/example/compiler.csh
 #
 # Description
-#     Fine tuning of openmpi settings for OpenFOAM
-#     Sourced from OpenFOAM-<VERSION>/etc/settings.sh
+#     Example of fine tuning ThirdParty compiler settings for OpenFOAM
+#     Sourced from OpenFOAM-<VERSION>/etc/config/settings.csh
 #
 #------------------------------------------------------------------------------
 
-# Modified openmpi settings
-export FOAM_MPI=openmpi-1.4.3
+# Modified compiler settings
+switch ("$WM_COMPILER")
+case Gcc46:
+case Gcc46++0x:
+    set gcc_version=gcc-4.6.0
+    set gmp_version=gmp-5.0.1
+    set mpfr_version=mpfr-2.4.2
+    set mpc_version=mpc-0.8.1
+    breaksw
+case Gcc45:
+case Gcc45++0x:
+    set gcc_version=gcc-4.5.2
+    set gmp_version=gmp-5.0.1
+    set mpfr_version=mpfr-2.4.2
+    set mpc_version=mpc-0.8.1
+    breaksw
+endsw
 
 # ----------------------------------------------------------------- end-of-file

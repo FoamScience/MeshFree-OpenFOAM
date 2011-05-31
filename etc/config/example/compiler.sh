@@ -22,25 +22,28 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     paraview3/cshrc-EXAMPLE
+#     config/example/compiler.sh
 #
 # Description
-#     Example of chaining to the standard paraview3/cshrc with a
-#     different ParaView_VERSION
-#
-# Note
-#     This file could be copied to a user or site location, but should never
-#     replace the default shipped version as this will cause an infinite loop
+#     Example of fine tuning ThirdParty compiler settings for OpenFOAM
+#     Sourced from OpenFOAM-<VERSION>/etc/config/settings.sh
 #
 #------------------------------------------------------------------------------
 
-#
-# Use other (shipped) cshrc with a different ParaView_VERSION
-#
+# Modified compiler settings
+case "$WM_COMPILER" in
+Gcc46 | Gcc46++0x)
+    gcc_version=gcc-4.6.0
+    gmp_version=gmp-5.0.1
+    mpfr_version=mpfr-2.4.2
+    mpc_version=mpc-0.8.1
+    ;;
+Gcc45 | Gcc45++0x)
+    gcc_version=gcc-4.5.2
+    gmp_version=gmp-5.0.1
+    mpfr_version=mpfr-2.4.2
+    mpc_version=mpc-0.8.1
+    ;;
+esac
 
-set foamFile=`$WM_PROJECT_DIR/bin/foamEtcFile -mode o apps/paraview3/cshrc`
-if ( $status == 0 ) source $foamFile ParaView_VERSION=3.9.0
-
-unset foamFile
-
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------- end-of-file

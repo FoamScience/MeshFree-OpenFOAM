@@ -2,9 +2,9 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2004-2011 OpenCFD Ltd.
 #    \\/     M anipulation  |
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
 #
@@ -22,27 +22,33 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     etc/prefs.csh
+#     config/ensight.csh
 #
 # Description
-#     Preset variables for the OpenFOAM configuration - C-Shell shell syntax.
-#
-#     The prefs.csh file will be sourced by the OpenFOAM etc/cshrc when it is
-#     found by foamEtcFile.
-#
-# See Also
-#     'foamEtcFile -help' or 'foamEtcFile -list' for information about the
-#     paths searched
+#     Setup file for Ensight
+#     Sourced from OpenFOAM-*/etc/cshrc
 #
 #------------------------------------------------------------------------------
 
-## Specify OpenFOAM ThirdParty compiler
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# set foamCompiler=ThirdParty
+# fallback value
+if (! $?CEI_HOME) then
+    setenv CEI_HOME /usr/local/ensight/CEI
+endif
 
-## Specify system openmpi
-## ~~~~~~~~~~~~~~~~~~~~~~
-# setenv WM_MPLIB SYSTEMOPENMPI
+if ( -r $CEI_HOME ) then
 
+    # special treatment for 32bit OpenFOAM and 64bit Ensight
+    if ($WM_ARCH == linux && `uname -m` == x86_64) then
+        setenv CEI_ARCH linux_2.6_32
+    endif
 
-# ----------------------------------------------------------------- end-of-file
+    # add to path
+    setenv PATH ${CEI_HOME}/bin:${PATH}
+
+    setenv ENSIGHT9_INPUT dummy
+    setenv ENSIGHT9_READER $FOAM_LIBBIN
+else
+    unsetenv CEI_HOME
+endif
+
+# -----------------------------------------------------------------------------

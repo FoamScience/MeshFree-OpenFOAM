@@ -2,7 +2,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2010-2011 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2011-2011 OpenCFD Ltd.
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
@@ -22,19 +22,15 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     scotch/bashrc
+#     config/example/openmpi.sh
 #
 # Description
-#     Setup file for scotch include/libraries.
-#     Sourced during wmake process only.
+#     Example of fine tuning openmpi settings for OpenFOAM
+#     Sourced from OpenFOAM-<VERSION>/etc/config/settings.sh
 #
-# Note
-#     A csh version is not needed, since the values here are only sourced
-#     during the wmake process
 #------------------------------------------------------------------------------
 
-export SCOTCH_VERSION=scotch_5.1.11
-export SCOTCH_ARCH_PATH=$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$SCOTCH_VERSION
+# Modified openmpi settings
+export FOAM_MPI=openmpi-1.4.3
 
-
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------- end-of-file

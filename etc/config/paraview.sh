@@ -22,7 +22,7 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     paraview3/bashrc
+#     config/paraview.sh
 #
 # Description
 #     Setup file for paraview-3.x
@@ -51,7 +51,7 @@ done
 
 
 #- ParaView version, automatically determine major version
-export ParaView_VERSION=3.8.0
+export ParaView_VERSION=3.10.1
 export ParaView_MAJOR=detect
 
 
@@ -112,7 +112,6 @@ then
 else
     unset PV_PLUGIN_PATH
 fi
-
 
 unset _foamParaviewEval
 unset cleaned cmake paraviewInstDir paraviewPython
