@@ -23,57 +23,45 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Constant.H"
+#include "DataEntry.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Constant<Type>::Constant(const word& entryName, const dictionary& dict)
-:
-    DataEntry<Type>(entryName),
-    value_(pTraits<Type>::zero)
+Foam::Ostream& Foam::operator<<
+(
+    Ostream& os,
+    const TableBase<Type>& tbl
+)
 {
-    Istream& is(dict.lookup(entryName));
-    word entryType(is);
+    if (os.format() == IOstream::ASCII)
+    {
+         os << token::SPACE << tbl.table_;
+    }
+    else
+    {
+        os.write
+        (
+            reinterpret_cast<const char*>(&tbl.table_),
+            sizeof(tbl.table_)
+        );
+    }
 
-    is  >> value_;
+    // Check state of Ostream
+    os.check
+    (
+        "Ostream& operator<<(Ostream&, const TableBase<Type>&, const bool)"
+    );
+
+    return os;
 }
 
 
 template<class Type>
-Foam::Constant<Type>::Constant(const Constant<Type>& cnst)
-:
-    DataEntry<Type>(cnst),
-    value_(cnst.value_)
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-template<class Type>
-Foam::Constant<Type>::~Constant()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<class Type>
-Type Foam::Constant<Type>::value(const scalar x) const
+void Foam::TableBase<Type>::writeData(Ostream& os) const
 {
-    return value_;
+    os  << nl << indent << table_ << token::END_STATEMENT << nl;
 }
-
-
-template<class Type>
-Type Foam::Constant<Type>::integrate(const scalar x1, const scalar x2) const
-{
-    return (x2 - x1)*value_;
-}
-
-
-// * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * * * //
-
-#include "ConstantIO.C"
 
 
 // ************************************************************************* //
