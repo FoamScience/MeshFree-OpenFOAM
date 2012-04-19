@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,48 +23,55 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "clockTime.H"
-#include <sys/time.h>
+#include "interpolationWeights.H"
+#include "ListOps.H"
+#include "IOobject.H"
+#include "HashSet.H"
+#include "objectRegistry.H"
 
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void Foam::clockTime::getTime(timeType& t)
+namespace Foam
 {
-    gettimeofday(&t, 0);
-}
-
-
-double Foam::clockTime::timeDifference(const timeType& beg, const timeType& end)
-{
-    return end.tv_sec - beg.tv_sec + 1e-6*(end.tv_usec - beg.tv_usec);
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::clockTime::clockTime()
-{
-    getTime(startTime_);
-    lastTime_ = startTime_;
-    newTime_ = startTime_;
-}
-
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-double Foam::clockTime::elapsedTime() const
+template<class ListType1, class ListType2>
+typename Foam::outerProduct
+<
+    typename ListType1::value_type,
+    typename ListType2::value_type
+>::type
+Foam::interpolationWeights::weightedSum
+(
+    const ListType1& f1,
+    const ListType2& f2
+)
 {
-    getTime(newTime_);
-    return timeDifference(startTime_, newTime_);
+    typedef typename outerProduct
+    <
+        typename ListType1::value_type,
+        typename ListType2::value_type
+    >::type returnType;
+
+    if (f1.size())
+    {
+        returnType SumProd = f1[0]*f2[0];
+        for (label i = 1; i < f1.size(); ++i)
+        {
+            SumProd += f1[i]*f2[i];
+        }
+        return SumProd;
+    }
+    else
+    {
+        return pTraits<returnType>::zero;
+    }
 }
 
 
-double Foam::clockTime::timeIncrement() const
-{
-    lastTime_ = newTime_;
-    getTime(newTime_);
-    return timeDifference(lastTime_, newTime_);
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace Foam
 
 // ************************************************************************* //
