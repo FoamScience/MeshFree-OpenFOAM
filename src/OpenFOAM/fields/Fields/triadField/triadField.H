@@ -21,63 +21,40 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::triadField
+
 Description
-    Determine correspondence between points. See below.
+    Specialisation of Field\<T\> for triad.
 
 SourceFiles
-    matchPoints.C
+    triadField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef matchPoints_H
-#define matchPoints_H
+#ifndef triadField_H
+#define triadField_H
 
-#include "scalarField.H"
-#include "pointField.H"
+#include "Field.H"
+#include "triad.H"
+
+#define TEMPLATE
+#include "FieldFunctionsM.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                      Function matchPoints Declaration
-\*---------------------------------------------------------------------------*/
+typedef Field<triad> triadField;
 
-//- Determine correspondence between pointFields. Gets passed
-//  local matching distance per point. Returns map from 0 to 1. Returns
-//  true if found corresponding point in 1 for every point in 0; false
-//  otherwise. Compares mag(pt - origin) and does proper comparison for points
-//  with (almost) identical mag. pts0 can be subset of pts1.
-bool matchPoints
-(
-    const UList<point>& pts0,
-    const UList<point>& pts1,
-    const UList<scalar>& matchDistance,
-    const bool verbose,
-    labelList& from0To1,
-    const point& origin = point::zero
-);
-
-
-//- Supply pts0Dir and pts1Dir. They are directions associated with the points
-//  e.g., a face normal associated with each face centre.
-//  A match between similar points is only allowed if their directions are
-//  equal and opposite
-bool matchPoints
-(
-    const UList<point>& pts0,
-    const UList<point>& pts1,
-    const UList<point>& pts0Dir,
-    const UList<point>& pts1Dir,
-    const UList<scalar>& matchDistance,
-    const bool verbose,
-    labelList& from0To1,
-    const point& origin = point::zero
-);
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "undefFieldFunctionsM.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
