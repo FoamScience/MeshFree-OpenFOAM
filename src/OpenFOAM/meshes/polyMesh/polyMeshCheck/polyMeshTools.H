@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,82 +21,86 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::DiagonalMatrix
+Namespace
+    Foam::polyMeshTools
 
 Description
-    DiagonalMatrix<Type> is a 2D diagonal matrix of objects
-    of type Type, size nxn
+    Collection of static functions operating on polyMesh (mainly checks) so
+    that need access to patch information.
 
 SourceFiles
-    DiagonalMatrix.C
+    polyMeshTools.C
 
 \*---------------------------------------------------------------------------*/
+#ifndef polyMeshTools_H
+#define polyMeshTools_H
 
-#ifndef DiagonalMatrix_H
-#define DiagonalMatrix_H
-
-#include "List.H"
+#include "polyMesh.H"
+#include "primitiveMeshTools.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * *  * * * * * * Class Forward declaration  * * * * * * * * * * * //
-
-template<class Form, class Type> class Matrix;
-
 /*---------------------------------------------------------------------------*\
-                           Class DiagonalMatrix Declaration
+                        Namespace polyMeshTools Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class DiagonalMatrix
+class polyMeshTools
 :
-    public List<Type>
+    public primitiveMeshTools
 {
+
 public:
 
-    // Constructors
+    //- Generate orthogonality field. (1 for fully orthogonal, < 1 for
+    //  non-orthogonal)
+    static tmp<scalarField> faceOrthogonality
+    (
+        const polyMesh& mesh,
+        const vectorField& fAreas,
+        const vectorField& cellCtrs
+    );
 
-        //- Null constructor.
-        DiagonalMatrix<Type>();
+//    static tmp<scalarField> faceOrthogonality(const polyMesh& mesh)
+//    {
+//        return faceOrthogonality
+//        (
+//            mesh,
+//            mesh.faceAreas(),
+//            mesh.cellCentres()
+//        );
+//    }
 
-        //- Construct from diagonal component of a Matrix
-        template<class Form>
-        DiagonalMatrix<Type>(const Matrix<Form, Type>&);
+    //- Generate skewness field
+    static tmp<scalarField> faceSkewness
+    (
+        const polyMesh& mesh,
+        const pointField& points,
+        const vectorField& fCtrs,
+        const vectorField& fAreas,
+        const vectorField& cellCtrs
+    );
 
-        //- Construct empty from size
-        DiagonalMatrix<Type>(const label size);
+//    static tmp<scalarField> faceSkewness(const polyMesh& mesh)
+//    {
+//        return faceSkewness
+//        (
+//            mesh,
+//            mesh.points(),
+//            mesh.faceCentres(),
+//            mesh.faceAreas(),
+//            mesh.cellCentres()
+//        );
+//    }
 
-        //- Construct from size and a value
-        DiagonalMatrix<Type>(const label, const Type&);
-
-
-    // Member functions
-
-        //- Invert the diaganol matrix and return itself
-        DiagonalMatrix<Type>& invert();
 };
-
-
-// Global functions
-
-//- Return the diagonal Matrix inverse
-template<class Type>
-DiagonalMatrix<Type> inv(const DiagonalMatrix<Type>&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-#   include "DiagonalMatrix.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
