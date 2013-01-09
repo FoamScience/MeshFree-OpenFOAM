@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,16 +23,24 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// Constants supplied in the main controlDict
-#include "fundamentalConstants.C"
+template<class Type>
+Foam::labelHashSet Foam::polyBoundaryMesh::findPatchIDs() const
+{
+    const polyBoundaryMesh& bm = *this;
 
-// Derived constants. Note:order is important
-#include "universalConstants.C"
-#include "electromagneticConstants.C"
-#include "atomicConstants.C"
-#include "physicoChemicalConstants.C"
+    labelHashSet patchIDs(bm.size());
+
+    forAll(bm, patchI)
+    {
+        if (isA<Type>(bm[patchI]))
+        {
+            patchIDs.insert(patchI);
+        }
+    }
+    return patchIDs;
+}
 
 
 // ************************************************************************* //
