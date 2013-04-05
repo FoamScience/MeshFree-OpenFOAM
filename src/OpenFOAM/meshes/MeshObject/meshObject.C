@@ -23,64 +23,30 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "dimensionedSphericalTensor.H"
+#include "MeshObject.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+/* * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * */
 
 namespace Foam
 {
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-template<>
-dimensionedSphericalTensor dimensionedSphericalTensor::T() const
-{
-    return dimensionedSphericalTensor
-    (
-        name()+".T()",
-        dimensions(),
-        value().T()
-    );
+    defineTypeNameAndDebug(meshObject, 0);
 }
 
 
-// * * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-dimensionedScalar tr(const dimensionedSphericalTensor& dt)
-{
-    return dimensionedScalar
+Foam::meshObject::meshObject(const word& typeName, const objectRegistry& obr)
+:
+    regIOobject
     (
-        "tr("+dt.name()+')',
-        dt.dimensions(),
-        tr(dt.value())
-    );
-}
+        IOobject
+        (
+            typeName,
+            obr.instance(),
+            obr
+        )
+    )
+{}
 
-
-dimensionedScalar det(const dimensionedSphericalTensor& dt)
-{
-    return dimensionedScalar
-    (
-        "det("+dt.name()+')',
-        pow(dt.dimensions(), sphericalTensor::dim),
-        det(dt.value())
-    );
-}
-
-
-dimensionedSphericalTensor inv(const dimensionedSphericalTensor& dt)
-{
-    return dimensionedSphericalTensor
-    (
-        "inv("+dt.name()+')',
-        dimless/dt.dimensions(),
-        inv(dt.value())
-    );
-}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
