@@ -21,20 +21,29 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::quaternionIOField
+
+Description
+    quaternionField with IO.
+
 \*---------------------------------------------------------------------------*/
 
-#include "PatchTools.H"
+#ifndef quaternionIOField_H
+#define quaternionIOField_H
 
-#include "PatchToolsCheck.C"
-#include "PatchToolsEdgeOwner.C"
-#include "PatchToolsGatherAndMerge.C"
-#include "PatchToolsSearch.C"
-#include "PatchToolsSortEdges.C"
-#include "PatchToolsSortPoints.C"
-#include "PatchToolsNormals.C"
-#include "PatchToolsMatch.C"
+#include "quaternionField.H"
+#include "IOField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+    typedef IOField<quaternion> quaternionIOField;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

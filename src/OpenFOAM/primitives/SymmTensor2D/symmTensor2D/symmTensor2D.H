@@ -21,20 +21,43 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::symmTensor2D
+
+Description
+    SymmTensor2D of scalars.
+
+SourceFiles
+    symmTensor2D.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "PatchTools.H"
+#ifndef symmTensor2D_H
+#define symmTensor2D_H
 
-#include "PatchToolsCheck.C"
-#include "PatchToolsEdgeOwner.C"
-#include "PatchToolsGatherAndMerge.C"
-#include "PatchToolsSearch.C"
-#include "PatchToolsSortEdges.C"
-#include "PatchToolsSortPoints.C"
-#include "PatchToolsNormals.C"
-#include "PatchToolsMatch.C"
+#include "SymmTensor2D.H"
+#include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+typedef SymmTensor2D<scalar> symmTensor2D;
+
+//- Data associated with symmTensor2D type are contiguous
+template<>
+inline bool contiguous<symmTensor2D>() {return true;}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

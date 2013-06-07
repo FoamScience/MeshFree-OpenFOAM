@@ -23,18 +23,63 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "PatchTools.H"
-
-#include "PatchToolsCheck.C"
-#include "PatchToolsEdgeOwner.C"
-#include "PatchToolsGatherAndMerge.C"
-#include "PatchToolsSearch.C"
-#include "PatchToolsSortEdges.C"
-#include "PatchToolsSortPoints.C"
-#include "PatchToolsNormals.C"
-#include "PatchToolsMatch.C"
+#include "symmTensor2D.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+template<>
+const char* const symmTensor2D::typeName = "symmTensor2D";
+
+template<>
+const char* symmTensor2D::componentNames[] =
+{
+    "xx", "xy",
+          "yy"
+};
+
+template<>
+const symmTensor2D symmTensor2D::zero
+(
+    0, 0,
+       0
+);
+
+template<>
+const symmTensor2D symmTensor2D::one
+(
+    1, 1,
+       1
+);
+
+template<>
+const symmTensor2D symmTensor2D::max
+(
+    VGREAT, VGREAT,
+            VGREAT
+);
+
+template<>
+const symmTensor2D symmTensor2D::min
+(
+    -VGREAT, -VGREAT,
+             -VGREAT
+);
+
+template<>
+const symmTensor2D symmTensor2D::I
+(
+    1, 0,
+       1
+);
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //
