@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,28 +23,51 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "pairGAMGAgglomeration.H"
+#include "SquareMatrix.H"
+#include "labelList.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+Foam::scalar Foam::detDecomposed
+(
+    const SquareMatrix<Type>& matrix,
+    const label sign
+)
 {
-    defineTypeNameAndDebug(pairGAMGAgglomeration, 0);
-    bool pairGAMGAgglomeration::forward_(true);
+    scalar diagProduct = 1.0;
+
+    for (label i = 0; i < matrix.n(); ++i)
+    {
+        diagProduct *= matrix[i][i];
+    }
+
+    return sign*diagProduct;
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+template<class Type>
+Foam::scalar Foam::det(const SquareMatrix<Type>& matrix)
+{
+    SquareMatrix<Type> matrixTmp = matrix;
 
-Foam::pairGAMGAgglomeration::pairGAMGAgglomeration
-(
-    const lduMesh& mesh,
-    const dictionary& controlDict
-)
-:
-    GAMGAgglomeration(mesh, controlDict),
-    mergeLevels_(readLabel(controlDict.lookup("mergeLevels")))
-{}
+    labelList pivotIndices(matrix.n());
+    label sign;
+    LUDecompose(matrixTmp, pivotIndices, sign);
+
+    return detDecomposed(matrixTmp, sign);
+}
 
 
-// ************************************************************************* //
+template<class Type>
+Foam::scalar Foam::det(SquareMatrix<Type>& matrix)
+{
+    labelList pivotIndices(matrix.n());
+    label sign;
+    LUDecompose(matrix, pivotIndices, sign);
+
+    return detDecomposed(matrix, sign);
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
