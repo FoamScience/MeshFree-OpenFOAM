@@ -51,8 +51,7 @@ done
 
 
 #- ParaView version, automatically determine major version
-#export ParaView_VERSION=3.12.0
-export ParaView_VERSION=3.98.1
+export ParaView_VERSION=4.0.1
 export ParaView_MAJOR=detect
 
 
