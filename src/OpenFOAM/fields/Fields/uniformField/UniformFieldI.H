@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,33 +23,29 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "DimensionedSphericalTensorField.H"
-
-#define TEMPLATE template<class GeoMesh>
-#include "DimensionedFieldFunctionsM.C"
+#include "UniformField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+inline Foam::UniformField<Type>::UniformField(const Type& value)
+:
+    value_(value)
+{}
+
+
+template<class Type>
+inline Type Foam::UniformField<Type>::operator[](const label) const
 {
-
-// * * * * * * * * * * * * * * * global functions  * * * * * * * * * * * * * //
-
-UNARY_FUNCTION(scalar, sphericalTensor, tr, transform)
-UNARY_FUNCTION(sphericalTensor, sphericalTensor, sph, transform)
-UNARY_FUNCTION(scalar, sphericalTensor, det, pow3)
-UNARY_FUNCTION(sphericalTensor, sphericalTensor, inv, inv)
-
-BINARY_OPERATOR(sphericalTensor, scalar, sphericalTensor, /, '|', divide)
-BINARY_TYPE_OPERATOR(sphericalTensor, scalar, sphericalTensor, /, '|', divide)
+    return value_;
+}
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+template<class Type>
+inline Foam::UniformField<Type> Foam::UniformField<Type>::field() const
+{
+    return UniformField(value_);
+}
 
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "undefFieldFunctionsM.H"
 
 // ************************************************************************* //

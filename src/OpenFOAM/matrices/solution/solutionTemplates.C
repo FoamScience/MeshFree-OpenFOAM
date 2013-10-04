@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,46 +23,30 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "GeometricSymmTensorField.H"
-#include "symmTensorFieldField.H"
+#include "solution.H"
 
-#define TEMPLATE template<template<class> class PatchField, class GeoMesh>
-#include "GeometricFieldFunctionsM.C"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class FieldType>
+void Foam::solution::cachePrintMessage
+(
+    const char* message,
+    const word& name,
+    const FieldType& vf
+)
 {
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-UNARY_FUNCTION(symmTensor, vector, sqr, sqr)
-
-UNARY_FUNCTION(scalar, symmTensor, tr, transform)
-UNARY_FUNCTION(sphericalTensor, symmTensor, sph, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, symm, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, twoSymm, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, dev, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, dev2, transform)
-UNARY_FUNCTION(scalar, symmTensor, det, pow3)
-UNARY_FUNCTION(symmTensor, symmTensor, cof, pow2)
-UNARY_FUNCTION(symmTensor, symmTensor, inv, inv)
-
-
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
-
-UNARY_OPERATOR(vector, symmTensor, *, hdual, transform)
-
-BINARY_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
-BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
+    if (solution::debug)
+    {
+        Info<< "Cache: " << message << token::SPACE << name
+            << ", originating from " << vf.name()
+            << " event No. " << vf.eventNo()
+            << endl;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "undefFieldFunctionsM.H"
 
 // ************************************************************************* //

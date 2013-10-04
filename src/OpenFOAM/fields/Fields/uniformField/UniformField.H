@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,40 +21,50 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    Foam::UniformField
+
+Description
+    A class representing the concept of a uniform field which stores only
+    the single value and providing the operator[] to return it.
+
 \*---------------------------------------------------------------------------*/
 
-#include "GeometricSymmTensorField.H"
-#include "symmTensorFieldField.H"
+#ifndef UniformField_H
+#define UniformField_H
 
-#define TEMPLATE template<template<class> class PatchField, class GeoMesh>
-#include "GeometricFieldFunctionsM.C"
+#include "label.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class UniformField Declaration
+\*---------------------------------------------------------------------------*/
 
-UNARY_FUNCTION(symmTensor, vector, sqr, sqr)
+template<class Type>
+class UniformField
+{
+    // Private data
 
-UNARY_FUNCTION(scalar, symmTensor, tr, transform)
-UNARY_FUNCTION(sphericalTensor, symmTensor, sph, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, symm, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, twoSymm, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, dev, transform)
-UNARY_FUNCTION(symmTensor, symmTensor, dev2, transform)
-UNARY_FUNCTION(scalar, symmTensor, det, pow3)
-UNARY_FUNCTION(symmTensor, symmTensor, cof, pow2)
-UNARY_FUNCTION(symmTensor, symmTensor, inv, inv)
+        Type value_;
+
+public:
+
+    // Constructors
+
+        //- Construct given value
+        inline UniformField(const Type& value);
 
 
-// * * * * * * * * * * * * * * * global operators  * * * * * * * * * * * * * //
+    // Member Operators
 
-UNARY_OPERATOR(vector, symmTensor, *, hdual, transform)
+        inline Type operator[](const label) const;
 
-BINARY_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
-BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
+        inline UniformField field() const;
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -63,6 +73,10 @@ BINARY_TYPE_OPERATOR(tensor, symmTensor, symmTensor, &, '&', dot)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "undefFieldFunctionsM.H"
+#include "UniformFieldI.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
