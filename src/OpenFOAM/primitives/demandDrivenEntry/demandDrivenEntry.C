@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,64 +23,67 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "coupledPointPatchField.H"
+#include "demandDrivenEntry.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+Foam::demandDrivenEntry<Type>::demandDrivenEntry
+(
+    const dictionary& dict,
+    const Type& value
+)
+:
+    dict_(dict),
+    keyword_("unknown-keyword"),
+    value_(value),
+    stored_(true)
+{}
+
+
+template<class Type>
+Foam::demandDrivenEntry<Type>::demandDrivenEntry
+(
+    const dictionary& dict,
+    const word& keyword
+)
+:
+    dict_(dict),
+    keyword_(keyword),
+    value_(pTraits<Type>::zero),
+    stored_(false)
+{}
+
+
+template<class Type>
+Foam::demandDrivenEntry<Type>::demandDrivenEntry
+(
+    const dictionary& dict,
+    const word& keyword,
+    const Type& defaultValue,
+    const bool readIfPresent
+)
+:
+    dict_(dict),
+    keyword_(keyword),
+    value_(defaultValue),
+    stored_(true)
 {
-
-// * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * * //
-
-template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF
-)
-:
-    pointPatchField<Type>(p, iF)
-{}
+    if (readIfPresent)
+    {
+        dict_.readIfPresent<Type>(keyword, value_);
+    }
+}
 
 
 template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF,
-    const dictionary& dict
-)
+Foam::demandDrivenEntry<Type>::demandDrivenEntry(const demandDrivenEntry& dde)
 :
-    pointPatchField<Type>(p, iF, dict)
+    dict_(dde.dict_),
+    keyword_(dde.keyword_),
+    value_(dde.value_),
+    stored_(dde.stored_)
 {}
 
-
-template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const coupledPointPatchField<Type>& ptf,
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF,
-    const pointPatchFieldMapper& mapper
-)
-:
-    pointPatchField<Type>(ptf, p, iF, mapper)
-{}
-
-
-template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const coupledPointPatchField<Type>& ptf,
-    const DimensionedField<Type, pointMesh>& iF
-)
-:
-    pointPatchField<Type>(ptf, iF)
-{}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //

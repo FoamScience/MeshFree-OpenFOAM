@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,64 +23,44 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "coupledPointPatchField.H"
+#include "demandDrivenEntry.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+inline void Foam::demandDrivenEntry<Type>::initialise() const
 {
-
-// * * * * * * * * * * * * * * * * Constructors * * * * * * * * * * * * * * * //
-
-template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF
-)
-:
-    pointPatchField<Type>(p, iF)
-{}
+    if (!stored_)
+    {
+        dict_.lookup(keyword_) >> value_;
+        stored_ = true;
+    }
+}
 
 
 template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF,
-    const dictionary& dict
-)
-:
-    pointPatchField<Type>(p, iF, dict)
-{}
+inline const Type& Foam::demandDrivenEntry<Type>::value() const
+{
+    initialise();
+
+    return value_;
+}
 
 
 template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const coupledPointPatchField<Type>& ptf,
-    const pointPatch& p,
-    const DimensionedField<Type, pointMesh>& iF,
-    const pointPatchFieldMapper& mapper
-)
-:
-    pointPatchField<Type>(ptf, p, iF, mapper)
-{}
+inline void Foam::demandDrivenEntry<Type>::setValue(const Type& value)
+{
+//    dict_.set<Type>(keyword_, value);
+    value_ = value;
+    stored_ = true;
+}
 
 
 template<class Type>
-coupledPointPatchField<Type>::coupledPointPatchField
-(
-    const coupledPointPatchField<Type>& ptf,
-    const DimensionedField<Type, pointMesh>& iF
-)
-:
-    pointPatchField<Type>(ptf, iF)
-{}
+inline void Foam::demandDrivenEntry<Type>::reset()
+{
+    stored_ = false;
+}
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // ************************************************************************* //
