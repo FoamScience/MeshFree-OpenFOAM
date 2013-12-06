@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,24 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::symmetryPointPatch
+    Foam::symmetryPlanePointPatch
 
 Description
-    Symmetry patch for non-planar or multi-plane patches.
+    Symmetry-plane patch.
 
 SourceFiles
-    symmetryPointPatch.C
-
-SeeAlso
-    symmetryPlanePointPatch
+    symmetryPlanePointPatch.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef symmetryPointPatch_H
-#define symmetryPointPatch_H
+#ifndef symmetryPlanePointPatch_H
+#define symmetryPlanePointPatch_H
 
 #include "facePointPatch.H"
-#include "symmetryPolyPatch.H"
+#include "symmetryPlanePolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,31 +44,33 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-               Class symmetryPointPatch Declaration
+               Class symmetryPlanePointPatch Declaration
 \*---------------------------------------------------------------------------*/
 
-class symmetryPointPatch
+class symmetryPlanePointPatch
 :
     public facePointPatch
 {
+    // Private data
+
+        //- Local reference cast into the symmetryPlane patch
+        const symmetryPlanePolyPatch& symmetryPlanePolyPatch_;
+
 
 public:
 
     //- Runtime type information
-    TypeName(symmetryPolyPatch::typeName_());
+    TypeName(symmetryPlanePolyPatch::typeName_());
 
 
     // Constructors
 
         //- Construct from polyPatch
-        symmetryPointPatch
+        symmetryPlanePointPatch
         (
             const polyPatch& patch,
             const pointBoundaryMesh& bm
-        )
-        :
-            facePointPatch(patch, bm)
-        {}
+        );
 
 
     // Member Functions
@@ -88,6 +87,12 @@ public:
             const label pointi,
             pointConstraint&
         ) const;
+
+        //- Return symmetry plane normal
+        const vector& n() const
+        {
+            return symmetryPlanePolyPatch_.n();
+        }
 };
 
 
