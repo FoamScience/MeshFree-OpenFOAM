@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,75 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::symmetryPointPatch
-
-Description
-    Symmetry patch for non-planar or multi-plane patches.
-
-SourceFiles
-    symmetryPointPatch.C
-
-SeeAlso
-    symmetryPlanePointPatch
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef symmetryPointPatch_H
-#define symmetryPointPatch_H
+#ifndef symmetryPlanePointPatchFields_H
+#define symmetryPlanePointPatchFields_H
 
-#include "facePointPatch.H"
-#include "symmetryPolyPatch.H"
+#include "symmetryPlanePointPatchField.H"
+#include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-               Class symmetryPointPatch Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-class symmetryPointPatch
-:
-    public facePointPatch
-{
-
-public:
-
-    //- Runtime type information
-    TypeName(symmetryPolyPatch::typeName_());
-
-
-    // Constructors
-
-        //- Construct from polyPatch
-        symmetryPointPatch
-        (
-            const polyPatch& patch,
-            const pointBoundaryMesh& bm
-        )
-        :
-            facePointPatch(patch, bm)
-        {}
-
-
-    // Member Functions
-
-        //- Return the constraint type this pointPatch implements.
-        virtual const word& constraintType() const
-        {
-            return type();
-        }
-
-        //- Accumulate the effect of constraint direction of this patch
-        virtual void applyConstraint
-        (
-            const label pointi,
-            pointConstraint&
-        ) const;
-};
-
+makePointPatchFieldTypedefs(symmetryPlane);
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
