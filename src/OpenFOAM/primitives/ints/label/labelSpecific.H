@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,61 +21,47 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Primitive
-    uint
+Typedef
+    Foam::label
 
 Description
-    System uinteger
-
-SourceFiles
-    uintIO.C
+    label specific functions for which there is no uLabel equivalent
 
 \*---------------------------------------------------------------------------*/
-
-#ifndef uint_H
-#define uint_H
-
-#include "uint32.H"
-#include "uint64.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-#define MAXMIN(retType, type1, type2)              \
-                                                   \
-inline retType max(const type1 s1, const type2 s2) \
-{                                                  \
-    return (s1 > s2)? s1: s2;                      \
-}                                                  \
-                                                   \
-inline retType min(const type1 s1, const type2 s2) \
-{                                                  \
-    return (s1 < s2)? s1: s2;                      \
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+inline label mag(const label l)
+{
+    #if WM_LABEL_SIZE == 32
+        return ::abs(l);
+    #elif WM_LABEL_SIZE == 64
+        return ::labs(l);
+    #endif
 }
 
+inline label sign(const label s)
+{
+    return (s >= 0)? 1: -1;
+}
 
-MAXMIN(uint8_t, uint8_t, uint8_t)
-MAXMIN(uint16_t, uint16_t, uint16_t)
+inline label pos(const label s)
+{
+    return (s >= 0)? 1: 0;
+}
 
-MAXMIN(uint32_t, uint32_t, uint32_t)
-MAXMIN(uint64_t, uint64_t, uint32_t)
-MAXMIN(uint64_t, uint32_t, uint64_t)
-MAXMIN(uint64_t, uint64_t, uint64_t)
-
-
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
-
-uint readUint(Istream&);
-
+inline label neg(const label s)
+{
+    return (s < 0)? 1: 0;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
-// ************************************************************************* //

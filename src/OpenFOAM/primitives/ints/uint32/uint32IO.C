@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,60 +24,78 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "uLabel.H"
+
+#include "uint32.H"
+#include "IOstreams.H"
+
+#include <sstream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#if WM_LABEL_SIZE == 32
-const char* const Foam::pTraits<uint64_t>::typeName = "uint64";
-const char* const Foam::pTraits<uint32_t>::typeName = "uLabel";
-#elif WM_LABEL_SIZE == 64
-const char* const Foam::pTraits<uint64_t>::typeName = "uLabel";
-const char* const Foam::pTraits<uint32_t>::typeName = "uint32";
-#endif
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-Foam::uLabel Foam::pow(uLabel a, uLabel b)
+Foam::word Foam::name(const uint32_t val)
 {
-    register uLabel ans = 1;
-    for (register uLabel i=0; i<b; i++)
-    {
-        ans *= a;
-    }
-
-    #ifdef FULLDEBUG
-    if (b < 0)
-    {
-        FatalErrorIn("pow(uLabel a, uLabel b)")
-            << "negative value for b is not supported"
-            << abort(FatalError);
-    }
-    #endif
-
-    return ans;
+    std::ostringstream buf;
+    buf << val;
+    return buf.str();
 }
 
 
-Foam::uLabel Foam::factorial(uLabel n)
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Istream& Foam::operator>>(Istream& is, uint32_t& i)
 {
-    static uLabel factTable[13] =
-    {
-        1, 1, 2, 6, 24, 120, 720, 5040, 40320,
-        362880, 3628800, 39916800, 479001600
-    };
+    token t(is);
 
-    #ifdef FULLDEBUG
-    if (n > 12 && n < 0)
+    if (!t.good())
     {
-        FatalErrorIn("factorial(uLabel n)")
-            << "n value out of range"
-            << abort(FatalError);
+        is.setBad();
+        return is;
     }
-    #endif
 
-    return factTable[n];
+    if (t.isLabel())
+    {
+        i = uint32_t(t.labelToken());
+    }
+    else
+    {
+        is.setBad();
+        FatalIOErrorIn("operator>>(Istream&, uint32_t&)", is)
+            << "wrong token type - expected uint32_t, found " << t.info()
+            << exit(FatalIOError);
+
+        return is;
+    }
+
+    // Check state of Istream
+    is.check("Istream& operator>>(Istream&, uint32_t&)");
+
+    return is;
+}
+
+
+uint32_t Foam::readUint32(Istream& is)
+{
+    uint32_t val;
+    is >> val;
+
+    return val;
+}
+
+
+bool Foam::read(const char* buf, uint32_t& s)
+{
+    char *endptr = NULL;
+    long l = strtol(buf, &endptr, 10);
+    s = uint32_t(l);
+    return (*endptr == 0);
+}
+
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const uint32_t i)
+{
+    os.write(label(i));
+    os.check("Ostream& operator<<(Ostream&, const uint32_t)");
+    return os;
 }
 
 

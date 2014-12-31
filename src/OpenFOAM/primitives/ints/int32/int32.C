@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2014 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,17 +23,27 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "uint.H"
-#include "IOstreams.H"
+#include "int32.H"
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-uint Foam::readUint(Istream& is)
+const int32_t Foam::pTraits<int32_t>::zero = 0;
+const int32_t Foam::pTraits<int32_t>::one = 1;
+const int32_t Foam::pTraits<int32_t>::min = INT32_MIN;
+const int32_t Foam::pTraits<int32_t>::max = INT32_MAX;
+const int32_t Foam::pTraits<int32_t>::rootMin = pTraits<int32_t>::min;
+const int32_t Foam::pTraits<int32_t>::rootMax = pTraits<int32_t>::max;
+
+const char* Foam::pTraits<int32_t>::componentNames[] = { "x" };
+
+Foam::pTraits<int32_t>::pTraits(const int32_t& p)
+:
+    p_(p)
+{}
+
+Foam::pTraits<int32_t>::pTraits(Istream& is)
 {
-    uint val;
-    is >> val;
-
-    return val;
+    is >> p_;
 }
 
 
