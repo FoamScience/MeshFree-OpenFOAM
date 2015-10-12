@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,18 +22,24 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::DLPtrList
+    Foam::PtrListDictionary
 
 Description
-    Non-intrusive doubly-linked pointer list.
+    Template dictionary class which manages the storage associated with it.
+
+    It is derived from DictionaryBase instantiated on the memory managed PtrList
+    of \<T\> to provide ordered indexing in addition to the dictionary lookup.
+
+SourceFiles
+    PtrListDictionary.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DLPtrList_H
-#define DLPtrList_H
+#ifndef PtrListDictionary_H
+#define PtrListDictionary_H
 
-#include "LPtrList.H"
-#include "DLListBase.H"
+#include "DictionaryBase.H"
+#include "PtrList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,41 +47,72 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class DLPtrList Declaration
+                        Class PtrListDictionary Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class T>
-class DLPtrList
+class PtrListDictionary
 :
-    public LPtrList<DLListBase, T>
+    public DictionaryBase<PtrList<T>, T>
 {
 
 public:
 
     // Constructors
 
-        //- Null construct
-        DLPtrList()
-        {}
+        //- Construct given initial list size
+        PtrListDictionary(const label size);
+
+        //- Copy construct
+        PtrListDictionary(const PtrListDictionary&);
 
         //- Construct from Istream using given Istream constructor class
         template<class INew>
-        DLPtrList(Istream& is, const INew& inewt)
-        :
-            LPtrList<DLListBase, T>(is, inewt)
-        {}
+        PtrListDictionary(Istream&, const INew&);
 
         //- Construct from Istream
-        DLPtrList(Istream& is)
-        :
-            LPtrList<DLListBase, T>(is)
-        {}
+        PtrListDictionary(Istream&);
+
+
+    // Member functions
+
+        //- Set element to pointer provided and return old element
+        autoPtr<T> set(const label, const word& key, T*);
+
+        //- Set element to autoPtr value provided and return old element
+        autoPtr<T> set(const label, const word& key, autoPtr<T>&);
+
+        //- Set element to tmp value provided and return old element
+        autoPtr<T> set(const label, const word& key, tmp<T>&);
+
+
+    // Member operators
+
+        using PtrList<T>::operator[];
+
+        //- Find and return entry
+        const T& operator[](const word& key) const
+        {
+            return *DictionaryBase<PtrList<T>, T>::operator[](key);
+        }
+
+        //- Find and return entry
+        T& operator[](const word& key)
+        {
+            return *DictionaryBase<PtrList<T>, T>::operator[](key);
+        }
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "PtrListDictionary.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
