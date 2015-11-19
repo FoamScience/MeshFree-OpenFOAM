@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  | Copyright (C) 2015 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -23,82 +23,53 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ISstream.H"
+#include "flipOp.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline Foam::ISstream::ISstream
+template<>
+Foam::scalar Foam::flipOp::operator()(const scalar& v) const
+{
+    return -v;
+}
+
+
+template<> Foam::vector Foam::flipOp::operator()(const vector& v) const
+{
+    return -v;
+}
+
+
+template<>Foam::sphericalTensor Foam::flipOp::operator()
 (
-    istream& is,
-    const string& name,
-    streamFormat format,
-    versionNumber version,
-    compressionType compression
-)
-:
-    Istream(format, version, compression),
-    name_(name),
-    is_(is)
+    const sphericalTensor& v
+) const
 {
-    if (is_.good())
-    {
-        setOpened();
-        setGood();
-    }
-    else
-    {
-        setState(is_.rdstate());
-    }
+    return -v;
 }
 
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-inline Foam::ISstream& Foam::ISstream::get(char& c)
+template<> Foam::symmTensor Foam::flipOp::operator()
+(
+    const symmTensor& v
+) const
 {
-    is_.get(c);
-    setState(is_.rdstate());
-
-    if (good() && c == '\n')
-    {
-        lineNumber_++;
-    }
-
-    return *this;
+    return -v;
 }
 
 
-inline int Foam::ISstream::peek()
+template<> Foam::tensor Foam::flipOp::operator()(const tensor& v) const
 {
-    return is_.peek();
+    return -v;
 }
 
 
-inline Foam::ISstream& Foam::ISstream::getLine(string& s)
+template<> Foam::triad Foam::flipOp::operator()
+(
+    const triad& v
+) const
 {
-    getline(is_, s);
-    setState(is_.rdstate());
-    lineNumber_++;
-
-    return *this;
-}
-
-
-inline Foam::ISstream& Foam::ISstream::putback(const char& c)
-{
-    if (c == '\n')
-    {
-        lineNumber_--;
-    }
-
-    if (!is_.putback(c))
-    {
-        setBad();
-    }
-
-    setState(is_.rdstate());
-
-    return *this;
+    return -v;
 }
 
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  | Copyright (C) 2015 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -22,104 +22,74 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::volumeType
+    Foam::flipOp
 
 Description
+    Class containing functor to negate primitives. Dummy for all other types.
+
+    Used in mesh transformations where face can flip.
 
 SourceFiles
-    volumeType.C
+    flipOp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef volumeType_H
-#define volumeType_H
+#ifndef flipOp_H
+#define flipOp_H
 
-#include "NamedEnum.H"
+#include "fieldTypes.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-
-class volumeType;
-Istream& operator>>(Istream& is, volumeType&);
-Ostream& operator<<(Ostream& os, const volumeType& C);
-
-
 /*---------------------------------------------------------------------------*\
-                         Class volumeType Declaration
+                           Class flipOp Declaration
 \*---------------------------------------------------------------------------*/
 
-class volumeType
+class flipOp
 {
 public:
 
-    //- Volume types
-    enum type
+    template<class Type>
+    Type operator()(const Type& val) const
     {
-        UNKNOWN = 0,
-        MIXED   = 1,
-        INSIDE  = 2,
-        OUTSIDE = 3
-    };
-
-
-private:
-
-    // Private data
-
-        //- Volume type
-        type t_;
-
-
-public:
-
-    // Static data
-
-        static const NamedEnum<volumeType, 4> names;
-
-
-    // Constructors
-
-        //- Construct null
-        volumeType()
-        :
-            t_(UNKNOWN)
-        {}
-
-        //- Construct from components
-        volumeType(type t)
-        :
-            t_(t)
-        {}
-
-        //- Construct from integer
-        explicit volumeType(const int t)
-        :
-            t_(static_cast<volumeType::type>(t))
-        {}
-
-
-    // Member Functions
-
-        operator type() const
-        {
-            return t_;
-        }
-
-
-    // IOstream operators
-
-        friend Istream& operator>>(Istream& is, volumeType& vt);
-        friend Ostream& operator<<(Ostream& os, const volumeType& vt);
+        return val;
+    }
 };
 
 
-//- Data associated with volumeType type are contiguous
-template<>
-inline bool contiguous<volumeType>() {return true;}
+class noOp
+{
+public:
+
+    template<class Type>
+    Type operator()(const Type& val) const
+    {
+        return val;
+    }
+};
+
+
+class flipLabelOp
+{
+public:
+
+    label operator()(const label& val) const
+    {
+        return -val;
+    }
+};
+
+
+// Template specialisation for primitives that support negation
+template<> scalar flipOp::operator()(const scalar&) const;
+template<> vector flipOp::operator()(const vector&) const;
+template<> sphericalTensor flipOp::operator()(const sphericalTensor&) const;
+template<> symmTensor flipOp::operator()(const symmTensor&) const;
+template<> tensor flipOp::operator()(const tensor&) const;
+template<> triad flipOp::operator()(const triad&) const;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

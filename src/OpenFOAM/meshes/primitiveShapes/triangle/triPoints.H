@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  | Copyright (C) 2015 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -22,104 +22,71 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::volumeType
+    Foam::triPoints
 
 Description
+    Triangle storage. Null constructable (unfortunately triangle<point, point>
+    is not)
 
 SourceFiles
-    volumeType.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef volumeType_H
-#define volumeType_H
+#ifndef triPoints_H
+#define triPoints_H
 
-#include "NamedEnum.H"
+#include "FixedList.H"
+#include "treeBoundBox.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// Forward declaration of friend functions and operators
-
-class volumeType;
-Istream& operator>>(Istream& is, volumeType&);
-Ostream& operator<<(Ostream& os, const volumeType& C);
-
-
 /*---------------------------------------------------------------------------*\
-                         Class volumeType Declaration
+                          Class triPoints Declaration
 \*---------------------------------------------------------------------------*/
 
-class volumeType
+class triPoints
+:
+    public FixedList<point, 3>
 {
 public:
-
-    //- Volume types
-    enum type
-    {
-        UNKNOWN = 0,
-        MIXED   = 1,
-        INSIDE  = 2,
-        OUTSIDE = 3
-    };
-
-
-private:
-
-    // Private data
-
-        //- Volume type
-        type t_;
-
-
-public:
-
-    // Static data
-
-        static const NamedEnum<volumeType, 4> names;
-
 
     // Constructors
 
         //- Construct null
-        volumeType()
-        :
-            t_(UNKNOWN)
+        inline triPoints()
         {}
 
-        //- Construct from components
-        volumeType(type t)
-        :
-            t_(t)
-        {}
-
-        //- Construct from integer
-        explicit volumeType(const int t)
-        :
-            t_(static_cast<volumeType::type>(t))
-        {}
+        //- Construct from points
+        inline triPoints
+        (
+            const point& a,
+            const point& b,
+            const point& c
+        )
+        {
+            operator[](0) = a;
+            operator[](1) = b;
+            operator[](2) = c;
+        }
 
 
     // Member Functions
 
-        operator type() const
+        //- Calculate the bounding box
+        inline treeBoundBox bounds() const
         {
-            return t_;
+            treeBoundBox bb(operator[](0), operator[](0));
+            for (label i = 1; i < size(); i++)
+            {
+                bb.min() = min(bb.min(), operator[](i));
+                bb.max() = max(bb.max(), operator[](i));
+            }
+            return bb;
         }
-
-
-    // IOstream operators
-
-        friend Istream& operator>>(Istream& is, volumeType& vt);
-        friend Ostream& operator<<(Ostream& os, const volumeType& vt);
 };
-
-
-//- Data associated with volumeType type are contiguous
-template<>
-inline bool contiguous<volumeType>() {return true;}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
