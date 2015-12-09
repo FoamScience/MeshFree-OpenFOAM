@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,28 +21,50 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    Write primitive and binary block from OPstream
-
 \*---------------------------------------------------------------------------*/
 
-#include "UOPstream.H"
+#include "data.H"
+#include "Time.H"
+#include "solverPerformance.H"
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::UOPstream::write
+template<class Type>
+void Foam::data::setSolverPerformance
 (
-    const commsTypes commsType,
-    const int toProcNo,
-    const char* buf,
-    const std::streamsize bufSize,
-    const int tag,
-    const label communicator
-)
+    const word& name,
+    const SolverPerformance<Type>& sp
+) const
 {
-    NotImplemented;
+    dictionary& dict = const_cast<dictionary&>(solverPerformanceDict());
 
-    return false;
+    List<SolverPerformance<Type> > perfs;
+
+    if (prevTimeIndex_ != this->time().timeIndex())
+    {
+        // Reset solver performance between iterations
+        prevTimeIndex_ = this->time().timeIndex();
+        dict.clear();
+    }
+    else
+    {
+        dict.readIfPresent(name, perfs);
+    }
+
+    // Append to list
+    perfs.setSize(perfs.size()+1, sp);
+
+    dict.set(name, perfs);
+}
+
+
+template<class Type>
+void Foam::data::setSolverPerformance
+(
+    const SolverPerformance<Type>& sp
+) const
+{
+    setSolverPerformance(sp.fieldName(), sp);
 }
 
 
