@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,14 +23,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOdictionary.H"
-#include "objectRegistry.H"
-#include "Pstream.H"
-#include "Time.H"
+#include "localIOdictionary.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::IOdictionary::IOdictionary(const IOobject& io)
+Foam::localIOdictionary::localIOdictionary(const IOobject& io)
 :
     baseIOdictionary(io)
 {
@@ -41,7 +38,7 @@ Foam::IOdictionary::IOdictionary(const IOobject& io)
 }
 
 
-Foam::IOdictionary::IOdictionary
+Foam::localIOdictionary::localIOdictionary
 (
     const IOobject& io,
     const dictionary& dict
@@ -59,7 +56,7 @@ Foam::IOdictionary::IOdictionary
 }
 
 
-Foam::IOdictionary::IOdictionary
+Foam::localIOdictionary::localIOdictionary
 (
     const IOobject& io,
     Istream& is
@@ -81,7 +78,7 @@ Foam::IOdictionary::IOdictionary
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-Foam::IOdictionary::~IOdictionary()
+Foam::localIOdictionary::~localIOdictionary()
 {}
 
 

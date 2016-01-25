@@ -23,19 +23,78 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOMap.H"
+#include "baseIOdictionary.H"
+#include "objectRegistry.H"
+#include "Pstream.H"
+#include "Time.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
 namespace Foam
 {
-    defineTemplateTypeNameAndDebug(IOMap<dictionary>, 0);
+defineTypeNameAndDebug(baseIOdictionary, 0);
 
-    //- Template specialisation for obtaining filePath
-    template<>
-    fileName typeFilePath<IOMap<dictionary> >(const IOobject& io)
-    {
-        return io.globalFilePath();
-    }
+bool baseIOdictionary::writeDictionaries
+(
+    debug::infoSwitch("writeDictionaries", 0)
+);
 }
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::baseIOdictionary::baseIOdictionary(const IOobject& io)
+:
+    regIOobject(io)
+{
+    dictionary::name() = IOobject::objectPath();
+}
+
+
+Foam::baseIOdictionary::baseIOdictionary
+(
+    const IOobject& io,
+    const dictionary& dict
+)
+:
+    regIOobject(io)
+{
+    dictionary::name() = IOobject::objectPath();
+}
+
+
+Foam::baseIOdictionary::baseIOdictionary
+(
+    const IOobject& io,
+    Istream& is
+)
+:
+    regIOobject(io)
+{
+    dictionary::name() = IOobject::objectPath();
+}
+
+
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+Foam::baseIOdictionary::~baseIOdictionary()
+{}
+
+
+// * * * * * * * * * * * * * * * Members Functions * * * * * * * * * * * * * //
+
+const Foam::word& Foam::baseIOdictionary::name() const
+{
+    return regIOobject::name();
+}
+
+
+// * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
+
+void Foam::baseIOdictionary::operator=(const baseIOdictionary& rhs)
+{
+    dictionary::operator=(rhs);
+}
+
 
 // ************************************************************************* //

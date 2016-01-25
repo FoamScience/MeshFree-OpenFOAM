@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,67 +21,65 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-InClass
-    Foam::UniformDimensionedField
+Typedef
+    Foam::globalIOFields
 
 Description
-
-SourceFiles
-    uniformDimensionedFields.C
+    Typedefs for globalIOFields of primitive types. These are fully compatible
+    with 'normal' IOFields except have global filePath() scope.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef UniformDimensionedFields_H
-#define UniformDimensionedFields_H
+#ifndef globalIOFields_H
+#define globalIOFields_H
 
-#include "UniformDimensionedField.H"
-#include "fieldTypes.H"
+#include "primitiveFields.H"
+#include "GlobalIOField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+    typedef GlobalIOField<label> labelGlobalIOField;
+    typedef GlobalIOField<scalar> scalarGlobalIOField;
+    typedef GlobalIOField<vector> vectorGlobalIOField;
+    typedef GlobalIOField<sphericalTensor> sphericalTensorGlobalIOField;
+    typedef GlobalIOField<symmTensor> symmTensorGlobalIOField;
+    typedef GlobalIOField<tensor> tensorGlobalIOField;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    //- Template function for obtaining global status
+    template<>
+    inline bool typeGlobal<labelGlobalIOField>()
+    {
+        return true;
+    }
+    template<>
+    inline bool typeGlobal<scalarGlobalIOField>()
+    {
+        return true;
+    }
+    template<>
+    inline bool typeGlobal<vectorGlobalIOField>()
+    {
+        return true;
+    }
+    template<>
+    inline bool typeGlobal<sphericalTensorGlobalIOField>()
+    {
+        return true;
+    }
+    template<>
+    inline bool typeGlobal<symmTensorGlobalIOField>()
+    {
+        return true;
+    }
+    template<>
+    inline bool typeGlobal<tensorGlobalIOField>()
+    {
+        return true;
+    }
 
-typedef UniformDimensionedField<scalar> uniformDimensionedScalarField;
-typedef UniformDimensionedField<vector> uniformDimensionedVectorField;
-typedef UniformDimensionedField<sphericalTensor>
-    uniformDimensionedSphericalTensorField;
-typedef UniformDimensionedField<symmTensor> uniformDimensionedSymmTensorField;
-typedef UniformDimensionedField<tensor> uniformDimensionedTensorField;
-
-//- Template function for obtaining global status
-template<>
-inline bool typeGlobal<uniformDimensionedScalarField>()
-{
-    return true;
 }
-template<>
-inline bool typeGlobal<uniformDimensionedVectorField>()
-{
-    return true;
-}
-template<>
-inline bool typeGlobal<uniformDimensionedSphericalTensorField>()
-{
-    return true;
-}
-template<>
-inline bool typeGlobal<uniformDimensionedSymmTensorField>()
-{
-    return true;
-}
-template<>
-inline bool typeGlobal<uniformDimensionedTensorField>()
-{
-    return true;
-}
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

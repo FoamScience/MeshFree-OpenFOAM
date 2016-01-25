@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,24 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::IOdictionary
+    Foam::GlobalIOField
 
 Description
-    IOdictionary is derived from dictionary and IOobject to give the dictionary
-    automatic IO functionality via the objectRegistry.  To facilitate IO,
-    IOdictioanry is provided with a constructor from IOobject and writeData and
-    write functions.
+    IOField with global data (so optionally read from master)
 
 SourceFiles
-    IOdictionary.C
-    IOdictionaryIO.C
+    GlobalIOField.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef IOdictionary_H
-#define IOdictionary_H
+#ifndef GlobalIOField_H
+#define GlobalIOField_H
 
-#include "baseIOdictionary.H"
+#include "regIOobject.H"
+#include "Field.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,30 +44,38 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class IOdictionary Declaration
+                           Class GlobalIOField Declaration
 \*---------------------------------------------------------------------------*/
 
-class IOdictionary
+template<class Type>
+class GlobalIOField
 :
-    public baseIOdictionary
+    public regIOobject,
+    public Field<Type>
 {
 
 public:
 
+    TypeName("Field");
+
+
     // Constructors
 
-        //- Construct given an IOobject
-        IOdictionary(const IOobject&);
+        //- Construct from IOobject
+        GlobalIOField(const IOobject&);
 
-        //- Construct given an IOobject and dictionary
-        IOdictionary(const IOobject&, const dictionary&);
+        //- Construct from IOobject and size (does not set values)
+        GlobalIOField(const IOobject&, const label size);
 
-        //- Construct given an IOobject and Istream
-        IOdictionary(const IOobject&, Istream&);
+        //- Construct from components
+        GlobalIOField(const IOobject&, const Field<Type>&);
+
+        //- Construct by transferring the Field contents
+        GlobalIOField(const IOobject&, const Xfer<Field<Type> >&);
 
 
     //- Destructor
-    virtual ~IOdictionary();
+    virtual ~GlobalIOField();
 
 
     // Member functions
@@ -88,20 +93,30 @@ public:
             return globalFilePath();
         }
 
+        //- ReadData function required for regIOobject read operation
+        virtual bool readData(Istream&);
+
+        //- WriteData function required for regIOobject write operation
+        bool writeData(Ostream&) const;
+
+
+    // Member operators
+
+        void operator=(const GlobalIOField<Type>&);
+
+        void operator=(const Field<Type>&);
 };
-
-
-//- Template function for obtaining global status
-template<>
-inline bool typeGlobal<IOdictionary>()
-{
-    return true;
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "GlobalIOField.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,26 +23,22 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOobject.H"
-#include "token.H"
+#include "globalIOLists.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-template<>
-Foam::Ostream& Foam::operator<<(Ostream& os, const InfoProxy<IOobject>& ip)
+namespace Foam
 {
-    const IOobject& io = ip.t_;
-
-    os  << "IOobject: "
-        << io.type() << token::SPACE
-        << io.name() << token::SPACE
-        << "readOpt:" << token::SPACE << io.readOpt() << token::SPACE
-        << "writeOpt:" << token::SPACE << io.writeOpt() << token::SPACE
-        << "globalObject:" << token::SPACE << io.globalObject() << token::SPACE
-        << io.path() << endl;
-
-    return os;
+    defineTemplateTypeNameWithName(labelGlobalIOList, "labelList");
+    defineTemplateTypeNameWithName(scalarGlobalIOList, "scalarList");
+    defineTemplateTypeNameWithName(vectorGlobalIOList, "vectorList");
+    defineTemplateTypeNameWithName
+    (
+        sphericalTensorGlobalIOList,
+        "sphericalTensorList"
+    );
+    defineTemplateTypeNameWithName(symmTensorGlobalIOList, "symmTensorList");
+    defineTemplateTypeNameWithName(tensorGlobalIOList, "tensorList");
 }
-
 
 // ************************************************************************* //

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,24 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::IOdictionary
+    Foam::GlobalIOList
 
 Description
-    IOdictionary is derived from dictionary and IOobject to give the dictionary
-    automatic IO functionality via the objectRegistry.  To facilitate IO,
-    IOdictioanry is provided with a constructor from IOobject and writeData and
-    write functions.
+    IOList with global data (so optionally read from master)
 
 SourceFiles
-    IOdictionary.C
-    IOdictionaryIO.C
+    GlobalIOList.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef IOdictionary_H
-#define IOdictionary_H
+#ifndef GlobalIOList_H
+#define GlobalIOList_H
 
-#include "baseIOdictionary.H"
+#include "List.H"
+#include "regIOobject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,30 +44,38 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class IOdictionary Declaration
+                           Class GlobalIOList Declaration
 \*---------------------------------------------------------------------------*/
 
-class IOdictionary
+template<class Type>
+class GlobalIOList
 :
-    public baseIOdictionary
+    public regIOobject,
+    public List<Type>
 {
 
 public:
 
+    TypeName("List");
+
+
     // Constructors
 
-        //- Construct given an IOobject
-        IOdictionary(const IOobject&);
+        //- Construct from IOobject
+        GlobalIOList(const IOobject&);
 
-        //- Construct given an IOobject and dictionary
-        IOdictionary(const IOobject&, const dictionary&);
+        //- Construct from IOobject
+        GlobalIOList(const IOobject&, const label size);
 
-        //- Construct given an IOobject and Istream
-        IOdictionary(const IOobject&, Istream&);
+        //- Construct from IOobject and a List
+        GlobalIOList(const IOobject&, const List<Type>&);
+
+        //- Construct by transferring the List contents
+        GlobalIOList(const IOobject&, const Xfer<List<Type> >&);
 
 
     //- Destructor
-    virtual ~IOdictionary();
+    virtual ~GlobalIOList();
 
 
     // Member functions
@@ -88,20 +93,30 @@ public:
             return globalFilePath();
         }
 
+        //- ReadData function required for regIOobject read operation
+        virtual bool readData(Istream&);
+
+        //- WriteData function required for regIOobject write operation
+        bool writeData(Ostream&) const;
+
+
+    // Member operators
+
+        void operator=(const GlobalIOList<Type>&);
+
+        void operator=(const List<Type>&);
 };
-
-
-//- Template function for obtaining global status
-template<>
-inline bool typeGlobal<IOdictionary>()
-{
-    return true;
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+#   include "GlobalIOList.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
