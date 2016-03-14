@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,25 +23,33 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOobject.H"
-#include "token.H"
+#include "baseIOdictionary.H"
+#include "Pstream.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Members Functions * * * * * * * * * * * * * //
 
-template<>
-Foam::Ostream& Foam::operator<<(Ostream& os, const InfoProxy<IOobject>& ip)
+bool Foam::baseIOdictionary::readData(Istream& is)
 {
-    const IOobject& io = ip.t_;
+    is >> *this;
 
-    os  << "IOobject: "
-        << io.type() << token::SPACE
-        << io.name() << token::SPACE
-        << "readOpt:" << token::SPACE << io.readOpt() << token::SPACE
-        << "writeOpt:" << token::SPACE << io.writeOpt() << token::SPACE
-        << "globalObject:" << token::SPACE << io.globalObject() << token::SPACE
-        << io.path() << endl;
+    if (writeDictionaries && Pstream::master() && !is.bad())
+    {
+        Sout<< nl
+            << "--- baseIOdictionary " << name()
+            << ' ' << objectPath() << ":" << nl;
+        writeHeader(Sout);
+        writeData(Sout);
+        Sout<< "--- End of baseIOdictionary " << name() << nl << endl;
+    }
 
-    return os;
+    return !is.bad();
+}
+
+
+bool Foam::baseIOdictionary::writeData(Ostream& os) const
+{
+    dictionary::write(os, false);
+    return os.good();
 }
 
 

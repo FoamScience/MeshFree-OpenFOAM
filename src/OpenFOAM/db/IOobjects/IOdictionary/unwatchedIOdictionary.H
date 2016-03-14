@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,22 +22,17 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::IOdictionary
+    Foam::unwatchedIOdictionary
 
 Description
-    IOdictionary is derived from dictionary and IOobject to give the dictionary
-    automatic IO functionality via the objectRegistry.  To facilitate IO,
-    IOdictioanry is provided with a constructor from IOobject and writeData and
-    write functions.
-
-SourceFiles
-    IOdictionary.C
-    IOdictionaryIO.C
+    unwatchedIOdictionary is like IOdictionary but stores
+    dependencies as files instead of fileMonitor watchIndices. Used
+    to read controlDict since there fileMonitor not yet setup.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef IOdictionary_H
-#define IOdictionary_H
+#ifndef unwatchedIOdictionary_H
+#define unwatchedIOdictionary_H
 
 #include "baseIOdictionary.H"
 
@@ -47,30 +42,35 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class IOdictionary Declaration
+                   Class unwatchedIOdictionary Declaration
 \*---------------------------------------------------------------------------*/
 
-class IOdictionary
+class unwatchedIOdictionary
 :
     public baseIOdictionary
 {
+
+    fileNameList files_;
 
 public:
 
     // Constructors
 
         //- Construct given an IOobject
-        IOdictionary(const IOobject&);
+        unwatchedIOdictionary(const IOobject& io);
 
         //- Construct given an IOobject and dictionary
-        IOdictionary(const IOobject&, const dictionary&);
+        unwatchedIOdictionary
+        (
+            const IOobject& io,
+            const dictionary& dict
+        );
 
         //- Construct given an IOobject and Istream
-        IOdictionary(const IOobject&, Istream&);
-
+        unwatchedIOdictionary(const IOobject& io, Istream& is);
 
     //- Destructor
-    virtual ~IOdictionary();
+    virtual ~unwatchedIOdictionary();
 
 
     // Member functions
@@ -88,12 +88,29 @@ public:
             return globalFilePath();
         }
 
+        //- Add file watch on object (READ_IF_MODIFIED)
+        virtual void addWatch();
+
+        //- Add file watch for fileName on object if not yet watched. Return
+        //  index of watch
+        virtual label addWatch(const fileName&);
+
+        const fileNameList& files() const
+        {
+            return files_;
+        }
+
+        fileNameList& files()
+        {
+            return files_;
+        }
+
 };
 
 
 //- Template function for obtaining global status
 template<>
-inline bool typeGlobal<IOdictionary>()
+inline bool typeGlobal<unwatchedIOdictionary>()
 {
     return true;
 }

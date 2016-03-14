@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,22 +22,19 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::IOdictionary
+    Foam::localIOdictionary
 
 Description
-    IOdictionary is derived from dictionary and IOobject to give the dictionary
-    automatic IO functionality via the objectRegistry.  To facilitate IO,
-    IOdictioanry is provided with a constructor from IOobject and writeData and
-    write functions.
+    localIOdictionary is derived from IOdictionary but excludes parallel
+    master reading.
 
 SourceFiles
-    IOdictionary.C
-    IOdictionaryIO.C
+    localIOdictionary.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef IOdictionary_H
-#define IOdictionary_H
+#ifndef localIOdictionary_H
+#define localIOdictionary_H
 
 #include "baseIOdictionary.H"
 
@@ -47,10 +44,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class IOdictionary Declaration
+                           Class localIOdictionary Declaration
 \*---------------------------------------------------------------------------*/
 
-class IOdictionary
+class localIOdictionary
 :
     public baseIOdictionary
 {
@@ -60,17 +57,16 @@ public:
     // Constructors
 
         //- Construct given an IOobject
-        IOdictionary(const IOobject&);
+        localIOdictionary(const IOobject& io);
 
         //- Construct given an IOobject and dictionary
-        IOdictionary(const IOobject&, const dictionary&);
+        localIOdictionary(const IOobject& io, const dictionary& dict);
 
         //- Construct given an IOobject and Istream
-        IOdictionary(const IOobject&, Istream&);
-
+        localIOdictionary(const IOobject& io, Istream& is);
 
     //- Destructor
-    virtual ~IOdictionary();
+    virtual ~localIOdictionary();
 
 
     // Member functions
@@ -78,25 +74,18 @@ public:
         //- Is object global
         virtual bool global() const
         {
-            return true;
+            return false;
         }
 
         //- Return complete path + object name if the file exists
-        //  either in the case/processor or case otherwise null
+        //  in the case otherwise null
         virtual fileName filePath() const
         {
-            return globalFilePath();
+            // Use default (local only) search strategy
+            return localFilePath();
         }
 
 };
-
-
-//- Template function for obtaining global status
-template<>
-inline bool typeGlobal<IOdictionary>()
-{
-    return true;
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

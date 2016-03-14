@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,54 +23,31 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOField.H"
+#include "GlobalIOField.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::IOField<Type>::IOField(const IOobject& io)
+Foam::GlobalIOField<Type>::GlobalIOField(const IOobject& io)
 :
     regIOobject(io)
 {
     // Check for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOField<Type> >();
+    warnNoRereading<GlobalIOField<Type> >();
 
-    if
-    (
-        (
-            io.readOpt() == IOobject::MUST_READ
-         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
-        )
-     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
-    )
-    {
-        readStream(typeName) >> *this;
-        close();
-    }
+    readHeaderOk(IOstream::BINARY, typeName);
 }
 
 
 template<class Type>
-Foam::IOField<Type>::IOField(const IOobject& io, const label size)
+Foam::GlobalIOField<Type>::GlobalIOField(const IOobject& io, const label size)
 :
     regIOobject(io)
 {
     // Check for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOField<Type> >();
+    warnNoRereading<GlobalIOField<Type> >();
 
-    if
-    (
-        (
-            io.readOpt() == IOobject::MUST_READ
-         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
-        )
-     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
-    )
-    {
-        readStream(typeName) >> *this;
-        close();
-    }
-    else
+    if (!readHeaderOk(IOstream::BINARY, typeName))
     {
         Field<Type>::setSize(size);
     }
@@ -78,26 +55,18 @@ Foam::IOField<Type>::IOField(const IOobject& io, const label size)
 
 
 template<class Type>
-Foam::IOField<Type>::IOField(const IOobject& io, const Field<Type>& f)
+Foam::GlobalIOField<Type>::GlobalIOField
+(
+    const IOobject& io,
+    const Field<Type>& f
+)
 :
     regIOobject(io)
 {
     // Check for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOField<Type> >();
+    warnNoRereading<GlobalIOField<Type> >();
 
-    if
-    (
-        (
-            io.readOpt() == IOobject::MUST_READ
-         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
-        )
-     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
-    )
-    {
-        readStream(typeName) >> *this;
-        close();
-    }
-    else
+    if (!readHeaderOk(IOstream::BINARY, typeName))
     {
         Field<Type>::operator=(f);
     }
@@ -105,40 +74,42 @@ Foam::IOField<Type>::IOField(const IOobject& io, const Field<Type>& f)
 
 
 template<class Type>
-Foam::IOField<Type>::IOField(const IOobject& io, const Xfer<Field<Type> >& f)
+Foam::GlobalIOField<Type>::GlobalIOField
+(
+    const IOobject& io,
+    const Xfer<Field<Type> >& f
+)
 :
     regIOobject(io)
 {
     // Check for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOField<Type> >();
+    warnNoRereading<GlobalIOField<Type> >();
 
     Field<Type>::transfer(f());
 
-    if
-    (
-        (
-            io.readOpt() == IOobject::MUST_READ
-         || io.readOpt() == IOobject::MUST_READ_IF_MODIFIED
-        )
-     || (io.readOpt() == IOobject::READ_IF_PRESENT && headerOk())
-    )
-    {
-        readStream(typeName) >> *this;
-        close();
-    }
+    readHeaderOk(IOstream::BINARY, typeName);
 }
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::IOField<Type>::~IOField()
+Foam::GlobalIOField<Type>::~GlobalIOField()
 {}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-bool Foam::IOField<Type>::writeData(Ostream& os) const
+bool Foam::GlobalIOField<Type>::readData(Istream& is)
+{
+    is >> *this;
+    return is.good();
+}
+
+
+template<class Type>
+bool Foam::GlobalIOField<Type>::writeData(Ostream& os) const
 {
     return (os << static_cast<const Field<Type>&>(*this)).good();
 }
@@ -147,14 +118,14 @@ bool Foam::IOField<Type>::writeData(Ostream& os) const
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::IOField<Type>::operator=(const IOField<Type>& rhs)
+void Foam::GlobalIOField<Type>::operator=(const GlobalIOField<Type>& rhs)
 {
     Field<Type>::operator=(rhs);
 }
 
 
 template<class Type>
-void Foam::IOField<Type>::operator=(const Field<Type>& rhs)
+void Foam::GlobalIOField<Type>::operator=(const Field<Type>& rhs)
 {
     Field<Type>::operator=(rhs);
 }
