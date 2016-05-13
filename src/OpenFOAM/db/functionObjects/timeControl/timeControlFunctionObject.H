@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,11 +22,9 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::OutputFilterFunctionObject
+    Foam::functionObjects::timeControl
 
 Description
-    A functionObject wrapper around OutputFilter to allow them to be
-    created via the functions entry within controlDict.
 
 Note
     Since the timeIndex is used directly from Foam::Time, it is unaffected
@@ -35,12 +33,12 @@ Note
     execution \a interval would still be in timestep.
 
 SourceFiles
-    OutputFilterFunctionObject.C
+    timeControlFunctionObject.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef OutputFilterFunctionObject_H
-#define OutputFilterFunctionObject_H
+#ifndef functionObjects_timeControl_H
+#define functionObjects_timeControl_H
 
 #include "functionObject.H"
 #include "dictionary.H"
@@ -50,13 +48,14 @@ SourceFiles
 
 namespace Foam
 {
+namespace functionObjects
+{
 
 /*---------------------------------------------------------------------------*\
-                 Class OutputFilterFunctionObject Declaration
+                 Class timeControl Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class OutputFilter>
-class OutputFilterFunctionObject
+class timeControl
 :
     public functionObject
 {
@@ -82,14 +81,14 @@ class OutputFilterFunctionObject
             label nStepsToStartTimeChange_;
 
 
-        //- Output controls
-        timeControl writeControl_;
+        //- Execute controls
+        Foam::timeControl executeControl_;
 
-        //- Evaluate controls
-        timeControl evaluateControl_;
+        //- Write controls
+        Foam::timeControl writeControl_;
 
-        //- The output filter
-        OutputFilter filter_;
+        //- The functionObject to execute
+        autoPtr<functionObject> foPtr_;
 
 
     // Private Member Functions
@@ -101,22 +100,22 @@ class OutputFilterFunctionObject
         bool active() const;
 
         //- Disallow default bitwise copy construct
-        OutputFilterFunctionObject(const OutputFilterFunctionObject&);
+        timeControl(const timeControl&);
 
         //- Disallow default bitwise assignment
-        void operator=(const OutputFilterFunctionObject&);
+        void operator=(const timeControl&);
 
 
 public:
 
     //- Runtime type information
-    TypeName(OutputFilter::typeName_());
+    TypeName("timeControl");
 
 
     // Constructors
 
         //- Construct from components
-        OutputFilterFunctionObject
+        timeControl
         (
             const word& name,
             const Time&,
@@ -137,11 +136,14 @@ public:
             //- Return the region name
             inline const word& regionName() const;
 
-            //- Return the output control object
-            inline const timeControl& writeControl() const;
+            //- Return the execute control object
+            inline const Foam::timeControl& executeControl() const;
 
-            //- Return the output filter
-            inline const OutputFilter& outputFilter() const;
+            //- Return the write control object
+            inline const Foam::timeControl& writeControl() const;
+
+            //- Return the functionObject filter
+            inline const functionObject& filter() const;
 
 
         // Function object control
@@ -178,17 +180,12 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace functionObjects
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "OutputFilterFunctionObjectI.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-    #include "OutputFilterFunctionObject.C"
-#endif
+#include "timeControlFunctionObjectI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
