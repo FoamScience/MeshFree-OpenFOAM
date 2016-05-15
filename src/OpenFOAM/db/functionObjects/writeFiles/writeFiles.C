@@ -23,13 +23,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "functionObjectFiles.H"
+#include "writeFiles.H"
 #include "Time.H"
 #include "IFstream.H"
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Foam::functionObjectFiles::createFiles()
+void Foam::functionObjects::writeFiles::createFiles()
 {
     if (Pstream::master())
     {
@@ -64,13 +64,13 @@ void Foam::functionObjectFiles::createFiles()
 }
 
 
-void Foam::functionObjectFiles::write()
+void Foam::functionObjects::writeFiles::write()
 {
     createFiles();
 }
 
 
-void Foam::functionObjectFiles::resetNames(const wordList& names)
+void Foam::functionObjects::writeFiles::resetNames(const wordList& names)
 {
     names_.clear();
     names_.append(names);
@@ -79,13 +79,11 @@ void Foam::functionObjectFiles::resetNames(const wordList& names)
     {
         filePtrs_.clear();
         filePtrs_.setSize(names_.size());
-
-        createFiles();
     }
 }
 
 
-void Foam::functionObjectFiles::resetName(const word& name)
+void Foam::functionObjects::writeFiles::resetName(const word& name)
 {
     names_.clear();
     names_.append(name);
@@ -94,87 +92,55 @@ void Foam::functionObjectFiles::resetName(const word& name)
     {
         filePtrs_.clear();
         filePtrs_.setSize(1);
-
-        createFiles();
     }
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::functionObjectFiles::functionObjectFiles
+Foam::functionObjects::writeFiles::writeFiles
 (
-    const objectRegistry& obr,
+    const word& name,
+    const Time& time,
+    const dictionary& dict,
     const word& prefix
 )
 :
-    functionObjectFile(obr, prefix),
+    writeFile(name, time, dict, prefix),
     names_(),
     filePtrs_()
 {}
 
 
-Foam::functionObjectFiles::functionObjectFiles
+Foam::functionObjects::writeFiles::writeFiles
 (
+    const word& name,
     const objectRegistry& obr,
-    const word& prefix,
-    const word& name
+    const dictionary& dict,
+    const word& prefix
 )
 :
-    functionObjectFile(obr, prefix),
+    writeFile(name, obr, dict, prefix),
     names_(),
     filePtrs_()
-{
-    names_.clear();
-    names_.append(name);
-    if (Pstream::master())
-    {
-        filePtrs_.clear();
-        filePtrs_.setSize(1);
-
-        // Cannot create files - need to access virtual function
-    }
-}
-
-
-Foam::functionObjectFiles::functionObjectFiles
-(
-    const objectRegistry& obr,
-    const word& prefix,
-    const wordList& names
-)
-:
-    functionObjectFile(obr, prefix),
-    names_(names),
-    filePtrs_()
-{
-    names_.clear();
-    names_.append(names);
-    if (Pstream::master())
-    {
-        filePtrs_.clear();
-        filePtrs_.setSize(names_.size());
-
-        // Cannot create files - need to access virtual function
-    }
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::functionObjectFiles::~functionObjectFiles()
+Foam::functionObjects::writeFiles::~writeFiles()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::wordList& Foam::functionObjectFiles::names() const
+const Foam::wordList& Foam::functionObjects::writeFiles::names() const
 {
     return names_;
 }
 
 
-Foam::OFstream& Foam::functionObjectFiles::file()
+Foam::OFstream& Foam::functionObjects::writeFiles::file()
 {
     if (!Pstream::master())
     {
@@ -201,7 +167,7 @@ Foam::OFstream& Foam::functionObjectFiles::file()
 }
 
 
-Foam::PtrList<Foam::OFstream>& Foam::functionObjectFiles::files()
+Foam::PtrList<Foam::OFstream>& Foam::functionObjects::writeFiles::files()
 {
     if (!Pstream::master())
     {
@@ -214,7 +180,7 @@ Foam::PtrList<Foam::OFstream>& Foam::functionObjectFiles::files()
 }
 
 
-Foam::OFstream& Foam::functionObjectFiles::file(const label i)
+Foam::OFstream& Foam::functionObjects::writeFiles::file(const label i)
 {
     if (!Pstream::master())
     {

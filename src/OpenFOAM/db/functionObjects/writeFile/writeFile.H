@@ -22,10 +22,10 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::functionObjectFile
+    Foam::functionObjects::writeFile
 
 Description
-    Base class for output file data handling
+    functionObject base class for writing single files
 
 See Also
     Foam::functionObject
@@ -36,33 +36,44 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef functionObjectFile_H
-#define functionObjectFile_H
+#ifndef functionObjects_writeFile_H
+#define functionObjects_writeFile_H
 
-#include "objectRegistry.H"
+#include "functionObject.H"
+#include "Time.H"
 #include "IOmanip.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace functionObjects
+{
 
 /*---------------------------------------------------------------------------*\
                      Class functionObjectFile Declaration
 \*---------------------------------------------------------------------------*/
 
-class functionObjectFile
+class writeFile
+:
+    public functionObject
 {
 
 protected:
 
     // Protected data
 
+        //- Reference to the Time
+        const Time& time_;
+
         //- Reference to the objectRegistry
         const objectRegistry& obr_;
 
         //- Prefix
         const word prefix_;
+
+        //- Switch to send output to Info as well as to file
+        Switch log_;
 
 
     // Protected Member Functions
@@ -83,10 +94,10 @@ protected:
         virtual Omanip<int> valueWidth(const label offset = 0) const;
 
         //- Disallow default bitwise copy construct
-        functionObjectFile(const functionObjectFile&);
+        writeFile(const writeFile&);
 
         //- Disallow default bitwise assignment
-        void operator=(const functionObjectFile&);
+        void operator=(const writeFile&);
 
 
 public:
@@ -100,36 +111,42 @@ public:
 
     // Constructors
 
-        //- Construct from objectRegistry
-        functionObjectFile(const objectRegistry& obr, const word& prefix);
+        //- Construct from name, Time, dictionary and prefix
+        writeFile
+        (
+            const word& name,
+            const Time& t,
+            const dictionary& dict,
+            const word& prefix
+        );
+
+        //- Construct from name, objectRegistry, dictionary and prefix
+        writeFile
+        (
+            const word& name,
+            const objectRegistry& obr,
+            const dictionary& dict,
+            const word& prefix
+        );
 
 
     //- Destructor
-    virtual ~functionObjectFile();
+    virtual ~writeFile();
 
 
     // Member Functions
 
+        //- Read optional controls
+        virtual bool read(const dictionary&);
+
         //- Write a commented string to stream
-        void writeCommented
-        (
-            Ostream& os,
-            const string& str
-        ) const;
+        void writeCommented(Ostream& os, const string& str) const;
 
         //- Write a tabbed string to stream
-        void writeTabbed
-        (
-            Ostream& os,
-            const string& str
-        ) const;
+        void writeTabbed(Ostream& os, const string& str) const;
 
         //- Write a commented header to stream
-        void writeHeader
-        (
-            Ostream& os,
-            const string& str
-        ) const;
+        void writeHeader(Ostream& os, const string& str) const;
 
         //- Write the current time to stream
         void writeTime(Ostream& os) const;
@@ -150,12 +167,13 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace functionObjects
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "functionObjectFileTemplates.C"
+    #include "writeFileTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

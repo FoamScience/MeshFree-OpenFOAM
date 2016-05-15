@@ -23,27 +23,31 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "functionObjectFile.H"
+#include "writeFile.H"
 #include "Time.H"
 #include "polyMesh.H"
 #include "IOmanip.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-const Foam::word Foam::functionObjectFile::outputPrefix = "postProcessing";
-Foam::label Foam::functionObjectFile::addChars = 7;
+const Foam::word Foam::functionObjects::writeFile::outputPrefix
+(
+    "postProcessing"
+);
+
+Foam::label Foam::functionObjects::writeFile::addChars = 7;
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Foam::functionObjectFile::initStream(Ostream& os) const
+void Foam::functionObjects::writeFile::initStream(Ostream& os) const
 {
     os.setf(ios_base::scientific, ios_base::floatfield);
     os.width(charWidth());
 }
 
 
-Foam::fileName Foam::functionObjectFile::baseFileDir() const
+Foam::fileName Foam::functionObjects::writeFile::baseFileDir() const
 {
     fileName baseDir = obr_.time().path();
 
@@ -72,17 +76,20 @@ Foam::fileName Foam::functionObjectFile::baseFileDir() const
 }
 
 
-Foam::fileName Foam::functionObjectFile::baseTimeDir() const
+Foam::fileName Foam::functionObjects::writeFile::baseTimeDir() const
 {
     return baseFileDir()/prefix_/obr_.time().timeName();
 }
 
 
-void Foam::functionObjectFile::writeFileHeader(const label i)
+void Foam::functionObjects::writeFile::writeFileHeader(const label i)
 {}
 
 
-Foam::Omanip<int> Foam::functionObjectFile::valueWidth(const label offset) const
+Foam::Omanip<int> Foam::functionObjects::writeFile::valueWidth
+(
+    const label offset
+) const
 {
     return setw(IOstream::defaultPrecision() + addChars + offset);
 }
@@ -90,32 +97,67 @@ Foam::Omanip<int> Foam::functionObjectFile::valueWidth(const label offset) const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::functionObjectFile::functionObjectFile
+Foam::functionObjects::writeFile::writeFile
 (
-    const objectRegistry& obr,
+    const word& name,
+    const Time& t,
+    const dictionary& dict,
     const word& prefix
 )
 :
+    functionObject(name),
+    time_(t),
+    obr_
+    (
+        time_.lookupObject<objectRegistry>
+        (
+            dict.lookupOrDefault("region", polyMesh::defaultRegion)
+        )
+    ),
+    prefix_(prefix),
+    log_(true)
+{}
+
+
+Foam::functionObjects::writeFile::writeFile
+(
+    const word& name,
+    const objectRegistry& obr,
+    const dictionary& dict,
+    const word& prefix
+)
+:
+    functionObject(name),
+    time_(obr.time()),
     obr_(obr),
-    prefix_(prefix)
+    prefix_(prefix),
+    log_(true)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::functionObjectFile::~functionObjectFile()
+Foam::functionObjects::writeFile::~writeFile()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::label Foam::functionObjectFile::charWidth() const
+bool Foam::functionObjects::writeFile::read(const dictionary& dict)
+{
+    log_ = dict.lookupOrDefault<Switch>("log", true);
+
+    return true;
+}
+
+
+Foam::label Foam::functionObjects::writeFile::charWidth() const
 {
     return IOstream::defaultPrecision() + addChars;
 }
 
 
-void Foam::functionObjectFile::writeCommented
+void Foam::functionObjects::writeFile::writeCommented
 (
     Ostream& os,
     const string& str
@@ -126,7 +168,7 @@ void Foam::functionObjectFile::writeCommented
 }
 
 
-void Foam::functionObjectFile::writeTabbed
+void Foam::functionObjects::writeFile::writeTabbed
 (
     Ostream& os,
     const string& str
@@ -136,7 +178,7 @@ void Foam::functionObjectFile::writeTabbed
 }
 
 
-void Foam::functionObjectFile::writeHeader
+void Foam::functionObjects::writeFile::writeHeader
 (
     Ostream& os,
     const string& str
@@ -147,7 +189,7 @@ void Foam::functionObjectFile::writeHeader
 }
 
 
-void Foam::functionObjectFile::writeTime(Ostream& os) const
+void Foam::functionObjects::writeFile::writeTime(Ostream& os) const
 {
     os  << setw(charWidth()) << obr_.time().timeName();
 }

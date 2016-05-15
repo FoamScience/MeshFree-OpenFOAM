@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,31 +21,22 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    FunctionObject wrapper around functionObjectTemplate to allow them
-    to be created via the functions entry within controlDict.
-
-SourceFiles
-    FilterFunctionObject.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef FilterFunctionObject_H
-#define FilterFunctionObject_H
-
-#include "functionObjectTemplate.H"
-#include "OutputFilterFunctionObject.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+template<class Type>
+void Foam::functionObjects::writeFile::writeHeaderValue
+(
+    Ostream& os,
+    const string& property,
+    const Type& value
+) const
 {
-    typedef OutputFilterFunctionObject<${typeName}FunctionObject>
-        ${typeName}FilterFunctionObject;
+    os  << setw(1) << '#' << setw(1) << ' '
+        << setw(charWidth() - 2) << setf(ios_base::left) << property.c_str()
+        << setw(1) << ':' << setw(1) << ' ' << value << nl;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

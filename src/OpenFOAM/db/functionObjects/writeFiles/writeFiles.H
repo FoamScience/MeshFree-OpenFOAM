@@ -22,10 +22,10 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::functionObjectFiles
+    Foam::functionObjects::writeFiles
 
 Description
-    Base class for output file data handling
+    functionObject base class for writing files
 
 See Also
     Foam::functionObject
@@ -36,10 +36,10 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef functionObjectFiles_H
-#define functionObjectFiles_H
+#ifndef functionObjects_writeFiles_H
+#define functionObjects_writeFiles_H
 
-#include "functionObjectFile.H"
+#include "writeFile.H"
 #include "OFstream.H"
 #include "PtrList.H"
 
@@ -47,15 +47,16 @@ SourceFiles
 
 namespace Foam
 {
-
+namespace functionObjects
+{
 
 /*---------------------------------------------------------------------------*\
-                     Class functionObjectFiles Declaration
+                     Class writeFiles Declaration
 \*---------------------------------------------------------------------------*/
 
-class functionObjectFiles
+class writeFiles
 :
-    public functionObjectFile
+    public writeFile
 {
     // Private data
 
@@ -83,38 +84,37 @@ protected:
         virtual void resetName(const word& name);
 
         //- Disallow default bitwise copy construct
-        functionObjectFiles(const functionObjectFiles&);
+        writeFiles(const writeFiles&);
 
         //- Disallow default bitwise assignment
-        void operator=(const functionObjectFiles&);
+        void operator=(const writeFiles&);
 
 
 public:
 
     // Constructors
 
-        //- Construct from objectRegistry
-        functionObjectFiles(const objectRegistry& obr, const word& prefix);
-
-        //- Construct from components
-        functionObjectFiles
+        //- Construct from name, Time, dictionary and prefix
+        writeFiles
         (
-            const objectRegistry& obr,
-            const word& prefix,
-            const word& name
+            const word& name,
+            const Time& time,
+            const dictionary& dict,
+            const word& prefix
         );
 
-        //- Construct from components
-        functionObjectFiles
+        //- Construct from name, objectRegistry, dictionary and prefix
+        writeFiles
         (
+            const word& name,
             const objectRegistry& obr,
-            const word& prefix,
-            const wordList& names
+            const dictionary& dict,
+            const word& prefix
         );
 
 
     //- Destructor
-    virtual ~functionObjectFiles();
+    virtual ~writeFiles();
 
 
     // Member Functions
@@ -135,6 +135,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace functionObjects
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
