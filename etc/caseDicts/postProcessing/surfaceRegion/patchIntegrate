@@ -16,7 +16,7 @@ patchIntegrate
     fields (<field names>);
 
     operation areaIntegrate;
-    #includeEtc "caseDicts/postProcessing/faceSource/patchSource.cfg"
+    #includeEtc "caseDicts/postProcessing/surfaceRegion/patch.cfg"
 
     log    true;
 }

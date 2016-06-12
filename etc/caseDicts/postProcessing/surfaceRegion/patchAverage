@@ -16,7 +16,7 @@ patchAverage
     fields (<field names>);
 
     operation average;
-    #includeEtc "caseDicts/postProcessing/faceSource/patchSource.cfg"
+    #includeEtc "caseDicts/postProcessing/surfaceRegion/patch.cfg"
 
     log    true;
 }
