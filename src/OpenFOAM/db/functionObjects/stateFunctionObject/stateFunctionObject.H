@@ -29,60 +29,67 @@ Description
     information (data required for smooth restart behaviour) and results
     to/from the state dictionary
 
-See Also
+    Note: cannot access the state dictionary until after construction of the
+    function objects, since the owner container functionObjectList is owned
+    by time, and time owns the state dictionary.  I.e. need to wait for time
+    to be fully consttucted.
+
+See also
     Foam::functionObject
 
 SourceFiles
-    functionObjectState.C
+    stateFunctionObject.C
+    stateFunctionObjectTemplates.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef functionObjectState_H
-#define functionObjectState_H
+#ifndef functionObjects_stateFunctionObject_H
+#define functionObjects_stateFunctionObject_H
 
-#include "objectRegistry.H"
-#include "IOdictionary.H"
+#include "functionObject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+class IOdictionary;
+
+namespace functionObjects
+{
+
 /*---------------------------------------------------------------------------*\
-                     Class functionObjectState Declaration
+                     Class stateFunctionObject Declaration
 \*---------------------------------------------------------------------------*/
 
-class functionObjectState
+class stateFunctionObject
+:
+    public functionObject
 {
+
 private:
 
-    // Private data
+    // Private member data
 
         //- Name of the results dictionary
         static const word resultsName_;
-
-        //- Reference to the database
-        const objectRegistry& obr_;
 
 
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        functionObjectState(const functionObjectState&);
+        stateFunctionObject(const stateFunctionObject&) = delete;
 
         //- Disallow default bitwise assignment
-        void operator=(const functionObjectState&);
+        void operator=(const stateFunctionObject&) = delete;
 
 
 protected:
 
-    // Protected data
+    // Protected Member Data
 
-        //- Name of model
-        const word name_;
-
-        //- Flag to indicate whether the object is active
-        bool active_;
+        //- Reference to the time database
+        const Time& time_;
 
 
     // Protacted Member Functions
@@ -100,28 +107,17 @@ public:
     // Constructors
 
         //- Construct from components
-        functionObjectState(const objectRegistry& obr, const word& name);
+        stateFunctionObject(const word& name, const Time& runTime);
 
 
     //- Destructor
-    virtual ~functionObjectState();
+    ~stateFunctionObject();
 
 
     // Member Functions
 
-        //- Return the name
-        const word& name() const;
-
-        //- Return the active flag
-        bool active() const;
-
         //- Return access to the property dictionary
         dictionary& propertyDict();
-
-        //- Set the active status by querying objectRegistry type
-        //  returns new active status
-        template<class Type>
-        bool setActive();
 
 
         // Properties
@@ -238,12 +234,13 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace functionObjects
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "functionObjectStateTemplates.C"
+    #include "stateFunctionObjectTemplates.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

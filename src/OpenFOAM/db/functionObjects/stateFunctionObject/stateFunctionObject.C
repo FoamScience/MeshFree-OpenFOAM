@@ -23,79 +23,71 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "functionObjectState.H"
+#include "stateFunctionObject.H"
 #include "Time.H"
 
-const Foam::word Foam::functionObjectState::resultsName_ = "results";
+const Foam::word Foam::functionObjects::stateFunctionObject::resultsName_ =
+    "results";
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-const Foam::IOdictionary& Foam::functionObjectState::stateDict() const
+const Foam::IOdictionary&
+Foam::functionObjects::stateFunctionObject::stateDict() const
 {
-    return obr_.time().functionObjects().stateDict();
+    return time_.functionObjects().stateDict();
 }
 
 
-Foam::IOdictionary& Foam::functionObjectState::stateDict()
+Foam::IOdictionary& Foam::functionObjects::stateFunctionObject::stateDict()
 {
-    return const_cast<IOdictionary&>(obr_.time().functionObjects().stateDict());
+    return const_cast<IOdictionary&>(time_.functionObjects().stateDict());
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::functionObjectState::functionObjectState
+Foam::functionObjects::stateFunctionObject::stateFunctionObject
 (
-    const objectRegistry& obr,
-    const word& name
+    const word& name,
+    const Time& runTime
 )
 :
-    obr_(obr),
-    name_(name),
-    active_(true)
+    functionObject(name),
+    time_(runTime)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::functionObjectState::~functionObjectState()
+Foam::functionObjects::stateFunctionObject::~stateFunctionObject()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::word& Foam::functionObjectState::name() const
-{
-    return name_;
-}
-
-
-bool Foam::functionObjectState::active() const
-{
-    return active_;
-}
-
-
-Foam::dictionary& Foam::functionObjectState::propertyDict()
+Foam::dictionary& Foam::functionObjects::stateFunctionObject::propertyDict()
 {
     IOdictionary& stateDict = this->stateDict();
 
-    if (!stateDict.found(name_))
+    if (!stateDict.found(name()))
     {
-        stateDict.add(name_, dictionary());
+        stateDict.add(name(), dictionary());
     }
 
-    return stateDict.subDict(name_);
+    return stateDict.subDict(name());
 }
 
 
-bool Foam::functionObjectState::foundProperty(const word& entryName) const
+bool Foam::functionObjects::stateFunctionObject::foundProperty
+(
+    const word& entryName
+) const
 {
     const IOdictionary& stateDict = this->stateDict();
 
-    if (stateDict.found(name_))
+    if (stateDict.found(name()))
     {
-        const dictionary& baseDict = stateDict.subDict(name_);
+        const dictionary& baseDict = stateDict.subDict(name());
         return baseDict.found(entryName);
     }
 
@@ -103,13 +95,16 @@ bool Foam::functionObjectState::foundProperty(const word& entryName) const
 }
 
 
-Foam::word Foam::functionObjectState::resultType(const word& entryName) const
+Foam::word Foam::functionObjects::stateFunctionObject::resultType
+(
+    const word& entryName
+) const
 {
-    return objectResultType(name_, entryName);
+    return objectResultType(name(), entryName);
 }
 
 
-Foam::word Foam::functionObjectState::objectResultType
+Foam::word Foam::functionObjects::stateFunctionObject::objectResultType
 (
     const word& objectName,
     const word& entryName
@@ -142,13 +137,15 @@ Foam::word Foam::functionObjectState::objectResultType
 }
 
 
-Foam::List<Foam::word> Foam::functionObjectState::objectResultEntries() const
+Foam::List<Foam::word>
+Foam::functionObjects::stateFunctionObject::objectResultEntries() const
 {
-    return objectResultEntries(name_);
+    return objectResultEntries(name());
 }
 
 
-Foam::List<Foam::word> Foam::functionObjectState::objectResultEntries
+Foam::List<Foam::word> Foam::functionObjects::stateFunctionObject::
+objectResultEntries
 (
     const word& objectName
 ) const

@@ -3,7 +3,7 @@
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
     \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
-     \\/     M anipulation  | Copyright (C) 2015 OpenCFD Ltd.
+     \\/     M anipulation  | Copyright (C) 2015-2016 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,28 +23,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "IOdictionary.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-bool Foam::functionObjectState::setActive()
-{
-    active_ = true;
-
-    if (!isA<Type>(obr_))
-    {
-        WarningInFunction
-            << "No " << Type::typeName << " available, deactivating " << name_
-            << endl;
-
-        active_ = false;
-    }
-
-    return active_;
-}
-
-
-template<class Type>
-Type Foam::functionObjectState::getProperty
+Type Foam::functionObjects::stateFunctionObject::getProperty
 (
     const word& entryName,
     const Type& defaultValue
@@ -57,29 +41,29 @@ Type Foam::functionObjectState::getProperty
 
 
 template<class Type>
-void Foam::functionObjectState::getProperty
+void Foam::functionObjects::stateFunctionObject::getProperty
 (
     const word& entryName,
     Type& value
 ) const
 {
-    getObjectProperty(name_, entryName, value);
+    getObjectProperty(name(), entryName, value);
 }
 
 
 template<class Type>
-void Foam::functionObjectState::setProperty
+void Foam::functionObjects::stateFunctionObject::setProperty
 (
     const word& entryName,
     const Type& value
 )
 {
-    setObjectProperty(name_, entryName, value);
+    setObjectProperty(name(), entryName, value);
 }
 
 
 template<class Type>
-Type Foam::functionObjectState::getObjectProperty
+Type Foam::functionObjects::stateFunctionObject::getObjectProperty
 (
     const word& objectName,
     const word& entryName,
@@ -93,7 +77,7 @@ Type Foam::functionObjectState::getObjectProperty
 
 
 template<class Type>
-void Foam::functionObjectState::getObjectProperty
+void Foam::functionObjects::stateFunctionObject::getObjectProperty
 (
     const word& objectName,
     const word& entryName,
@@ -121,7 +105,7 @@ void Foam::functionObjectState::getObjectProperty
 
 
 template<class Type>
-void Foam::functionObjectState::setObjectProperty
+void Foam::functionObjects::stateFunctionObject::setObjectProperty
 (
     const word& objectName,
     const word& entryName,
@@ -141,18 +125,18 @@ void Foam::functionObjectState::setObjectProperty
 
 
 template<class Type>
-void Foam::functionObjectState::setResult
+void Foam::functionObjects::stateFunctionObject::setResult
 (
     const word& entryName,
     const Type& value
 )
 {
-    setObjectResult(name_, entryName, value);
+    setObjectResult(name(), entryName, value);
 }
 
 
 template<class Type>
-void Foam::functionObjectState::setObjectResult
+void Foam::functionObjects::stateFunctionObject::setObjectResult
 (
     const word& objectName,
     const word& entryName,
@@ -170,7 +154,7 @@ void Foam::functionObjectState::setObjectResult
 
     if (!resultsDict.found(objectName))
     {
-        resultsDict.add(name_, dictionary());
+        resultsDict.add(name(), dictionary());
     }
 
     dictionary& objectDict = resultsDict.subDict(objectName);
@@ -189,18 +173,18 @@ void Foam::functionObjectState::setObjectResult
 
 
 template<class Type>
-Type Foam::functionObjectState::getResult
+Type Foam::functionObjects::stateFunctionObject::getResult
 (
     const word& entryName,
     const Type& defaultValue
 ) const
 {
-    return getObjectResult(name_, entryName, defaultValue);
+    return getObjectResult(name(), entryName, defaultValue);
 }
 
 
 template<class Type>
-Type Foam::functionObjectState::getObjectResult
+Type Foam::functionObjects::stateFunctionObject::getObjectResult
 (
     const word& objectName,
     const word& entryName,
@@ -214,7 +198,7 @@ Type Foam::functionObjectState::getObjectResult
 
 
 template<class Type>
-void Foam::functionObjectState::getObjectResult
+void Foam::functionObjects::stateFunctionObject::getObjectResult
 (
     const word& objectName,
     const word& entryName,
