@@ -2,8 +2,8 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2014-2016 OpenFOAM Foundation
-#    \\/     M anipulation  | Copyright (C) 2016 OpenCFD Ltd.
+#   \\  /    A nd           | Copyright (C) 2016 OpenCFD Ltd.
+#    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
 #     This file is part of OpenFOAM.
@@ -22,66 +22,55 @@
 #     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 #
 # File
-#     etc/config.sh/CGAL
+#     etc/config.sh/FFTW
 #
 # Description
-#     Setup file for CGAL (& boost) include/libraries.
+#     Setup file for FFTW include/libraries.
 #     Sourced from OpenFOAM-<VERSION>/etc/bashrc
 #
 #     If using system-wide installations, use the following settings:
 #
-#         boost_version=boost-system
-#         cgal_version=cgal-system
+#         fftw_version=fftw-system
 #
-#     If the system boost/cgal is unusable (eg, too old) and you don't
+#     If the system fftw is unusable (eg, too old) and you don't
 #     have or want a ThirdParty installation:
 #
-#         boost_version=boost-none
-#         cgal_version=cgal-none
+#         fftw_version=fftw-none
 #
 #     If using a central installation, but not located under ThirdParty:
-#         - specify boost-system / cgal-system
-#         - provide full paths for BOOST_ARCH_PATH / CGAL_ARCH_PATH
+#         - specify fftw-system
+#         - provide full paths for FFTW_ARCH_PATH
 #
 # Note
-#     When _foamAddLib is unset (eg, called from makeCGAL):
-#         - boost_version / cgal_version variables are retained.
+#     When _foamAddLib is unset (eg, called from makeFFTW):
+#         - fftw_version variable is retained.
 #         - the LD_LIBRARY_PATH is not adjusted.
 #------------------------------------------------------------------------------
 
-boost_version=boost_1_61_0
-cgal_version=CGAL-4.8
+fftw_version=fftw-3.3.4
 
-export BOOST_ARCH_PATH=$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$boost_version
-export CGAL_ARCH_PATH=$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$cgal_version
+export FFTW_ARCH_PATH=$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$fftw_version
 
 #------------------------------------------------------------------------------
 if [ "$FOAM_VERBOSE" -a "$PS1" ]
 then
-    echo "Using boost ($boost_version)  ->  $BOOST_ARCH_PATH" 1>&2
-    echo "Using CGAL ($cgal_version)  ->  $CGAL_ARCH_PATH" 1>&2
+    echo "Using fftw ($fftw_version)  ->  $FFTW_ARCH_PATH" 1>&2
 fi
 
 if type _foamAddLib > /dev/null 2>&1    # normal sourcing
 then
 
-    # If BOOST_ARCH_PATH, CGAL_ARCH_PATH do not end with '-system' or '-none',
-    # they are either located within ThirdParty, or a central installation
+    # If FFTW_ARCH_PATH does not end with '-system' or '-none',
+    # it is either located within ThirdParty, or a central installation
     # outside of ThirdParty and must be added to the lib-path.
 
-    ending="${BOOST_ARCH_PATH##*-}"
+    ending="${FFTW_ARCH_PATH##*-}"
     if [ "$ending" != none -a "$ending" != system ]
     then
-        _foamAddLib $BOOST_ARCH_PATH/lib
+        _foamAddLib $FFTW_ARCH_PATH/lib$WM_COMPILER_LIB_ARCH
     fi
 
-    ending="${CGAL_ARCH_PATH##*-}"
-    if [ "$ending" != none -a "$ending" != system ]
-    then
-        _foamAddLib $CGAL_ARCH_PATH/lib
-    fi
-
-    unset boost_version cgal_version ending
+    unset fftw_version ending
 
 fi
 
