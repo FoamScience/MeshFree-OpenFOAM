@@ -22,28 +22,30 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Typedef
-    Foam::faceListFwd
+    Foam::surfZoneIdentifierList
 
 Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef faceListFwd_H
-#define faceListFwd_H
+#ifndef surfZoneIdentifierList_H
+#define surfZoneIdentifierList_H
 
+#include "surfZoneIdentifier.H"
 #include "List.H"
-#include "SubList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    class face;
-    typedef UList<face> faceUList;
-    typedef List<face> faceList;
-    typedef SubList<face> faceSubList;
-    typedef List<faceList> faceListList;
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+typedef List<surfZoneIdentifier>  surfZoneIdentifierList;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
