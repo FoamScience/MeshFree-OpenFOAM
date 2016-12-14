@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,45 +21,20 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    Reads the data description and data portions of a DictionaryBase File.
-
 \*---------------------------------------------------------------------------*/
 
-#include "DictionaryBase.H"
-#include "IOstreams.H"
+#include "dictionaryListEntry.H"
 
-// * * * * * * * * * * * * * * Ostream Operator  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class IDLListType, class T>
-Foam::Ostream& Foam::operator<<
+Foam::dictionaryListEntry::dictionaryListEntry
 (
-    Ostream& os,
-    const DictionaryBase<IDLListType, T>& dict)
-{
-    for
-    (
-        typename IDLListType::const_iterator iter = dict.begin();
-        iter != dict.end();
-        ++iter
-    )
-    {
-        os << *iter;
-
-        // Check stream before going to next entry.
-        if (!os.good())
-        {
-            Info
-                << "operator<<(Ostream&, const DictionaryBase&) : "
-                << "Can't write entry for DictionaryBase"
-                << endl;
-
-            return os;
-        }
-    }
-
-    return os;
-}
+    const dictionary& parentDict,
+    const dictionaryListEntry& dictEnt
+)
+:
+    dictionaryEntry(parentDict, dictEnt)
+{}
 
 
 // ************************************************************************* //
