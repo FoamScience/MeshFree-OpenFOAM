@@ -22,23 +22,49 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::OneConstant
+    Foam::Function1Types::ramp
 
 Description
-    Templated function that returns the corresponding 1 (one).
+    Ramp function base class for the set of scalar functions starting from 0 and
+    increasing monotonically to 1 from \c start over the \c duration and
+    remaining at 1 thereafter.
 
     Usage:
     \verbatim
-        <entryName> one;
+        <entryName> <rampFunction>;
+        <entryName>Coeffs
+        {
+            start     10;
+            duration  20;
+        }
+    \endverbatim
+    or
+    \verbatim
+        <entryName>
+        {
+            type      <rampFunction>;
+            start     10;
+            duration  20;
+        }
     \endverbatim
 
+    Where:
+    \table
+        Property | Description  | Required | Default value
+        start    | Start time   | no       | 0
+        duration | Duration     | yes      |
+    \endtable
+
+See also
+    Foam::Function1
+
 SourceFiles
-    OneConstant.C
+    ramp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef OneConstant_H
-#define OneConstant_H
+#ifndef ramp_H
+#define ramp_H
 
 #include "Function1.H"
 
@@ -50,52 +76,62 @@ namespace Function1Types
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class OneConstant Declaration
+                           Class ramp Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class OneConstant
+class ramp
 :
-    public Function1<Type>
+    public Function1<scalar>
 {
+protected:
+
+    // Protected data
+
+        //- Start-time of the ramp function
+        scalar start_;
+
+        //- Duration of the ramp function
+        scalar duration_;
+
+        //- Simple linear ramp function
+        //  which form the basis of many more complex ramp functions
+        inline scalar linearRamp(const scalar t) const
+        {
+            return max(min((t - start_)/duration_, 1), 0);
+        }
+
+
+private:
+
     // Private Member Functions
 
+        //- Read the coefficients from the given dictionary
+        void read(const dictionary& coeffs);
+
         //- Disallow default bitwise assignment
-        void operator=(const OneConstant<Type>&);
+        void operator=(const ramp&);
 
 
 public:
 
-    // Runtime type information
-    TypeName("one");
-
-
     // Constructors
 
-        //- Construct from entry name
-        OneConstant(const word& entryName);
-
         //- Construct from entry name and dictionary
-        OneConstant(const word& entryName, const dictionary& dict);
-
-        //- Construct and return a clone
-        virtual tmp<Function1<Type>> clone() const
-        {
-            return tmp<Function1<Type>>(new OneConstant<Type>(*this));
-        }
+        ramp
+        (
+            const word& entryName,
+            const dictionary& dict
+        );
 
 
     //- Destructor
-    virtual ~OneConstant();
+    virtual ~ramp();
 
 
     // Member Functions
 
-        //- Return constant value
-        Type value(const scalar) const;
-
-        //- Integrate between two values
-        Type integrate(const scalar x1, const scalar x2) const;
+        //- Return value for time t
+        scalar value(const scalar t) const = 0;
 
         //- Write in dictionary format
         virtual void writeData(Ostream& os) const;
@@ -106,12 +142,6 @@ public:
 
 } // End namespace Function1Types
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-    #include "OneConstant.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

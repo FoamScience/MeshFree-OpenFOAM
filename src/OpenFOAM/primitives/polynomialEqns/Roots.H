@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,92 +22,107 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::Table
+    Foam::Roots
 
 Description
-    Templated table container function.
-
-    Items are stored in a list of Tuple2's. First column is always stored as
-    scalar entries. Data is read in Tuple2 form.
-
-    Usage:
-    \verbatim
-        <entryName>   table
-        (
-            (0.0 (1 2 3))
-            (1.0 (4 5 6))
-        );
-    \endverbatim
+    Templated storage for the roots of polynomial equations, plus flags to
+    indicate the nature of the roots.
 
 SourceFiles
-    Table.C
+    RootsI.H
+    Roots.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Table_H
-#define Table_H
+#ifndef Roots_H
+#define Roots_H
 
-#include "Function1.H"
-#include "Tuple2.H"
+#include "VectorSpace.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace Function1Types
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace roots
 {
+
+//- Types of root
+enum type
+{
+    real = 0,
+    complex,
+    posInf,
+    negInf,
+    nan
+};
+
+}
 
 /*---------------------------------------------------------------------------*\
-                           Class Table Declaration
+                         Class Roots Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class Table
+template<direction N>
+class Roots
 :
-    public TableBase<Type>
+    public VectorSpace<Roots<N>, scalar, N>
 {
-    // Private Member Functions
+    // Private data
 
-        //- Disallow default bitwise assignment
-        void operator=(const Table<Type>&);
-
+        //- Root types, encoded into a single integer
+        label types_;
 
 public:
 
-    //- Runtime type information
-    TypeName("table");
-
-
     // Constructors
 
-        //- Construct from entry name and Istream
-        Table(const word& entryName, const dictionary& dict);
+        //- Construct null
+        inline Roots();
 
-        //- Copy constructor
-        Table(const Table<Type>& tbl);
+        //- Construct with a uniform value
+        inline Roots(const roots::type t, const scalar x);
 
-        //- Construct and return a clone
-        virtual tmp<Function1<Type>> clone() const
-        {
-            return tmp<Function1<Type>>(new Table<Type>(*this));
-        }
+        //- Construct by concatenation
+        inline Roots
+        (
+            const roots::type t,
+            const scalar x,
+            const Roots<N - 1>& xs
+        );
+
+        //- Construct by concatenation
+        inline Roots
+        (
+            const Roots<N - 1>& xs,
+            const roots::type t,
+            const scalar x
+        );
+
+        //- Construct by concatenation
+        template <direction M>
+        inline Roots(const Roots<M>& xs, const Roots<N - M>& ys);
 
 
-    //- Destructor
-    virtual ~Table();
+    // Member Functions
+
+        //- Set the type of the i-th root
+        inline void type(const direction i, const roots::type t);
+
+        //- Return the type of the i-th root
+        inline roots::type type(const direction i) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Function1Types
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
-    #include "Table.C"
-#endif
+#include "RootsI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

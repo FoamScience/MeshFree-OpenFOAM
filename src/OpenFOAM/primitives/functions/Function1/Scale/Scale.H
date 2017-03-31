@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,33 +22,57 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::Table
+    Foam::Function1Types::Scale
 
 Description
-    Templated table container function.
+    Function1 which scales a given 'value' function by a scalar 'scale'
+    function.
 
-    Items are stored in a list of Tuple2's. First column is always stored as
-    scalar entries. Data is read in Tuple2 form.
+    This is particularly useful to ramp a time-varying value by one of the
+    monotonic ramp functions.
 
-    Usage:
+    Usage for a vector:
     \verbatim
-        <entryName>   table
-        (
-            (0.0 (1 2 3))
-            (1.0 (4 5 6))
-        );
+        <entryName>
+        {
+            type      scale;
+
+            scale
+            {
+                type        linearRamp;
+
+                start       0;
+                duration    10;
+            }
+
+            value
+            {
+                type        sine;
+
+                frequency   10;
+                amplitude   1;
+                scale       (1 0.1 0);
+                level       (10 1 0);
+            }
+        }
     \endverbatim
 
+    Where:
+    \table
+        Property | Description                                  | Required
+        value    | Function of type Function1<Type>             | yes
+        scale    | Scaling function of type Function1<scalar>   | yes
+    \endtable
+
 SourceFiles
-    Table.C
+    Scale.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Table_H
-#define Table_H
+#ifndef Scale_H
+#define Scale_H
 
 #include "Function1.H"
-#include "Tuple2.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,43 +82,68 @@ namespace Function1Types
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Table Declaration
+                           Class Scale Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class Table
+class Scale
 :
-    public TableBase<Type>
+    public Function1<Type>
 {
+    // Private data
+
+        //- Scalar scaling function
+        autoPtr<Function1<scalar>> scale_;
+
+        //- Value function
+        autoPtr<Function1<Type>> value_;
+
+
     // Private Member Functions
 
+        //- Read the coefficients from the given dictionary
+        void read(const dictionary& coeffs);
+
         //- Disallow default bitwise assignment
-        void operator=(const Table<Type>&);
+        void operator=(const Scale<Type>&);
 
 
 public:
 
-    //- Runtime type information
-    TypeName("table");
+    // Runtime type information
+    TypeName("scale");
 
 
     // Constructors
 
-        //- Construct from entry name and Istream
-        Table(const word& entryName, const dictionary& dict);
+        //- Construct from entry name and dictionary
+        Scale
+        (
+            const word& entryName,
+            const dictionary& dict
+        );
 
         //- Copy constructor
-        Table(const Table<Type>& tbl);
+        Scale(const Scale<Type>& se);
 
         //- Construct and return a clone
         virtual tmp<Function1<Type>> clone() const
         {
-            return tmp<Function1<Type>>(new Table<Type>(*this));
+            return tmp<Function1<Type>>(new Scale<Type>(*this));
         }
 
 
     //- Destructor
-    virtual ~Table();
+    virtual ~Scale();
+
+
+    // Member Functions
+
+        //- Return value for time t
+        Type value(const scalar t) const;
+
+        //- Write in dictionary format
+        virtual void writeData(Ostream& os) const;
 };
 
 
@@ -106,7 +155,7 @@ public:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-    #include "Table.C"
+    #include "Scale.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

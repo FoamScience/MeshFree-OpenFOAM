@@ -2,8 +2,8 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2016-2017 OpenFOAM Foundation
-     \\/     M anipulation  | Copyright (C) 2016 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,24 +23,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Square.H"
+#include "Scale.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-void Foam::Function1Types::Square<Type>::read(const dictionary& coeffs)
+void Foam::Function1Types::Scale<Type>::read(const dictionary& coeffs)
 {
-    t0_ = coeffs.lookupOrDefault<scalar>("t0", 0);
-    markSpace_ = coeffs.lookupOrDefault<scalar>("markSpace", 1);
-    amplitude_ = Function1<scalar>::New("amplitude", coeffs);
-    frequency_ = Function1<scalar>::New("frequency", coeffs);
-    scale_ = Function1<Type>::New("scale", coeffs);
-    level_ = Function1<Type>::New("level", coeffs);
+    scale_ = Function1<scalar>::New("scale", coeffs);
+    value_ = Function1<Type>::New("value", coeffs);
 }
 
 
 template<class Type>
-Foam::Function1Types::Square<Type>::Square
+Foam::Function1Types::Scale<Type>::Scale
 (
     const word& entryName,
     const dictionary& dict
@@ -53,66 +49,40 @@ Foam::Function1Types::Square<Type>::Square
 
 
 template<class Type>
-Foam::Function1Types::Square<Type>::Square(const Square<Type>& se)
+Foam::Function1Types::Scale<Type>::Scale(const Scale<Type>& se)
 :
     Function1<Type>(se),
-    t0_(se.t0_),
-    markSpace_(se.markSpace_),
-    amplitude_(se.amplitude_, false),
-    frequency_(se.frequency_, false),
     scale_(se.scale_, false),
-    level_(se.level_, false)
+    value_(se.value_, false)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Function1Types::Square<Type>::~Square()
+Foam::Function1Types::Scale<Type>::~Scale()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Type Foam::Function1Types::Square<Type>::value(const scalar t) const
+Type Foam::Function1Types::Scale<Type>::value(const scalar t) const
 {
-    // Number of waves including fractions
-    scalar waves = frequency_->value(t)*(t - t0_);
-
-    // Number of complete waves
-    scalar nWaves;
-
-    // Fraction of last incomplete wave
-    scalar waveFrac = std::modf(waves, &nWaves);
-
-    // Mark fraction of a wave
-    scalar markFrac = markSpace_/(1.0 + markSpace_);
-
-    return
-        amplitude_->value(t)
-       *(waveFrac < markFrac ? 1 : -1)
-       *scale_->value(t)
-      + level_->value(t);
+    return scale_->value(t)*value_->value(t);
 }
 
 
 template<class Type>
-void Foam::Function1Types::Square<Type>::writeData(Ostream& os) const
+void Foam::Function1Types::Scale<Type>::writeData(Ostream& os) const
 {
     Function1<Type>::writeData(os);
-    os.endEntry();
-
-    os.beginBlock(word(this->name() + "Coeffs"));
-
-    os.writeEntry("t0", t0_);
-    os.writeEntry("markSpace", markSpace_);
-    amplitude_->writeData(os);
-    frequency_->writeData(os);
+    os  << token::END_STATEMENT << nl;
+    os  << indent << word(this->name() + "Coeffs") << nl;
+    os  << indent << token::BEGIN_BLOCK << incrIndent << nl;
     scale_->writeData(os);
-    level_->writeData(os);
-
-    os.endBlock() << flush;
+    value_->writeData(os);
+    os  << decrIndent << indent << token::END_BLOCK << endl;
 }
 
 

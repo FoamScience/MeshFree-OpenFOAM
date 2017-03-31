@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,33 +22,24 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::Table
+    Foam::Function1Types::linearRamp
 
 Description
-    Templated table container function.
+    Linear ramp function starting from 0 and increasing linearRamply to 1 from
+    \c start over the \c duration and remaining at 1 thereafter.
 
-    Items are stored in a list of Tuple2's. First column is always stored as
-    scalar entries. Data is read in Tuple2 form.
-
-    Usage:
-    \verbatim
-        <entryName>   table
-        (
-            (0.0 (1 2 3))
-            (1.0 (4 5 6))
-        );
-    \endverbatim
+See also
+    Foam::Function1Types::ramp
 
 SourceFiles
-    Table.C
+    linearRamp.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Table_H
-#define Table_H
+#ifndef linearRamp_H
+#define linearRamp_H
 
-#include "Function1.H"
-#include "Tuple2.H"
+#include "ramp.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,43 +49,43 @@ namespace Function1Types
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Table Declaration
+                           Class linearRamp Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class Table
+class linearRamp
 :
-    public TableBase<Type>
+    public ramp
 {
     // Private Member Functions
 
         //- Disallow default bitwise assignment
-        void operator=(const Table<Type>&);
+        void operator=(const linearRamp&);
 
 
 public:
 
-    //- Runtime type information
-    TypeName("table");
+    // Runtime type information
+    TypeName("linearRamp");
 
 
     // Constructors
 
-        //- Construct from entry name and Istream
-        Table(const word& entryName, const dictionary& dict);
-
-        //- Copy constructor
-        Table(const Table<Type>& tbl);
-
-        //- Construct and return a clone
-        virtual tmp<Function1<Type>> clone() const
-        {
-            return tmp<Function1<Type>>(new Table<Type>(*this));
-        }
+        //- Construct from entry name and dictionary
+        linearRamp
+        (
+            const word& entryName,
+            const dictionary& dict
+        );
 
 
     //- Destructor
-    virtual ~Table();
+    virtual ~linearRamp();
+
+
+    // Member Functions
+
+        //- Return value for time t
+        scalar value(const scalar t) const;
 };
 
 
@@ -102,12 +93,6 @@ public:
 
 } // End namespace Function1Types
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-    #include "Table.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -2,8 +2,8 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
-     \\/     M anipulation  | Copyright (C) 2016-2017 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,71 +23,43 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "TableFile.H"
+#include "quarterSineRamp.H"
+#include "mathematicalConstants.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace Function1Types
+{
+    makeScalarFunction1(quarterSineRamp);
+}
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::Function1Types::TableFile<Type>::TableFile
+Foam::Function1Types::quarterSineRamp::quarterSineRamp
 (
     const word& entryName,
     const dictionary& dict
 )
 :
-    TableBase<Type>(entryName, dict),
-    fName_("none")
-{
-    dict.lookup("file") >> fName_;
-
-    fileName expandedFile(fName_);
-    IFstream is(expandedFile.expand());
-
-    if (!is.good())
-    {
-        FatalIOErrorInFunction
-        (
-            is
-        )   << "Cannot open file." << exit(FatalIOError);
-    }
-
-    is  >> this->table_;
-
-    TableBase<Type>::check();
-}
-
-
-template<class Type>
-Foam::Function1Types::TableFile<Type>::TableFile(const TableFile<Type>& tbl)
-:
-    TableBase<Type>(tbl),
-    fName_(tbl.fName_)
+    ramp(entryName, dict)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-template<class Type>
-Foam::Function1Types::TableFile<Type>::~TableFile()
+Foam::Function1Types::quarterSineRamp::~quarterSineRamp()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-template<class Type>
-void Foam::Function1Types::TableFile<Type>::writeData(Ostream& os) const
+Foam::scalar Foam::Function1Types::quarterSineRamp::value(const scalar t) const
 {
-    Function1<Type>::writeData(os);
-    os.endEntry();
-
-    os.beginBlock(word(this->name() + "Coeffs"));
-
-    // Note: for TableBase write the dictionary entries it needs but not
-    // the values themselves
-    TableBase<Type>::writeEntries(os);
-
-    os.writeEntry("file", fName_);
-
-    os.endBlock() << flush;
+    return sin(0.5*constant::mathematical::pi*linearRamp(t));
 }
 
 

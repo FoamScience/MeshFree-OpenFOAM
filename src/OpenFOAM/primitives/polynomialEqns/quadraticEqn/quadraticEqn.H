@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,92 +22,83 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::Table
+    Foam::quadraticEqn
 
 Description
-    Templated table container function.
-
-    Items are stored in a list of Tuple2's. First column is always stored as
-    scalar entries. Data is read in Tuple2 form.
-
-    Usage:
-    \verbatim
-        <entryName>   table
-        (
-            (0.0 (1 2 3))
-            (1.0 (4 5 6))
-        );
-    \endverbatim
+    Quadratic equation of the form a*x^2 + b*x + c = 0
 
 SourceFiles
-    Table.C
+    quadraticEqnI.H
+    quadraticEqn.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Table_H
-#define Table_H
+#ifndef quadraticEqn_H
+#define quadraticEqn_H
 
-#include "Function1.H"
-#include "Tuple2.H"
+#include "Roots.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace Function1Types
-{
 
 /*---------------------------------------------------------------------------*\
-                           Class Table Declaration
+                         Class quadraticEqn Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class Type>
-class Table
+class quadraticEqn
 :
-    public TableBase<Type>
+    public VectorSpace<quadraticEqn, scalar, 3>
 {
-    // Private Member Functions
-
-        //- Disallow default bitwise assignment
-        void operator=(const Table<Type>&);
-
-
 public:
 
-    //- Runtime type information
-    TypeName("table");
+    //- Component labeling enumeration
+    enum components { A, B, C };
 
 
     // Constructors
 
-        //- Construct from entry name and Istream
-        Table(const word& entryName, const dictionary& dict);
+        //- Construct null
+        inline quadraticEqn();
 
-        //- Copy constructor
-        Table(const Table<Type>& tbl);
+        //- Construct initialized to zero
+        inline quadraticEqn(const Foam::zero);
 
-        //- Construct and return a clone
-        virtual tmp<Function1<Type>> clone() const
-        {
-            return tmp<Function1<Type>>(new Table<Type>(*this));
-        }
+        //- Construct from components
+        inline quadraticEqn(const scalar a, const scalar b, const scalar c);
 
 
-    //- Destructor
-    virtual ~Table();
+    // Member Functions
+
+        // Access
+
+            inline scalar a() const;
+            inline scalar b() const;
+            inline scalar c() const;
+
+            inline scalar& a();
+            inline scalar& b();
+            inline scalar& c();
+
+        //- Evaluate at x
+        inline scalar value(const scalar x) const;
+
+        //- Estimate the error of evaluation at x
+        inline scalar error(const scalar x) const;
+
+        //- Get the roots
+        Roots<2> roots() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Function1Types
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#ifdef NoRepository
-    #include "Table.C"
-#endif
+#include "quadraticEqnI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
