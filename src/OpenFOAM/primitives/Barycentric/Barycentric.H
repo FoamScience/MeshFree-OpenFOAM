@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,21 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cubicEqn
+    Foam::Barycentric
 
 Description
-    Cubic equation of the form a*x^3 + b*x^2 + c*x + d = 0
+    Templated 3D Barycentric derived from VectorSpace. Has 4 components, one of
+    which is redundant.
 
 SourceFiles
-    cubicEqnI.H
-    cubicEqn.C
+    BarycentricI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cubicEqn_H
-#define cubicEqn_H
+#ifndef Barycentric_H
+#define Barycentric_H
 
-#include "Roots.H"
+#include "VectorSpace.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,14 +44,25 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class cubicEqn Declaration
+                         Class Barycentric Declaration
 \*---------------------------------------------------------------------------*/
 
-class cubicEqn
+template<class Cmpt>
+class Barycentric
 :
-    public VectorSpace<cubicEqn, scalar, 4>
+    public VectorSpace<Barycentric<Cmpt>, Cmpt, 4>
 {
 public:
+
+    //- Equivalent type of labels used for valid component indexing
+    typedef Barycentric<label> labelType;
+
+
+    // Member constants
+
+        //- Rank of Barycentric is 1
+        static const direction rank = 1;
+
 
     //- Component labeling enumeration
     enum components { A, B, C, D };
@@ -60,18 +71,18 @@ public:
     // Constructors
 
         //- Construct null
-        inline cubicEqn();
+        inline Barycentric();
 
         //- Construct initialized to zero
-        inline cubicEqn(const Foam::zero);
+        inline Barycentric(const Foam::zero);
 
-        //- Construct from components
-        inline cubicEqn
+        //- Construct given four components
+        inline Barycentric
         (
-            const scalar a,
-            const scalar b,
-            const scalar c,
-            const scalar d
+            const Cmpt& va,
+            const Cmpt& vb,
+            const Cmpt& vc,
+            const Cmpt& vd
         );
 
 
@@ -79,27 +90,15 @@ public:
 
         // Access
 
-            inline scalar a() const;
-            inline scalar b() const;
-            inline scalar c() const;
-            inline scalar d() const;
+            inline const Cmpt& a() const;
+            inline const Cmpt& b() const;
+            inline const Cmpt& c() const;
+            inline const Cmpt& d() const;
 
-            inline scalar& a();
-            inline scalar& b();
-            inline scalar& c();
-            inline scalar& d();
-
-        //- Evaluate at x
-        inline scalar value(const scalar x) const;
-
-        //- Evaluate the derivative at x
-        inline scalar derivative(const scalar x) const;
-
-        //- Estimate the error of evaluation at x
-        inline scalar error(const scalar x) const;
-
-        //- Get the roots
-        Roots<3> roots() const;
+            inline Cmpt& a();
+            inline Cmpt& b();
+            inline Cmpt& c();
+            inline Cmpt& d();
 };
 
 
@@ -109,7 +108,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "cubicEqnI.H"
+#include "BarycentricI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

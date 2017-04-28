@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2016-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,84 +21,51 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::linearEqn
+Typedef
+    Foam::barycentric
 
 Description
-    Linear equation of the form a*x + b = 0
-
-SourceFiles
-    linearEqnI.H
+    A scalar version of the templated Barycentric
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef linearEqn_H
-#define linearEqn_H
+#ifndef barycentric_H
+#define barycentric_H
 
-#include "Roots.H"
+#include "scalar.H"
+#include "Barycentric.H"
+#include "contiguous.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class linearEqn Declaration
-\*---------------------------------------------------------------------------*/
+// Forward declaration of classes
+class Random;
+class cachedRandom;
 
-class linearEqn
-:
-    public VectorSpace<linearEqn, scalar, 2>
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+typedef Barycentric<scalar> barycentric;
+
+
+//- Generate a random barycentric coordinate within the unit tetrahedron
+barycentric barycentric01(Random& rndGen);
+barycentric barycentric01(cachedRandom& rndGen);
+
+
+template<>
+inline bool contiguous<barycentric>()
 {
-public:
-
-    //- Component labeling enumeration
-    enum components { A, B };
-
-
-    // Constructors
-
-        //- Construct null
-        inline linearEqn();
-
-        //- Construct initialized to zero
-        inline linearEqn(const Foam::zero);
-
-        //- Construct from components
-        inline linearEqn(const scalar a, const scalar b);
-
-
-    // Member Functions
-
-        // Access
-
-            inline scalar a() const;
-            inline scalar b() const;
-
-            inline scalar& a();
-            inline scalar& b();
-
-        //- Evaluate at x
-        inline scalar value(const scalar x) const;
-
-        //- Evaluate the derivative at x
-        inline scalar derivative(const scalar x) const;
-
-        //- Estimate the error of evaluation at x
-        inline scalar error(const scalar x) const;
-
-        //- Get the roots
-        inline Roots<1> roots() const;
-};
+    return true;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "linearEqnI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
