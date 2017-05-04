@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,47 +23,58 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-inline Foam::cell::cell()
-{}
+// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-
-inline Foam::cell::cell(const label sz)
-:
-    labelList(sz, -1)
-{}
-
-
-inline Foam::cell::cell(const labelUList& lst)
-:
-    labelList(lst)
-{}
-
-
-inline Foam::cell::cell(const Xfer<labelList>& lst)
-:
-    labelList(lst)
-{}
-
-
-inline Foam::cell::cell(Istream& is)
-:
-    labelList(is)
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-inline Foam::label Foam::cell::nFaces() const
+inline bool Foam::regExp::meta(const char c)
 {
-    return size();
+    return
+    (
+        (c == '.')                           // any character
+     || (c == '*' || c == '+' || c == '?')   // quantifiers
+     || (c == '(' || c == ')' || c == '|')   // grouping/branching
+     || (c == '[' || c == ']')               // range
+    );
 }
 
 
-inline bool Foam::operator!=(const cell& a, const cell& b)
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+inline bool Foam::regExp::empty() const
 {
-    return !(a == b);
+    return !preg_;
+}
+
+
+inline bool Foam::regExp::exists() const
+{
+    return preg_ ? true : false;
+}
+
+
+inline unsigned Foam::regExp::ngroups() const
+{
+    return preg_ ? preg_->re_nsub : 0;
+}
+
+
+inline bool Foam::regExp::search(const std::string& text) const
+{
+    return std::string::npos != find(text);
+}
+
+
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+inline void Foam::regExp::operator=(const char* pattern)
+{
+    set(pattern);
+}
+
+
+inline void Foam::regExp::operator=(const std::string& pattern)
+{
+    set(pattern);
 }
 
 
