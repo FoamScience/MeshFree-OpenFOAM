@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,45 +21,31 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::wordReListMatcher
+
+Description
+    The older name for Foam::wordRes, which is a wrapper for matching
+    a std::string against wordRe list.
+
 \*---------------------------------------------------------------------------*/
 
-#include "cellZone.H"
-#include "dictionary.H"
+#ifndef wordReListMatcher_H
+#define wordReListMatcher_H
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+#include "wordRes.H"
 
-Foam::autoPtr<Foam::cellZone> Foam::cellZone::New
-(
-    const word& name,
-    const dictionary& dict,
-    const label index,
-    const cellZoneMesh& zm
-)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
 {
-    if (debug)
-    {
-        InfoInFunction << "Constructing cellZone " << name << endl;
-    }
 
-    const word zoneType(dict.lookup("type"));
+     typedef wordRes wordReListMatcher;
 
-    dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(zoneType);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    if (!cstrIter.found())
-    {
-        FatalIOErrorInFunction
-        (
-            dict
-        )   << "Unknown cellZone type "
-            << zoneType << nl << nl
-            << "Valid cellZone types are:" << nl
-            << dictionaryConstructorTablePtr_->sortedToc()
-            << exit(FatalIOError);
-    }
+} // End namespace Foam
 
-    return autoPtr<cellZone>(cstrIter()(name, dict, index, zm));
-}
-
+#endif
 
 // ************************************************************************* //
