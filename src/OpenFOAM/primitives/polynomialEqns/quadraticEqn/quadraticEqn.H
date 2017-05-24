@@ -2,8 +2,8 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
-     \\/     M anipulation  | Copyright (C) 2016 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -22,25 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::wordReListMatcher
+    Foam::quadraticEqn
 
 Description
-    A wrapper for matching a List of wordRe.
-
-Note
-    The constructor should remain non-explicit. This allows automatic
-    conversion from UList\<wordRe\> to wordReListMatcher in search
-    functions.
+    Quadratic equation of the form a*x^2 + b*x + c = 0
 
 SourceFiles
-    wordReListMatcherI.H
+    quadraticEqnI.H
+    quadraticEqn.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wordReListMatcher_H
-#define wordReListMatcher_H
+#ifndef quadraticEqn_H
+#define quadraticEqn_H
 
-#include "wordReList.H"
+#include "Roots.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,49 +44,51 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class wordReListMatcher Declaration
+                         Class quadraticEqn Declaration
 \*---------------------------------------------------------------------------*/
 
-class wordReListMatcher
+class quadraticEqn
+:
+    public VectorSpace<quadraticEqn, scalar, 3>
 {
-    // Private data
-
-        //- Reference to underlying list
-        const UList<wordRe>& reList_;
-
 public:
+
+    //- Component labeling enumeration
+    enum components { A, B, C };
+
 
     // Constructors
 
-        //- Construct from a List of wordRe
-        inline wordReListMatcher(const UList<wordRe>&);
+        //- Construct null
+        inline quadraticEqn();
+
+        //- Construct initialized to zero
+        inline quadraticEqn(const Foam::zero);
+
+        //- Construct from components
+        inline quadraticEqn(const scalar a, const scalar b, const scalar c);
 
 
     // Member Functions
 
         // Access
 
-            inline label size() const;
-            inline bool  empty() const;
+            inline scalar a() const;
+            inline scalar b() const;
+            inline scalar c() const;
 
-            //- Return underlying list of wordRe
-            inline const UList<wordRe>& operator()() const;
+            inline scalar& a();
+            inline scalar& b();
+            inline scalar& c();
 
+        //- Evaluate at x
+        inline scalar value(const scalar x) const;
 
-        // Searching
+        //- Estimate the error of evaluation at x
+        inline scalar error(const scalar x) const;
 
-            //- Return true if string matches any of the regular expressions
-            //  Smart match as regular expression or as a string.
-            //  Optionally specify a literal match only.
-            inline bool match(const string&, bool literalMatch=false) const;
-
-
-        // Helpers
-
-            //- Return a wordReList with duplicate words filtered out.
-            //  No filtering is done on regular expressions.
-            static wordReList uniq(const UList<wordRe>& input);
-
+        //- Get the roots
+        Roots<2> roots() const;
 };
 
 
@@ -100,7 +98,9 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "wordReListMatcherI.H"
+#include "quadraticEqnI.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 

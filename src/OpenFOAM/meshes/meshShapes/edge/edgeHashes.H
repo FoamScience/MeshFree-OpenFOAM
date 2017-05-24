@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -21,34 +21,37 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::edgeHashSet
+
+Description
+    A HashSet for an edge.
+    The hashing on an edge is commutative.
+
 \*---------------------------------------------------------------------------*/
 
-#include "cachedRandom.H"
+#ifndef edgeHashes_H
+#define edgeHashes_H
+
+#include "HashSet.H"
+#include "edge.H"
+#include "EdgeMap.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline Foam::label Foam::cachedRandom::seed() const
+namespace Foam
 {
-    return seed_;
+    // Alternative:
+    // template<class T>
+    // using EdgeMap = HashTable<T, edge, Hash<edge>>;
+
+    //- A HashSet with edge for its key.
+    typedef HashSet<edge, Hash<edge>> edgeHashSet;
+
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline const Foam::scalarList& Foam::cachedRandom::samples() const
-{
-    return samples_;
-}
-
-
-inline Foam::label Foam::cachedRandom::sampleI() const
-{
-    return sampleI_;
-}
-
-
-inline Foam::label& Foam::cachedRandom::sampleI()
-{
-    return sampleI_;
-}
-
+#endif
 
 // ************************************************************************* //
