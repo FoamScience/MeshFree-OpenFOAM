@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,55 +23,46 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "quarterCosineRamp.H"
+#include "mathematicalConstants.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace Function1Types
+{
+    makeScalarFunction1(quarterCosineRamp);
+}
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-inline Foam::wordReListMatcher::wordReListMatcher
+Foam::Function1Types::quarterCosineRamp::quarterCosineRamp
 (
-    const UList<wordRe>& lst
+    const word& entryName,
+    const dictionary& dict
 )
 :
-    reList_(lst)
+    ramp(entryName, dict)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::Function1Types::quarterCosineRamp::~quarterCosineRamp()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline Foam::label Foam::wordReListMatcher::size() const
-{
-    return reList_.size();
-}
-
-
-inline bool Foam::wordReListMatcher::empty() const
-{
-    return reList_.empty();
-}
-
-
-inline const Foam::UList<Foam::wordRe>&
-Foam::wordReListMatcher::operator()() const
-{
-    return reList_;
-}
-
-
-inline bool Foam::wordReListMatcher::match
+Foam::scalar Foam::Function1Types::quarterCosineRamp::value
 (
-    const std::string& text,
-    bool literalMatch
+    const scalar t
 ) const
 {
-    const label n = reList_.size();
-    for (label i = 0; i < n; ++i)
-    {
-        if (reList_[i].match(text, literalMatch))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return 1 - cos(0.5*constant::mathematical::pi*linearRamp(t));
 }
 
 

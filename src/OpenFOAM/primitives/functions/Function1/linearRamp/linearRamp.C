@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2016 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,33 +23,42 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "wordReListMatcher.H"
-#include "HashSet.H"
+#include "linearRamp.H"
 
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-Foam::wordReList Foam::wordReListMatcher::uniq(const UList<wordRe>& input)
+namespace Foam
 {
-    wordReList retain(input.size());
-    wordHashSet uniqWord;
+namespace Function1Types
+{
+    makeScalarFunction1(linearRamp);
+}
+}
 
-    label nUniq = 0;
-    forAll(input, i)
-    {
-        const wordRe& select = input[i];
 
-        if
-        (
-            select.isPattern()
-         || uniqWord.insert(static_cast<const word&>(select))
-        )
-        {
-            retain[nUniq++] = select;
-        }
-    }
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-    retain.setSize(nUniq);
-    return retain;
+Foam::Function1Types::linearRamp::linearRamp
+(
+    const word& entryName,
+    const dictionary& dict
+)
+:
+    ramp(entryName, dict)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::Function1Types::linearRamp::~linearRamp()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::scalar Foam::Function1Types::linearRamp::value(const scalar t) const
+{
+    return ramp::linearRamp(t);
 }
 
 
