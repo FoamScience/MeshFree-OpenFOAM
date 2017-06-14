@@ -2,8 +2,8 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
-     \\/     M anipulation  | Copyright (C) 2016 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2017 OpenCFD Ltd.
+     \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,44 +23,32 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "algebraicPairGAMGAgglomeration.H"
-#include "lduMatrix.H"
-#include "addToRunTimeSelectionTable.H"
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-namespace Foam
-{
-    defineTypeNameAndDebug(algebraicPairGAMGAgglomeration, 0);
-
-    addToRunTimeSelectionTable
-    (
-        GAMGAgglomeration,
-        algebraicPairGAMGAgglomeration,
-        lduMatrix
-    );
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::algebraicPairGAMGAgglomeration::algebraicPairGAMGAgglomeration
+template<class Type>
+void Foam::lduInterfaceField::addToInternalField
 (
-    const lduMatrix& matrix,
-    const dictionary& controlDict
-)
-:
-    pairGAMGAgglomeration(matrix.mesh(), controlDict)
+    Field<Type>& result,
+    const bool add,
+    const scalarField& coeffs,
+    const Field<Type>& vals
+) const
 {
-    const lduMesh& mesh = matrix.mesh();
+    const labelUList& faceCells = this->interface().faceCells();
 
-    if (matrix.hasLower())
+    if (add)
     {
-        agglomerate(mesh, max(mag(matrix.upper()), mag(matrix.lower())));
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] += coeffs[elemI]*vals[elemI];
+        }
     }
     else
     {
-        agglomerate(mesh, mag(matrix.upper()));
+        forAll(faceCells, elemI)
+        {
+            result[faceCells[elemI]] -= coeffs[elemI]*vals[elemI];
+        }
     }
 }
 
