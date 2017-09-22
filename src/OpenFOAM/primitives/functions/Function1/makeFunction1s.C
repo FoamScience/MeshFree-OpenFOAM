@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "Constant.H"
+#include "Uniform.H"
 #include "ZeroConstant.H"
 #include "OneConstant.H"
 #include "PolynomialEntry.H"
@@ -41,6 +42,7 @@ License
 #define makeFunction1s(Type)                                                   \
     makeFunction1(Type);                                                       \
     makeFunction1Type(Constant, Type);                                         \
+    makeFunction1Type(Uniform, Type);                                          \
     makeFunction1Type(ZeroConstant, Type);                                     \
     makeFunction1Type(OneConstant, Type);                                      \
     makeFunction1Type(Polynomial, Type);                                       \
@@ -55,14 +57,25 @@ namespace Foam
 {
     makeFunction1(label);
     makeFunction1Type(Constant, label);
-    // Polynomial functions and interpolation do evaluate to label
-    // Instead evaluate a scalar and convert to label as appropriate
 
     makeFunction1s(scalar);
     makeFunction1s(vector);
     makeFunction1s(sphericalTensor);
     makeFunction1s(symmTensor);
     makeFunction1s(tensor);
+}
+
+
+template<>
+Foam::tmp<Foam::Field<Foam::label>>
+Foam::Function1Types::Constant<Foam::label>::integrate
+(
+    const scalarField& x1,
+    const scalarField& x2
+) const
+{
+    NotImplemented;
+    return tmp<Field<label>>(new Field<label>(x1.size()));
 }
 
 

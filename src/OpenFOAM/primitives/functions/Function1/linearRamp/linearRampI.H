@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,22 +23,17 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "globalIOFields.H"
+#include "linearRamp.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-namespace Foam
+inline Foam::scalar Foam::Function1Types::linearRamp::value
+(
+    const scalar t
+) const
 {
-    defineTemplateTypeNameWithName(labelGlobalIOField, "labelField");
-    defineTemplateTypeNameWithName(scalarGlobalIOField, "scalarField");
-    defineTemplateTypeNameWithName(vectorGlobalIOField, "vectorField");
-    defineTemplateTypeNameWithName
-    (
-        sphericalTensorGlobalIOField,
-        "sphericalTensorField"
-    );
-    defineTemplateTypeNameWithName(symmTensorGlobalIOField, "symmTensorField");
-    defineTemplateTypeNameWithName(tensorGlobalIOField, "tensorField");
+    return ramp::linearRamp(t);
 }
+
 
 // ************************************************************************* //
