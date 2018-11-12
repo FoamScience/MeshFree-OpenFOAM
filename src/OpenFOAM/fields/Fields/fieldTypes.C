@@ -24,23 +24,19 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "fieldTypes.H"
-#include "labelIOField.H"
-#include "scalarIOField.H"
-#include "vectorIOField.H"
-#include "sphericalTensorIOField.H"
-#include "symmTensorIOField.H"
-#include "tensorIOField.H"
 
 // * * * * * * * * * * * * * * * * Global Data * * * * * * * * * * * * * * * //
 
+// Note hard-coded values are more reliable than other alternatives
+
 const Foam::wordList Foam::fieldTypes::basic
 ({
-    Foam::labelIOField::typeName_(),
-    Foam::scalarIOField::typeName_(),
-    Foam::vectorIOField::typeName_(),
-    Foam::sphericalTensorIOField::typeName_(),
-    Foam::symmTensorIOField::typeName_(),
-    Foam::tensorIOField::typeName_()
+    "labelField",               //< labelIOField
+    "scalarField",              //< scalarIOField
+    "vectorField",              //< vectorOField
+    "sphericalTensorField",     //< sphericalTensorIOField
+    "symmTensorField",          //< symmTensorIOField
+    "tensorField"               //< tensorIOField
 });
 
 
