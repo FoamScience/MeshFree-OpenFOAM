@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2016-2018 OpenCFD Ltd.
+    \\  /    A nd           | Copyright (C) 2018 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -23,52 +23,44 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "foamVtkPTraits.H"
-#include "endian.H"
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+inline Foam::word Foam::vtk::vtmWriter::ext()
+{
+    return vtk::fileExtension[vtk::fileTag::MULTI_BLOCK];
+}
 
-template<>
-const char* const
-Foam::vtkPTraits<uint8_t>::typeName = "UInt8";
 
-template<>
-const char * const
-Foam::vtkPTraits<int32_t>::typeName = "Int32";
+inline bool Foam::vtk::vtmWriter::append_vtp(const fileName& file)
+{
+    return append(file, vtk::fileTag::POLY_DATA);
+}
 
-template<>
-const char * const
-Foam::vtkPTraits<uint32_t>::typeName = "UInt32";
 
-template<>
-const char * const
-Foam::vtkPTraits<int64_t>::typeName = "Int64";
+inline bool Foam::vtk::vtmWriter::append_vtp
+(
+    const word& name,
+    const fileName& file
+)
+{
+    return append(name, file, vtk::fileTag::POLY_DATA);
+}
 
-template<>
-const char * const
-Foam::vtkPTraits<uint64_t>::typeName = "UInt64";
 
-template<>
-const char * const
-Foam::vtkPTraits<float>::typeName = "Float32";
+inline bool Foam::vtk::vtmWriter::append_vtu(const fileName& file)
+{
+    return append(file, vtk::fileTag::UNSTRUCTURED_GRID);
+}
 
-template<>
-const char * const
-Foam::vtkPTraits<double>::typeName = "Float64";
 
-#ifdef WM_LITTLE_ENDIAN
-template<>
-const char* const
-Foam::vtkPTraits<Foam::endian>::typeName = "LittleEndian";
-#else
-template<>
-const char* const
-Foam::vtkPTraits<Foam::endian>::typeName = "BigEndian";
-#endif
-
-template<>
-const char* const
-Foam::vtkPTraits<std::string>::typeName = "String";
+inline bool Foam::vtk::vtmWriter::append_vtu
+(
+    const word& name,
+    const fileName& file
+)
+{
+    return append(name, file, vtk::fileTag::UNSTRUCTURED_GRID);
+}
 
 
 // ************************************************************************* //
