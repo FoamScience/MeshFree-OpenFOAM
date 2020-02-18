@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2016 OpenCFD Ltd.
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,76 +25,51 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-inline const char* Foam::ensightCells::key(const enum elemType what)
+template<class Addr>
+bool Foam::ensightFile::isUndef(const IndirectListBase<scalar, Addr>& field)
 {
-    return elemNames[what];
+    for (const scalar val : field)
+    {
+        if (std::isnan(val))
+        {
+            return true;
+        }
+    }
+
+    return true;
 }
 
 
-inline Foam::label Foam::ensightCells::index() const
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+template<class Addr>
+void Foam::ensightFile::writeLabels(const IndirectListBase<label, Addr>& list)
 {
-    return index_;
+    for (const scalar val : list)
+    {
+        write(val);
+        newline();
+    }
 }
 
 
-inline Foam::label& Foam::ensightCells::index()
+template<class Addr>
+void Foam::ensightFile::writeList(const IndirectListBase<scalar, Addr>& field)
 {
-    return index_;
-}
-
-
-inline Foam::label Foam::ensightCells::size() const
-{
-    return address_.size();
-}
-
-
-inline const Foam::FixedList<Foam::label,5>& Foam::ensightCells::totals() const
-{
-    return sizes_;
-}
-
-
-inline Foam::label Foam::ensightCells::total(const enum elemType what) const
-{
-    return sizes_[what];
-}
-
-
-inline Foam::label Foam::ensightCells::size(const enum elemType what) const
-{
-    return slices_[what].size();
-}
-
-
-inline Foam::label Foam::ensightCells::offset(const enum elemType what) const
-{
-    return slices_[what].start();
-}
-
-
-inline const Foam::labelUList Foam::ensightCells::cellIds
-(
-    const enum elemType what
-) const
-{
-    return address_[slices_[what]];
-}
-
-
-inline const Foam::labelUList& Foam::ensightCells::cellIds() const
-{
-    return address_;
-}
-
-
-inline Foam::label Foam::ensightCells::operator[](const label i) const
-{
-    return address_[i];
+    for (const scalar val : field)
+    {
+        if (std::isnan(val))
+        {
+            writeUndef();
+        }
+        else
+        {
+            write(val);
+        }
+        newline();
+    }
 }
 
 

@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
     Copyright (C) 2016-2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,92 +25,71 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ensightGeoFile.H"
-#include "foamVersion.H"
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::ensightGeoFile::initialize()
+inline void Foam::ensightCells::add(const elemType etype, label id)
 {
-    writeBinaryHeader();
+    // Linear addressing location
+    const label index = offsets_[etype] + sizes_[etype]++;
 
-    // Description line 1
-    write("Ensight Geometry File");
-    newline();
-
-    // Description line 2
-    write(string("Written by OpenFOAM " + std::to_string(foamVersion::api)));
-    newline();
-
-    write("node id assign");
-    newline();
-
-    write("element id assign");
-    newline();
-}
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-Foam::ensightGeoFile::ensightGeoFile
-(
-    const fileName& pathname,
-    IOstream::streamFormat format
-)
-:
-    ensightFile(pathname, format)
-{
-    initialize();
-}
-
-
-Foam::ensightGeoFile::ensightGeoFile
-(
-    const fileName& path,
-    const fileName& name,
-    IOstream::streamFormat format
-)
-:
-    ensightFile(path, name, format)
-{
-    initialize();
+    addressing()[index] = id;
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::Ostream& Foam::ensightGeoFile::writeKeyword(const keyType& key)
+inline const char* Foam::ensightCells::key(const elemType etype)
 {
-    writeString(key);
-    newline();
-
-    return *this;
+    return elemNames[etype];
 }
 
 
-//
-// Convenience Output Methods
-//
-
-void Foam::ensightGeoFile::beginPart
-(
-    const label index,
-    const string& description
-)
+inline const Foam::FixedList<Foam::label,5>& Foam::ensightCells::totals() const
 {
-    beginPart(index);
-    writeString(description);
-    newline();
+    return sizes_;
 }
 
 
-void Foam::ensightGeoFile::beginCoordinates(const label npoints)
+inline Foam::label Foam::ensightCells::total(const elemType etype) const
 {
-    writeString(ensightFile::coordinates);
-    newline();
+    return sizes_[etype];
+}
 
-    write(npoints);
-    newline();
+
+inline Foam::label Foam::ensightCells::size(const elemType etype) const
+{
+    return (offsets_[etype+1] - offsets_[etype]);
+}
+
+
+inline Foam::labelRange Foam::ensightCells::range(const elemType etype) const
+{
+    return labelRange(offsets_[etype], offsets_[etype+1] - offsets_[etype]);
+}
+
+
+inline const Foam::labelList& Foam::ensightCells::cellIds() const
+{
+    return addressing();
+}
+
+
+inline const Foam::labelUList
+Foam::ensightCells::cellIds(const elemType etype) const
+{
+    return addressing()[range(etype)];
+}
+
+
+inline void Foam::ensightCells::incrCellIds(const label off)
+{
+    incrAddressing(off);
+}
+
+
+inline void Foam::ensightCells::decrCellIds(const label off)
+{
+    decrAddressing(off);
 }
 
 

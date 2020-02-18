@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2016-2020 OpenCFD Ltd.
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,92 +25,55 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ensightGeoFile.H"
-#include "foamVersion.H"
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-void Foam::ensightGeoFile::initialize()
-{
-    writeBinaryHeader();
-
-    // Description line 1
-    write("Ensight Geometry File");
-    newline();
-
-    // Description line 2
-    write(string("Written by OpenFOAM " + std::to_string(foamVersion::api)));
-    newline();
-
-    write("node id assign");
-    newline();
-
-    write("element id assign");
-    newline();
-}
-
+#include "ensightOutputSurface.H"
+#include "ensightOutput.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ensightGeoFile::ensightGeoFile
+Foam::ensightOutputSurface::ensightOutputSurface
 (
-    const fileName& pathname,
-    IOstream::streamFormat format
+    const pointField& points,
+    const faceList& faces,
+    const string& description
 )
 :
-    ensightFile(pathname, format)
+    ensightFaces(description),
+    points_(points),
+    faces_(faces)
 {
-    initialize();
-}
-
-
-Foam::ensightGeoFile::ensightGeoFile
-(
-    const fileName& path,
-    const fileName& name,
-    IOstream::streamFormat format
-)
-:
-    ensightFile(path, name, format)
-{
-    initialize();
+    // Classify face types
+    classify(faces);
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::Ostream& Foam::ensightGeoFile::writeKeyword(const keyType& key)
+void Foam::ensightOutputSurface::write(ensightGeoFile& os) const
 {
-    writeString(key);
-    newline();
+    if (!total())
+    {
+        return;
+    }
 
-    return *this;
-}
+    // Coordinates
+    ensightOutput::Detail::writeCoordinates
+    (
+        os,
+        index(),
+        name(),
+        points_.size(),
+        points_,
+        false // serial
+    );
 
-
-//
-// Convenience Output Methods
-//
-
-void Foam::ensightGeoFile::beginPart
-(
-    const label index,
-    const string& description
-)
-{
-    beginPart(index);
-    writeString(description);
-    newline();
-}
-
-
-void Foam::ensightGeoFile::beginCoordinates(const label npoints)
-{
-    writeString(ensightFile::coordinates);
-    newline();
-
-    write(npoints);
-    newline();
+    // Faces
+    ensightOutput::writeFaceConnectivity
+    (
+        os,
+        *this,
+        faces_,
+        false  // serial
+    );
 }
 
 

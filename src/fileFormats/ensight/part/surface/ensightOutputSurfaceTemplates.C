@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2016-2017 OpenCFD Ltd.
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,82 +25,72 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+#include "ensightOutputSurface.H"
+#include "ensightOutput.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline const char* Foam::ensightFaces::key(const enum elemType what)
-{
-    return elemNames[what];
-}
-
-
-inline Foam::label Foam::ensightFaces::index() const
-{
-    return index_;
-}
-
-
-inline Foam::label& Foam::ensightFaces::index()
-{
-    return index_;
-}
-
-
-inline Foam::label Foam::ensightFaces::size() const
-{
-    return address_.size();
-}
-
-
-inline const Foam::FixedList<Foam::label,3>& Foam::ensightFaces::totals() const
-{
-    return sizes_;
-}
-
-
-inline Foam::label Foam::ensightFaces::total(const enum elemType what) const
-{
-    return sizes_[what];
-}
-
-
-inline Foam::label Foam::ensightFaces::size(const enum elemType what) const
-{
-    return slices_[what].size();
-}
-
-
-inline Foam::label Foam::ensightFaces::offset(const enum elemType what) const
-{
-    return slices_[what].start();
-}
-
-
-inline const Foam::labelUList Foam::ensightFaces::faceIds
+template<class Type>
+void Foam::ensightOutputSurface::writeData
 (
-    const enum elemType what
+    ensightFile& os,
+    const Field<Type>& fld,
+    const bool isPointData
 ) const
 {
-    return address_[slices_[what]];
+    if (isPointData)
+    {
+        this->writePointData(os, fld);
+    }
+    else
+    {
+        this->writeFaceData(os, fld);
+    }
 }
 
 
-inline const Foam::labelUList& Foam::ensightFaces::faceIds() const
+template<class Type>
+void Foam::ensightOutputSurface::writeFaceData
+(
+    ensightFile& os,
+    const Field<Type>& fld
+) const
 {
-    return address_;
+    ensightOutput::writeField
+    (
+        os,
+        fld,
+        *this,
+        false  /* serial only! */
+    );
 }
 
 
-inline const Foam::boolList& Foam::ensightFaces::flipMap() const
+template<class Type>
+void Foam::ensightOutputSurface::writePointData
+(
+    ensightFile& os,
+    const Field<Type>& fld
+) const
 {
-    return flipMap_;
-}
+    const ensightOutputSurface& part = *this;
+
+    // No geometry or field
+    if (part.empty() || fld.empty())
+    {
+        return;
+    }
 
 
-inline Foam::label Foam::ensightFaces::operator[](const label i) const
-{
-    return address_[i];
+    os.beginPart(part.index());
+
+    ensightOutput::Detail::writeFieldComponents
+    (
+        os,
+        ensightFile::coordinates,
+        fld,
+        false  /* serial only! */
+    );
 }
 
 
