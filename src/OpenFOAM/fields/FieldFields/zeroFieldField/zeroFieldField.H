@@ -6,7 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
-    Copyright (C) 2019 OpenCFD Ltd.
+    Copyright (C) 2019-2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -48,27 +48,26 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class zeroField Declaration
+                       Class zeroFieldField Declaration
 \*---------------------------------------------------------------------------*/
 
 class zeroFieldField
 :
     public zero
 {
-
 public:
 
     // Constructors
 
-        //- Construct null
-        zeroFieldField() = default;
+        //- Default construct
+        zeroFieldField() noexcept = default;
 
 
     // Member Operators
 
-        zeroField operator[](const label) const
+        zeroField operator[](const label) const noexcept
         {
-            return zeroField();
+            return zeroField{};
         }
 };
 
