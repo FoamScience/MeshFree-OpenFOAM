@@ -44,7 +44,7 @@ Foam::Function1Types::ZeroConstant<Type>::ZeroConstant
     const dictionary& dict
 )
 :
-    Function1<Type>(entryName)
+    Function1<Type>(entryName, dict)
 {}
 
 

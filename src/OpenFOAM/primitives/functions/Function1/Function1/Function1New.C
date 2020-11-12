@@ -35,59 +35,43 @@ Foam::autoPtr<Foam::Function1<Type>>
 Foam::Function1<Type>::New
 (
     const word& entryName,
+    const entry* eptr,
     const dictionary& dict,
-    const word& redirectType
+    const word& redirectType,
+    const bool mandatory
 )
 {
     word modelType(redirectType);
 
-    const entry* eptr = dict.findEntry(entryName, keyType::LITERAL);
+    const dictionary* coeffs = (eptr ? eptr->dictPtr() : nullptr);
 
-    if (!eptr)
+    if (coeffs)
     {
-        if (modelType.empty())
-        {
-            FatalIOErrorInFunction(dict)
-                << "No Function1 dictionary entry: "
-                << entryName << nl << nl
-                << exit(FatalIOError);
-        }
-    }
-    else if (eptr->isDict())
-    {
-        const dictionary& coeffsDict = eptr->dict();
+        // Dictionary entry
 
-        coeffsDict.readEntry
+        coeffs->readEntry
         (
             "type",
             modelType,
             keyType::LITERAL,
-            redirectType.empty()  // mandatory when redirectType is empty
+            modelType.empty()  // "type" entry is mandatory if no 'redirect'
         );
 
-        auto cstrIter = dictionaryConstructorTablePtr_->cfind(modelType);
-
-        if (!cstrIter.found())
-        {
-            FatalIOErrorInFunction(dict)
-                << "Unknown Function1 type "
-                << modelType << " for " << entryName
-                << "\n\nValid Function1 types :\n"
-                << dictionaryConstructorTablePtr_->sortedToc() << nl
-                << exit(FatalIOError);
-        }
-
-        return cstrIter()(entryName, coeffsDict);
+        // Fallthrough
     }
-    else
+    else if (eptr)
     {
+        // Primitive entry
+        // - non-word : value for constant function
+        // - word : the modelType
+
         Istream& is = eptr->stream();
 
         token firstToken(is);
 
         if (!firstToken.isWord())
         {
-            // Backwards-compatibility for reading straight fields
+            // A value
             is.putBack(firstToken);
 
             const Type constValue = pTraits<Type>(is);
@@ -97,8 +81,40 @@ Foam::Function1<Type>::New
                 new Function1Types::Constant<Type>(entryName, constValue)
             );
         }
+        else
+        {
+            modelType = firstToken.wordToken();
+        }
 
-        modelType = firstToken.wordToken();
+        // Fallthrough
+    }
+
+
+    if (modelType.empty())
+    {
+        // Entry missing
+
+        if (mandatory)
+        {
+            FatalIOErrorInFunction(dict)
+                << "Missing or invalid Function1 entry: "
+                << entryName << nl
+                << exit(FatalIOError);
+        }
+
+        return nullptr;
+    }
+    else if (!coeffs)
+    {
+        // Primitive entry. Coeffs dictionary is optional.
+        // Use keyword() - not entryName - for compatibility lookup!
+
+        coeffs =
+           &dict.optionalSubDict
+            (
+                eptr->keyword() + "Coeffs",
+                keyType::LITERAL
+            );
     }
 
 
@@ -114,11 +130,77 @@ Foam::Function1<Type>::New
             << exit(FatalIOError);
     }
 
-    return cstrIter()
+    return cstrIter()(entryName, *coeffs);
+}
+
+
+template<class Type>
+Foam::autoPtr<Foam::Function1<Type>>
+Foam::Function1<Type>::New
+(
+    const word& entryName,
+    const dictionary& dict,
+    const word& redirectType,
+    const bool mandatory
+)
+{
+    return Function1<Type>::New
     (
         entryName,
-        dict.optionalSubDict(entryName + "Coeffs")
+        dict.findEntry(entryName, keyType::LITERAL),
+        dict,
+        redirectType,
+        mandatory
     );
+}
+
+
+template<class Type>
+Foam::autoPtr<Foam::Function1<Type>>
+Foam::Function1<Type>::NewCompat
+(
+    const word& entryName,
+    std::initializer_list<std::pair<const char*,int>> compat,
+    const dictionary& dict,
+    const word& redirectType,
+    const bool mandatory
+)
+{
+    return Function1<Type>::New
+    (
+        entryName,
+        dict.findCompat(entryName, compat, keyType::LITERAL),
+        dict,
+        redirectType,
+        mandatory
+    );
+}
+
+
+template<class Type>
+Foam::autoPtr<Foam::Function1<Type>>
+Foam::Function1<Type>::New
+(
+    const word& entryName,
+    const dictionary& dict,
+    const bool mandatory
+)
+{
+    return Function1<Type>::New(entryName, dict, word::null, mandatory);
+}
+
+
+template<class Type>
+Foam::autoPtr<Foam::Function1<Type>>
+Foam::Function1<Type>::NewIfPresent
+(
+    const word& entryName,
+    const dictionary& dict,
+    const word& redirectType
+)
+{
+    // mandatory = false
+    return Function1<Type>::New(entryName, dict, redirectType, false);
 }
 
 
