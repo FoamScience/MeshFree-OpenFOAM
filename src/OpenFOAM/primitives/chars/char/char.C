@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -29,6 +30,20 @@ License
 #include "IOstreams.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+const char* const Foam::pTraits<char>::typeName = "char";
+
+Foam::pTraits<char>::pTraits(const char p) noexcept
+:
+    p_(p)
+{}
+
+
+Foam::pTraits<char>::pTraits(Istream& is)
+{
+    is >> p_;
+}
+
 
 char Foam::readChar(Istream& is)
 {
