@@ -5,8 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017-2018 OpenFOAM Foundation
-    Copyright (C) 2020-2021 OpenCFD Ltd.
+    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,41 +26,54 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "threadedCollatedOFstream.H"
-#include "decomposedBlockData.H"
-#include "OFstreamCollator.H"
+#include "char.H"
+#include "IOstreams.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::threadedCollatedOFstream::threadedCollatedOFstream
-(
-    OFstreamCollator& writer,
-    const fileName& pathName,
-    IOstreamOption streamOpt,
-    const bool useThread
-)
+const char* const Foam::pTraits<char>::typeName = "char";
+
+Foam::pTraits<char>::pTraits(const char p) noexcept
 :
-    OStringStream(streamOpt),
-    writer_(writer),
-    pathName_(pathName),
-    compression_(streamOpt.compression()),
-    useThread_(useThread)
+    p_(p)
 {}
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::threadedCollatedOFstream::~threadedCollatedOFstream()
+Foam::pTraits<char>::pTraits(Istream& is)
 {
-    writer_.write
-    (
-        decomposedBlockData::typeName,
-        pathName_,
-        str(),
-        IOstreamOption(IOstream::BINARY, version(), compression_),
-        false,  // append=false
-        useThread_
-    );
+    is >> p_;
+}
+
+
+char Foam::readChar(Istream& is)
+{
+    char c;
+    is.read(c);
+    return c;
+}
+
+
+Foam::Istream& Foam::operator>>(Istream& is, char& c)
+{
+    is.read(c);
+    is.check(FUNCTION_NAME);
+    return is;
+}
+
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const char c)
+{
+    os.write(c);
+    os.check(FUNCTION_NAME);
+    return os;
+}
+
+
+Foam::Ostream& Foam::operator<<(Ostream& os, const char* str)
+{
+    os.write(str);
+    os.check(FUNCTION_NAME);
+    return os;
 }
 
 

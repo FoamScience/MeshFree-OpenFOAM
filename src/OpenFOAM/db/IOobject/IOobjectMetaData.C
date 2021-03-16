@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017-2018 OpenFOAM Foundation
-    Copyright (C) 2020-2021 OpenCFD Ltd.
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,41 +25,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "threadedCollatedOFstream.H"
-#include "decomposedBlockData.H"
-#include "OFstreamCollator.H"
+#include "IOobject.H"
+#include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::threadedCollatedOFstream::threadedCollatedOFstream
-(
-    OFstreamCollator& writer,
-    const fileName& pathName,
-    IOstreamOption streamOpt,
-    const bool useThread
-)
-:
-    OStringStream(streamOpt),
-    writer_(writer),
-    pathName_(pathName),
-    compression_(streamOpt.compression()),
-    useThread_(useThread)
-{}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::threadedCollatedOFstream::~threadedCollatedOFstream()
+const Foam::dictionary* Foam::IOobject::findMetaData() const noexcept
 {
-    writer_.write
-    (
-        decomposedBlockData::typeName,
-        pathName_,
-        str(),
-        IOstreamOption(IOstream::BINARY, version(), compression_),
-        false,  // append=false
-        useThread_
-    );
+    return nullptr;
 }
 
 

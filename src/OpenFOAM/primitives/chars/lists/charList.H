@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017-2018 OpenFOAM Foundation
-    Copyright (C) 2020-2021 OpenCFD Ltd.
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,44 +23,34 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::charListList
+
+Description
+    A List of charList.
+
 \*---------------------------------------------------------------------------*/
 
-#include "threadedCollatedOFstream.H"
-#include "decomposedBlockData.H"
-#include "OFstreamCollator.H"
+#ifndef charList_H
+#define charList_H
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+#include "char.H"
+#include "List.H"
+#include "SubList.H"
 
-Foam::threadedCollatedOFstream::threadedCollatedOFstream
-(
-    OFstreamCollator& writer,
-    const fileName& pathName,
-    IOstreamOption streamOpt,
-    const bool useThread
-)
-:
-    OStringStream(streamOpt),
-    writer_(writer),
-    pathName_(pathName),
-    compression_(streamOpt.compression()),
-    useThread_(useThread)
-{}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::threadedCollatedOFstream::~threadedCollatedOFstream()
+namespace Foam
 {
-    writer_.write
-    (
-        decomposedBlockData::typeName,
-        pathName_,
-        str(),
-        IOstreamOption(IOstream::BINARY, version(), compression_),
-        false,  // append=false
-        useThread_
-    );
+    // charUList   = defined in UList.H
+    // charList    = defined in List.H
+    // charSubList = defined in SubList.H
+
+    typedef List<charList> charListList;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
