@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2017-2021 OpenCFD Ltd.
+    Copyright (C) 2011-2016 OpenFOAM Foundation
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,48 +23,47 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Alias
-    Foam::LabelPairMap
+InNamespace
+    Foam
 
 Description
-    A HashTable to objects of type \<T\> with a labelPair key.
-    The hashing is based on labelPair (FixedList) and is thus non-commutative.
-    For commutative hashing, an EdgeMap can be used.
+    Miscellaneous hashing functions, mostly from Bob Jenkins.
 
-Typedef
-    Foam::labelPairHashSet
+    The Jenkins hashing function(s) is similar in speed to Paul Hsieh's
+    SuperFast hash, but is public domain, supports incremental hashing
+    and has been reported to have better characteristics.
+    It is also what postgresql seems to be using.
 
-Description
-    A HashSet for a labelPair.
-    The hashing is based on labelPair (FixedList) and is thus non-commutative.
+See also
+    http://burtleburtle.net/bob/c/lookup3.c
+    and HasherInt.H for a specialized version
 
-Typedef
-    Foam::labelPairLookup
-
-Description
-    This is a Map of a labelPair to a label.
-    Used for e.g. for face1, face2 to shared edge.
-    The hashing is based on labelPair (FixedList) and is thus non-commutative.
+SourceFiles
+    Hasher.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef labelPairHashes_H
-#define labelPairHashes_H
+#ifndef Hasher_H
+#define Hasher_H
 
-#include "labelPair.H"
-#include "HashSet.H"
+#include <cstddef>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    template<class T>
-    using LabelPairMap = HashTable<T, labelPair, Foam::Hash<labelPair>>;
 
-    typedef HashSet<labelPair, Foam::Hash<labelPair>> labelPairHashSet;
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    typedef HashTable<label, labelPair, Foam::Hash<labelPair>> labelPairLookup;
-}
+//- Bob Jenkins's 96-bit mixer hashing function (lookup3)
+//  \param[in] data - a character stream
+//  \param[in] len  - the number of bytes
+//  \param[in] seed - the previous hash, or an arbitrary value
+unsigned Hasher(const void* data, size_t len, unsigned seed = 0);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
