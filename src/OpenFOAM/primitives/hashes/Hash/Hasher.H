@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2015 OpenFOAM Foundation
-    Copyright (C) 2018-2021 OpenCFD Ltd.
+    Copyright (C) 2011-2016 OpenFOAM Foundation
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,68 +23,50 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+InNamespace
+    Foam
+
+Description
+    Miscellaneous hashing functions, mostly from Bob Jenkins.
+
+    The Jenkins hashing function(s) is similar in speed to Paul Hsieh's
+    SuperFast hash, but is public domain, supports incremental hashing
+    and has been reported to have better characteristics.
+    It is also what postgresql seems to be using.
+
+See also
+    http://burtleburtle.net/bob/c/lookup3.c
+    and HasherInt.H for a specialized version
+
+SourceFiles
+    Hasher.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "string.H"
-#include "token.H"
-#include "IOstreams.H"
+#ifndef Hasher_H
+#define Hasher_H
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+#include <cstddef>
 
-Foam::string::string(Istream& is)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
 {
-    is >> *this;
-}
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+//- Bob Jenkins's 96-bit mixer hashing function (lookup3)
+//  \param[in] data - a character stream
+//  \param[in] len  - the number of bytes
+//  \param[in] seed - the previous hash, or an arbitrary value
+unsigned Hasher(const void* data, size_t len, unsigned seed = 0);
 
-Foam::Istream& Foam::operator>>(Istream& is, string& val)
-{
-    token tok(is);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    if (tok.isString())
-    {
-        val = tok.stringToken();
-    }
-    else
-    {
-        FatalIOErrorInFunction(is);
-        if (tok.good())
-        {
-            FatalIOError
-                << "Wrong token type - expected string, found "
-                << tok.info();
-        }
-        else
-        {
-            FatalIOError
-                << "Bad token - could not get string";
-        }
-        FatalIOError << exit(FatalIOError);
-        is.setBad();
-        return is;
-    }
+} // End namespace Foam
 
-    is.check(FUNCTION_NAME);
-    return is;
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-Foam::Ostream& Foam::operator<<(Ostream& os, const string& val)
-{
-    os.write(val);
-    os.check(FUNCTION_NAME);
-    return os;
-}
-
-
-Foam::Ostream& Foam::operator<<(Ostream& os, const std::string& val)
-{
-    os.write(string(val));
-    os.check(FUNCTION_NAME);
-    return os;
-}
-
+#endif
 
 // ************************************************************************* //
