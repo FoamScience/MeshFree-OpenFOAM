@@ -31,8 +31,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef foamVtkPTraits_H
-#define foamVtkPTraits_H
+#ifndef Foam_vtk_vtkPTraits_H
+#define Foam_vtk_vtkPTraits_H
 
 #include <cstdint>
 #include <string>

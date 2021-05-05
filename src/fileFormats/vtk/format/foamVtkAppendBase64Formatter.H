@@ -35,8 +35,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef foamVtkAppendBase64Formatter_H
-#define foamVtkAppendBase64Formatter_H
+#ifndef Foam_vtk_appendBase64Formatter_H
+#define Foam_vtk_appendBase64Formatter_H
 
 #include "foamVtkBase64Layer.H"
 
