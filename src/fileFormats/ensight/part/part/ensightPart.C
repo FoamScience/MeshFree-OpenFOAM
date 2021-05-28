@@ -58,7 +58,7 @@ void Foam::ensightPart::decrAddressing(const label off)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::ensightPart::ensightPart() noexcept
+Foam::ensightPart::ensightPart()
 :
     index_(0),
     identifier_(-1),

@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2016-2020 OpenCFD Ltd.
+    Copyright (C) 2016-2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -27,12 +27,14 @@ License
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-inline void Foam::ensightCells::add(const elemType etype, label id)
+inline Foam::label Foam::ensightCells::add(const elemType etype, label id)
 {
     // Linear addressing location
     const label index = offsets_[etype] + sizes_[etype]++;
 
     addressing()[index] = id;
+
+    return index;
 }
 
 
