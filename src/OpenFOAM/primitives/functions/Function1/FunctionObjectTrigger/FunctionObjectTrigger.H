@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017 OpenFOAM Foundation
-    Copyright (C) 2020-2021 OpenCFD Ltd.
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,51 +24,45 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::ramp
+    Foam::Function1Types::FunctionObjectTrigger
 
 Description
-    Ramp function base class for the set of scalar functions starting from 0 and
-    increasing monotonically to 1 from \c start over the \c duration and
-    remaining at 1 thereafter.
+    Returns a 0/1 value corresponding to function object trigger levels.
 
     Usage:
     \verbatim
-        <entryName> <rampFunction>;
+        <entryName> functionObjectTrigger;
         <entryName>Coeffs
         {
-            start     10;
-            duration  20;
-        }
-    \endverbatim
-    or
-    \verbatim
-        <entryName>
-        {
-            type      <rampFunction>;
-            start     10;
-            duration  20;
+            triggers        (1 3 5);
+            defaultValue    false;  // Optional
         }
     \endverbatim
 
     Where:
     \table
-        Property | Description  | Required | Default value
-        start    | Start time   | no       | 0
-        duration | Duration     | yes      |
+        Property | Description                                  | Required
+        triggers | List of active trigger states to check for   | yes |
+        defaultValue | Treatment for unactivated trigger state  | no  | false
     \endtable
 
-See also
-    Foam::Function1
+    In some circumstances, it can be useful to treat an unactivated trigger
+    as being true. This is the role of the "defaultValue" keyword.
+
+Note
+- does not implement integrate()
 
 SourceFiles
-    ramp.C
+    FunctionObjectTrigger.C
+    FunctionObjectTriggerI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Function1Types_ramp_H
-#define Function1Types_ramp_H
+#ifndef Function1Types_FunctionObjectTrigger_H
+#define Function1Types_FunctionObjectTrigger_H
 
 #include "Function1.H"
+#include "labelList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,66 +72,83 @@ namespace Function1Types
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ramp Declaration
+                     Class FunctionObjectTrigger Declaration
 \*---------------------------------------------------------------------------*/
 
-class ramp
+template<class Type>
+class FunctionObjectTrigger
 :
-    public Function1<scalar>
+    public Function1<Type>
 {
-protected:
 
-    // Protected Data
+    // Private Data
 
-        //- Start-time of the ramp function
-        scalar start_;
+        //- Trigger indices when it is considered active
+        labelList triggers_;
 
-        //- Duration of the ramp function
-        scalar duration_;
+        //- Treatment for unactivated trigger state (true/false)
+        bool defaultValue_;
 
-        //- Simple linear ramp function
-        //- that forms the basis of many more complex ramp functions
-        inline scalar linearRamp(const scalar t) const
-        {
-            return max(min((t - start_)/duration_, 1), 0);
-        }
-
-
-private:
 
     // Private Member Functions
+
+        //- Is the trigger considered active?
+        inline bool active() const;
 
         //- Read the coefficients from the given dictionary
         void read(const dictionary& coeffs);
 
-        //- No copy assignment
-        void operator=(const ramp&) = delete;
-
 
 public:
+
+    //- Runtime type information
+    TypeName("functionObjectTrigger");
+
+
+    // Generated Methods
+
+        //- No copy assignment
+        void operator=(const FunctionObjectTrigger<Type>&) = delete;
+
 
     // Constructors
 
         //- Construct from entry name, dictionary and optional registry
-        ramp
+        FunctionObjectTrigger
         (
             const word& entryName,
             const dictionary& dict,
             const objectRegistry* obrPtr = nullptr
         );
 
+        //- Copy construct
+        explicit FunctionObjectTrigger(const FunctionObjectTrigger<Type>& rhs);
+
+        //- Construct and return a clone
+        virtual tmp<Function1<Type>> clone() const
+        {
+            return tmp<Function1<Type>>(new FunctionObjectTrigger<Type>(*this));
+        }
+
 
     //- Destructor
-    virtual ~ramp() = default;
+    virtual ~FunctionObjectTrigger() = default;
 
 
     // Member Functions
 
-        //- Convert time
-        virtual void userTimeToTime(const Time& t);
+        //- Return the trigger indices
+        inline const labelList& triggers() const noexcept;
 
-        //- Return value for time t
-        virtual scalar value(const scalar t) const = 0;
+        //- Change the trigger indices
+        inline void resetTriggers(const labelUList& indices);
+
+
+        //- Return 0/1 value at current time
+        virtual inline Type value(const scalar /*unused*/) const;
+
+        //- Integrate between two (scalar) values. Not implemented!
+        virtual inline Type integrate(const scalar, const scalar) const;
 
         //- Write in dictionary format
         virtual void writeData(Ostream& os) const;
@@ -152,6 +162,14 @@ public:
 
 } // End namespace Function1Types
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "FunctionObjectTriggerI.H"
+
+#ifdef NoRepository
+    #include "FunctionObjectTrigger.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

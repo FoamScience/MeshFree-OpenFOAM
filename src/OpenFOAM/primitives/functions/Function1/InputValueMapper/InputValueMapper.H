@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017 OpenFOAM Foundation
     Copyright (C) 2020-2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -25,37 +24,56 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::Function1Types::Scale
+    Foam::Function1Types::InputValueMapper
 
 Description
-    Function1 which scales a given 'value' function by a scalar 'scale'
-    function.
+    Function1 wrapper that maps the input value prior to it being used by
+    another Function1.
 
-    This is particularly useful to ramp a time-varying value by one of the
-    monotonic ramp functions.
-
-    Usage for a vector:
+    Example usage for limiting a polynomial:
     \verbatim
         <entryName>
         {
-            type      scale;
+            type            inputValueMapper;
+            mode            minMax;
 
-            scale
+            min             0.4;
+            max             1.4;
+
+            value polynomial
+            (
+                (5 1)
+                (-2 2)
+                (-2 3)
+                (1 4)
+            );
+        }
+    \endverbatim
+
+    Here the return value will be:
+    - poly(0.4) for x <= 0.4;
+    - poly(1.4) for x >= 1.4; and
+    - poly(x) for 0.4 < x < 1.4.
+
+
+    Example usage for supplying a patch mass flux for a table lookup:
+    \verbatim
+        <entryName>
+        {
+            type            inputValueMapper;
+            mode            function;
+
+            function
             {
-                type        linearRamp;
-
-                start       0;
-                duration    10;
+                type            functionObjectValue;
+                functionObject  surfaceFieldValue1;
+                functionObjectResult sum(outlet,phi);
             }
 
             value
             {
-                type        sine;
-
-                frequency   10;
-                amplitude   1;
-                scale       (1 0.1 0);
-                level       (10 1 0);
+                type        table;
+                file        "<system>/fanCurve.txt";
             }
         }
     \endverbatim
@@ -63,19 +81,34 @@ Description
     Where:
     \table
         Property | Description                                  | Required
-        scale    | Scaling function of type Function1<scalar>   | yes
+        mode     | Mapping mode (see below)                     | yes
+        function | Mapping Function1                            | no*
+        min      | Minimum input value                          | no*
+        max      | Maximum input value                          | no*
         value    | Function of type Function1<Type>             | yes
     \endtable
 
+    Mapping modes include
+    - none     : the input value is simply passed to the 'value' Function1
+    - function : the input value is passed through the 'function' Function1
+                 before being passed to the 'value' Function1
+    - minMax   : limits the input value to 'min' and 'max' values before being
+                 passed to the 'value' Function1
+
+Note
+    Replaces the LimitRange Function1 (v2106 and earlier)
+
 SourceFiles
-    Scale.C
+    InputValueMapper.C
+    InputValueMapperI.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Function1Types_Scale_H
-#define Function1Types_Scale_H
+#ifndef Function1Types_InputValueMapper_H
+#define Function1Types_InputValueMapper_H
 
 #include "Function1.H"
+#include "Enum.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -85,21 +118,56 @@ namespace Function1Types
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class Scale Declaration
+                      Class InputValueMapper Declaration
 \*---------------------------------------------------------------------------*/
 
 template<class Type>
-class Scale
+class InputValueMapper
 :
     public Function1<Type>
 {
+public:
+
+    // Public Enumerations
+
+        //- Input value mapping mode
+        enum class mappingMode
+        {
+            NONE,
+            FUNCTION1,
+            MINMAX
+        };
+
+        //- Names for the input value  mapping modes
+        static const Enum<mappingMode> mappingModeNames_;
+
+
+private:
+
     // Private Data
 
-        //- Scalar scaling function
-        autoPtr<Function1<scalar>> scale_;
+        //- Mapping mode
+        mappingMode mappingMode_;
 
-        //- Value function
-        autoPtr<Function1<Type>> value_;
+        // Function1 mapping
+
+            //- Input value Function1
+            autoPtr<Function1<scalar>> mappingValuePtr_;
+
+
+        // Min/max mapping
+
+            //- Minimum input value
+            scalar min_;
+
+            //- Maximum input value
+            scalar max_;
+
+
+        // Function being wrapped
+
+            //- Value function
+            autoPtr<Function1<Type>> value_;
 
 
     // Private Member Functions
@@ -111,19 +179,19 @@ class Scale
 public:
 
     //- Runtime type information
-    TypeName("scale");
+    TypeName("inputValueMapper");
 
 
     // Generated Methods
 
         //- No copy assignment
-        void operator=(const Scale<Type>&) = delete;
+        void operator=(const InputValueMapper<Type>&) = delete;
 
 
     // Constructors
 
         //- Construct from entry name, dictionary and optional registry
-        Scale
+        InputValueMapper
         (
             const word& entryName,
             const dictionary& dict,
@@ -131,17 +199,20 @@ public:
         );
 
         //- Copy construct
-        explicit Scale(const Scale<Type>& rhs);
+        explicit InputValueMapper(const InputValueMapper<Type>& rhs);
 
 
     //- Destructor
-    virtual ~Scale() = default;
+    virtual ~InputValueMapper() = default;
 
 
     // Member Functions
 
         //- Return value for time t
         virtual inline Type value(const scalar t) const;
+
+        //- Integrate between two (scalar) values
+        virtual inline Type integrate(const scalar x1, const scalar x2) const;
 
         //- Write in dictionary format
         virtual void writeData(Ostream& os) const;
@@ -158,10 +229,10 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "ScaleI.H"
+#include "InputValueMapperI.H"
 
 #ifdef NoRepository
-    #include "Scale.C"
+    #include "InputValueMapper.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

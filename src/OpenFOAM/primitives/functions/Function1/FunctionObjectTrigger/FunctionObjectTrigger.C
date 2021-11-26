@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017 OpenFOAM Foundation
     Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,61 +25,81 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OneConstant.H"
+#include "FunctionObjectTrigger.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Function1Types::OneConstant<Type>::OneConstant
+void Foam::Function1Types::FunctionObjectTrigger<Type>::read
 (
-    const word& entryName,
-    const objectRegistry* obrPtr
+    const dictionary& coeffs
 )
-:
-    Function1<Type>(entryName, obrPtr)
-{}
+{
+    triggers_ = coeffs.get<labelList>("triggers", keyType::LITERAL);
+    defaultValue_ =
+        coeffs.getOrDefault("defaultValue", false, keyType::LITERAL);
+}
 
 
 template<class Type>
-Foam::Function1Types::OneConstant<Type>::OneConstant
+Foam::Function1Types::FunctionObjectTrigger<Type>::FunctionObjectTrigger
 (
     const word& entryName,
     const dictionary& dict,
     const objectRegistry* obrPtr
 )
 :
-    Function1<Type>(entryName, dict, obrPtr)
+    Function1<Type>(entryName, dict, obrPtr),
+    triggers_(),
+    defaultValue_(false)
+{
+    read(dict);
+}
+
+
+template<class Type>
+Foam::Function1Types::FunctionObjectTrigger<Type>::FunctionObjectTrigger
+(
+    const FunctionObjectTrigger<Type>& rhs
+)
+:
+    Function1<Type>(rhs),
+    triggers_(rhs.triggers_),
+    defaultValue_(rhs.defaultValue_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type>> Foam::Function1Types::OneConstant<Type>::value
+void Foam::Function1Types::FunctionObjectTrigger<Type>::writeEntries
 (
-    const scalarField& x
+    Ostream& os
 ) const
 {
-    return tmp<Field<Type>>::New(x.size(), pTraits<Type>::one);
+    os.writeKeyword("triggers");
+    flatOutput(triggers_);
+    os.endEntry();
+
+    if (defaultValue_)
+    {
+        os.writeEntry("default", "true");
+    }
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type>> Foam::Function1Types::OneConstant<Type>::integrate
+void Foam::Function1Types::FunctionObjectTrigger<Type>::writeData
 (
-    const scalarField& x1,
-    const scalarField& x2
+    Ostream& os
 ) const
-{
-    return (x2 - x1)*pTraits<Type>::one;
-}
-
-
-template<class Type>
-void Foam::Function1Types::OneConstant<Type>::writeData(Ostream& os) const
 {
     Function1<Type>::writeData(os);
     os.endEntry();
+
+    os.beginBlock(word(this->name() + "Coeffs"));
+    writeEntries(os);
+    os.endBlock();
 }
 
 

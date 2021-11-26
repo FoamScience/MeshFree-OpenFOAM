@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017 OpenFOAM Foundation
     Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,61 +25,84 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "OneConstant.H"
+#include "FunctionObjectValue.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Function1Types::OneConstant<Type>::OneConstant
+void Foam::Function1Types::FunctionObjectValue<Type>::read
 (
-    const word& entryName,
-    const objectRegistry* obrPtr
+    const dictionary& coeffs
 )
-:
-    Function1<Type>(entryName, obrPtr)
-{}
+{
+    foName_ = coeffs.get<word>("functionObject");
+    foResultName_ = coeffs.get<word>("functionObjectResult");
+    haveDefaultValue_ = coeffs.readIfPresent("defaultValue", defaultValue_);
+}
 
 
 template<class Type>
-Foam::Function1Types::OneConstant<Type>::OneConstant
+Foam::Function1Types::FunctionObjectValue<Type>::FunctionObjectValue
 (
     const word& entryName,
     const dictionary& dict,
     const objectRegistry* obrPtr
 )
 :
-    Function1<Type>(entryName, dict, obrPtr)
+    Function1<Type>(entryName, dict, obrPtr),
+    foName_(),
+    foResultName_(),
+    defaultValue_(Zero),
+    haveDefaultValue_(false)
+{
+    read(dict);
+}
+
+
+template<class Type>
+Foam::Function1Types::FunctionObjectValue<Type>::FunctionObjectValue
+(
+    const FunctionObjectValue<Type>& rhs
+)
+:
+    Function1<Type>(rhs),
+    foName_(rhs.foName_),
+    foResultName_(rhs.foResultName_),
+    defaultValue_(rhs.defaultValue_),
+    haveDefaultValue_(rhs.haveDefaultValue_)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type>> Foam::Function1Types::OneConstant<Type>::value
+void Foam::Function1Types::FunctionObjectValue<Type>::writeEntries
 (
-    const scalarField& x
+    Ostream& os
 ) const
 {
-    return tmp<Field<Type>>::New(x.size(), pTraits<Type>::one);
+    os.writeEntry("functionObject", foName_);
+    os.writeEntry("functionObjectResult", foResultName_);
+
+    if (haveDefaultValue_)
+    {
+        os.writeEntry("defaultValue", defaultValue_);
+    }
 }
 
 
 template<class Type>
-Foam::tmp<Foam::Field<Type>> Foam::Function1Types::OneConstant<Type>::integrate
+void Foam::Function1Types::FunctionObjectValue<Type>::writeData
 (
-    const scalarField& x1,
-    const scalarField& x2
+    Ostream& os
 ) const
-{
-    return (x2 - x1)*pTraits<Type>::one;
-}
-
-
-template<class Type>
-void Foam::Function1Types::OneConstant<Type>::writeData(Ostream& os) const
 {
     Function1<Type>::writeData(os);
     os.endEntry();
+
+    os.beginBlock(word(this->name() + "Coeffs"));
+    writeEntries(os);
+    os.endBlock();
 }
 
 
