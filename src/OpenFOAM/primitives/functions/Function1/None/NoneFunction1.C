@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2017 OpenFOAM Foundation
-    Copyright (C) 2015-2021 OpenCFD Ltd.
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,25 +25,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Constant.H"
+#include "NoneFunction1.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::Function1Types::Constant<Type>::Constant
-(
-    const word& entryName,
-    const Type& value,
-    const objectRegistry* obrPtr
-)
-:
-    Function1<Type>(entryName, obrPtr),
-    value_(value)
-{}
-
-
-template<class Type>
-Foam::Function1Types::Constant<Type>::Constant
+Foam::Function1Types::None<Type>::None
 (
     const word& entryName,
     const dictionary& dict,
@@ -52,72 +38,58 @@ Foam::Function1Types::Constant<Type>::Constant
 )
 :
     Function1<Type>(entryName, dict, obrPtr),
-    value_(Zero)
-{
-    const entry* eptr = dict.findEntry(entryName, keyType::LITERAL);
-
-    if (eptr && eptr->isStream())
-    {
-        // Primitive (inline) format. Eg,
-        // - key constant 1.2;
-        // - key 1.2;
-
-        ITstream& is = eptr->stream();
-        if (is.peek().isWord())
-        {
-            is.skip();  // Discard leading 'constant'
-        }
-        is >> value_;
-        dict.checkITstream(is, entryName);
-    }
-    else
-    {
-        // Dictionary format. Eg,
-        // key { type constant; value 1.2; }
-
-        dict.readEntry("value", value_);
-    }
-}
-
-
-template<class Type>
-Foam::Function1Types::Constant<Type>::Constant
-(
-    const word& entryName,
-    Istream& is
-)
-:
-    Function1<Type>(entryName),
-    value_(pTraits<Type>(is))
-{}
-
-
-template<class Type>
-Foam::Function1Types::Constant<Type>::Constant(const Constant<Type>& rhs)
-:
-    Function1<Type>(rhs),
-    value_(rhs.value_)
+    context_(dict.relativeName())
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
-Foam::tmp<Foam::Field<Type>> Foam::Function1Types::Constant<Type>::value
-(
-    const scalarField& x
-) const
+Type Foam::Function1Types::None<Type>::value(const scalar) const
 {
-    return tmp<Field<Type>>::New(x.size(), value_);
+    FatalErrorInFunction
+        << "Function " << this->name() << " is 'none' in " << context_ << nl
+        << exit(FatalError);
+
+    return pTraits<Type>::zero;
 }
 
 
 template<class Type>
-void Foam::Function1Types::Constant<Type>::writeData(Ostream& os) const
+Type Foam::Function1Types::None<Type>::integral
+(
+    const scalar x1,
+    const scalar x2
+)
+const
 {
-    Function1<Type>::writeData(os);
+    FatalErrorInFunction
+        << "Function " << this->name() << " is 'none' in " << context_ << nl
+        << exit(FatalError);
 
-    os  << token::SPACE << value_;
+    return pTraits<Type>::zero;
+}
+
+
+template<class Type>
+Foam::tmp<Foam::Field<Type>> Foam::Function1Types::None<Type>::value
+(
+    const scalarField& x
+) const
+{
+    FatalErrorInFunction
+        << "Function " << this->name() << " is 'none' in " << context_ << nl
+        << exit(FatalError);
+
+    return nullptr;
+}
+
+
+template<class Type>
+void Foam::Function1Types::None<Type>::writeData(Ostream& os) const
+{
+    // OR:  os.writeEntry(this->name(), this->type());
+    Function1<Type>::writeData(os);
     os.endEntry();
 }
 
