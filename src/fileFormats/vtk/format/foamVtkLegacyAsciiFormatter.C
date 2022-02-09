@@ -50,10 +50,10 @@ Foam::vtk::legacyAsciiFormatter::legacyAsciiFormatter
 Foam::vtk::legacyAsciiFormatter::legacyAsciiFormatter
 (
     std::ostream& os,
-    unsigned precision
+    unsigned prec
 )
 :
-    asciiFormatter(os, precision)
+    asciiFormatter(os, prec)
 {}
 
 
