@@ -59,11 +59,11 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef contiguous_H
-#define contiguous_H
+#ifndef Foam_contiguous_H
+#define Foam_contiguous_H
 
-#include "scalar.H"
-#include "label.H"
+#include "scalarFwd.H"
+#include "labelFwd.H"
 #include <type_traits>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
