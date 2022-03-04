@@ -26,48 +26,68 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "bitSet.H"
+#include "UOPstream.H"
+#include "OPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(Pstream, 0);
-}
-
-
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-void Foam::Pstream::broadcast
+Foam::UOPstream::UOPstream
 (
-    bitSet& values,
-    const label comm
+    const commsTypes commsType,
+    const int toProcNo,
+    DynamicList<char>& sendBuf,
+    const int tag,
+    const label comm,
+    const bool sendAtDestruct,
+    IOstreamOption::streamFormat fmt
 )
+:
+    UOPstreamBase(commsType, toProcNo, sendBuf, tag, comm, sendAtDestruct, fmt)
+{}
+
+
+Foam::UOPstream::UOPstream(const int toProcNo, PstreamBuffers& buffers)
+:
+    UOPstreamBase(toProcNo, buffers)
+{}
+
+
+Foam::OPstream::OPstream
+(
+    const commsTypes commsType,
+    const int toProcNo,
+    const label bufSize,
+    const int tag,
+    const label comm,
+    IOstreamOption::streamFormat fmt
+)
+:
+    Pstream(commsType, bufSize),
+    UOPstream
+    (
+        commsType,
+        toProcNo,
+        Pstream::transferBuf_,
+        tag,
+        comm,
+        true,  // sendAtDestruct
+        fmt
+    )
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::UOPstream::~UOPstream()
 {
-    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
+    if (sendAtDestruct_)
     {
-        // Broadcast the size
-        label len(values.size());
-        UPstream::broadcast
-        (
-            reinterpret_cast<char*>(&len),
-            sizeof(label),
-            comm,
-            UPstream::masterNo()
-        );
-
-        values.resize_nocopy(len);  // A no-op on master
-
-        if (len)
+        if (!bufferIPCsend())
         {
-            UPstream::broadcast
-            (
-                values.data_bytes(),
-                values.size_bytes(),
-                comm,
-                UPstream::masterNo()
-            );
+            FatalErrorInFunction
+                << "Failed sending outgoing message of size "
+                << sendBuf_.size() << " to processor " << toProcNo_
+                << Foam::abort(FatalError);
         }
     }
 }

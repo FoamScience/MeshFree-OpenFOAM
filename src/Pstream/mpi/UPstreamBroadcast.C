@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
     Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,50 +25,61 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "bitSet.H"
+#include "UPstream.H"
+#include "PstreamGlobals.H"
+#include "profilingPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include <mpi.h>
 
-namespace Foam
-{
-    defineTypeNameAndDebug(Pstream, 0);
-}
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-void Foam::Pstream::broadcast
+bool Foam::UPstream::broadcast
 (
-    bitSet& values,
-    const label comm
+    char* buf,
+    const std::streamsize bufSize,
+    const label communicator,
+    const int rootProcNo
 )
 {
-    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
+    if (!UPstream::parRun() || UPstream::nProcs(communicator) < 2)
     {
-        // Broadcast the size
-        label len(values.size());
-        UPstream::broadcast
-        (
-            reinterpret_cast<char*>(&len),
-            sizeof(label),
-            comm,
-            UPstream::masterNo()
-        );
-
-        values.resize_nocopy(len);  // A no-op on master
-
-        if (len)
-        {
-            UPstream::broadcast
-            (
-                values.data_bytes(),
-                values.size_bytes(),
-                comm,
-                UPstream::masterNo()
-            );
-        }
+        // Nothing to do - ignore
+        return true;
     }
+
+    //Needed?  PstreamGlobals::checkCommunicator(communicator, rootProcNo);
+
+    if (debug)
+    {
+        Pout<< "UPstream::broadcast : root:" << rootProcNo
+            << " comm:" << communicator
+            << " size:" << label(bufSize)
+            << Foam::endl;
+    }
+    if (UPstream::warnComm != -1 && communicator != UPstream::warnComm)
+    {
+        Pout<< "UPstream::broadcast : root:" << rootProcNo
+            << " comm:" << communicator
+            << " size:" << label(bufSize)
+            << " warnComm:" << UPstream::warnComm
+            << Foam::endl;
+        error::printStack(Pout);
+    }
+
+    profilingPstream::beginTiming();
+
+    bool failed = MPI_Bcast
+    (
+        buf,
+        bufSize,
+        MPI_BYTE,
+        rootProcNo,
+        PstreamGlobals::MPICommunicators_[communicator]
+    );
+
+    profilingPstream::addBroadcastTime();
+
+    return !failed;
 }
 
 

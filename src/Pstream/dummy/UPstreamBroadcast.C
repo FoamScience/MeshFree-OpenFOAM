@@ -5,7 +5,6 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
     Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,50 +25,20 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "bitSet.H"
+#include "UPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-namespace Foam
-{
-    defineTypeNameAndDebug(Pstream, 0);
-}
-
-
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-void Foam::Pstream::broadcast
+bool Foam::UPstream::broadcast
 (
-    bitSet& values,
-    const label comm
+    char* buf,
+    const std::streamsize bufSize,
+    const label communicator,
+    const int rootProcNo
 )
 {
-    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
-    {
-        // Broadcast the size
-        label len(values.size());
-        UPstream::broadcast
-        (
-            reinterpret_cast<char*>(&len),
-            sizeof(label),
-            comm,
-            UPstream::masterNo()
-        );
-
-        values.resize_nocopy(len);  // A no-op on master
-
-        if (len)
-        {
-            UPstream::broadcast
-            (
-                values.data_bytes(),
-                values.size_bytes(),
-                comm,
-                UPstream::masterNo()
-            );
-        }
-    }
+    // Nothing to do - ignore
+    return true;
 }
 
 

@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2011-2015 OpenFOAM Foundation
     Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -26,50 +26,31 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
-#include "bitSet.H"
+#include "UOPstream.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-namespace Foam
+bool Foam::UOPstream::bufferIPCsend()
 {
-    defineTypeNameAndDebug(Pstream, 0);
+    NotImplemented;
+    return false;
 }
 
 
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::Pstream::broadcast
+bool Foam::UOPstream::write
 (
-    bitSet& values,
-    const label comm
+    const commsTypes commsType,
+    const int toProcNo,
+    const char* buf,
+    const std::streamsize bufSize,
+    const int tag,
+    const label communicator
 )
 {
-    if (UPstream::parRun() && UPstream::nProcs(comm) > 1)
-    {
-        // Broadcast the size
-        label len(values.size());
-        UPstream::broadcast
-        (
-            reinterpret_cast<char*>(&len),
-            sizeof(label),
-            comm,
-            UPstream::masterNo()
-        );
-
-        values.resize_nocopy(len);  // A no-op on master
-
-        if (len)
-        {
-            UPstream::broadcast
-            (
-                values.data_bytes(),
-                values.size_bytes(),
-                comm,
-                UPstream::masterNo()
-            );
-        }
-    }
+    NotImplemented;
+    return false;
 }
 
 
