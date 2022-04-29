@@ -5,8 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2014-2015 OpenFOAM Foundation
-    Copyright (C) 2015-2018 OpenCFD Ltd.
+    Copyright (C) 2015 OpenFOAM Foundation
+    Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -26,19 +26,19 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "IOmapDistribute.H"
+#include "IOmapDistributePolyMesh.H"
 
 /* * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * * */
 
 namespace Foam
 {
-    defineTypeNameAndDebug(IOmapDistribute, 0);
+    defineTypeNameAndDebug(IOmapDistributePolyMesh, 0);
 }
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-bool Foam::IOmapDistribute::readContents()
+bool Foam::IOmapDistributePolyMesh::readContents()
 {
     if
     (
@@ -60,47 +60,47 @@ bool Foam::IOmapDistribute::readContents()
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::IOmapDistribute::IOmapDistribute(const IOobject& io)
+Foam::IOmapDistributePolyMesh::IOmapDistributePolyMesh(const IOobject& io)
 :
     regIOobject(io)
 {
     // Warn for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOmapDistribute>();
+    warnNoRereading<IOmapDistributePolyMesh>();
 
     readContents();
 }
 
 
-Foam::IOmapDistribute::IOmapDistribute
+Foam::IOmapDistributePolyMesh::IOmapDistributePolyMesh
 (
     const IOobject& io,
-    const mapDistribute& map
+    const mapDistributePolyMesh& map
 )
 :
     regIOobject(io)
 {
     // Warn for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOmapDistribute>();
+    warnNoRereading<IOmapDistributePolyMesh>();
 
     if (!readContents())
     {
-        mapDistribute::operator=(map);
+        mapDistributePolyMesh::operator=(map);
     }
 }
 
 
-Foam::IOmapDistribute::IOmapDistribute
+Foam::IOmapDistributePolyMesh::IOmapDistributePolyMesh
 (
     const IOobject& io,
-    mapDistribute&& map
+    mapDistributePolyMesh&& map
 )
 :
     regIOobject(io)
 {
     // Warn for MUST_READ_IF_MODIFIED
-    warnNoRereading<IOmapDistribute>();
+    warnNoRereading<IOmapDistributePolyMesh>();
 
-    mapDistribute::transfer(map);
+    mapDistributePolyMesh::transfer(map);
 
     readContents();
 }
@@ -108,13 +108,13 @@ Foam::IOmapDistribute::IOmapDistribute
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::IOmapDistribute::readData(Istream& is)
+bool Foam::IOmapDistributePolyMesh::readData(Istream& is)
 {
     return (is >> *this).good();
 }
 
 
-bool Foam::IOmapDistribute::writeData(Ostream& os) const
+bool Foam::IOmapDistributePolyMesh::writeData(Ostream& os) const
 {
     return (os << *this).good();
 }

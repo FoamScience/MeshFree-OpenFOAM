@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,16 +23,34 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::distributedPointPatchFieldMapper
+
+Description
+    A directPointPatchFieldMapper
+    with direct mapping from local or remote quantities.
+
 \*---------------------------------------------------------------------------*/
 
-#include "Pstream.H"
+#ifndef Foam_distributedPointPatchFieldMapper_H
+#define Foam_distributedPointPatchFieldMapper_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "distributedFieldMapper.H"
+#include "directPointPatchFieldMapper.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineTypeNameAndDebug(Pstream, 0);
+
+typedef
+    DistributedFieldMapper<directPointPatchFieldMapper>
+    distributedPointPatchFieldMapper;
+
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2019 OpenCFD Ltd.
+    Copyright (C) 2019-2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,70 +24,99 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::cyclicSlipPointPatch
+    Foam::DistributedFieldMapper
 
 Description
-    Cyclic patch with slip constraint
-
-SourceFiles
-    cyclicSlipPointPatch.C
+    A templated field mapper
+    with direct mapping from local or remote quantities.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cyclicSlipPointPatch_H
-#define cyclicSlipPointPatch_H
+#ifndef Foam_distributedFieldMapper_H
+#define Foam_distributedFieldMapper_H
 
-#include "cyclicPointPatch.H"
-#include "cyclicSlipPolyPatch.H"
+#include "directFieldMapper.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// Forward Declarations
+template<class DirectFieldMapperType> class DistributedFieldMapper;
+
+// Standard Types
+
+//- A directFieldMapper with distributed (with local or remote) quantities
+typedef DistributedFieldMapper<directFieldMapper> distributedFieldMapper;
+
+
 /*---------------------------------------------------------------------------*\
-                      Class cyclicSlipPointPatch Declaration
+                   Class DistributedFieldMapper Declaration
 \*---------------------------------------------------------------------------*/
 
-class cyclicSlipPointPatch
+template<class DirectFieldMapperType>
+class DistributedFieldMapper
 :
-    public cyclicPointPatch
+    public DirectFieldMapperType
 {
+    // Private Data
+
+        //- The distributed map
+        const mapDistributeBase& distMap_;
+
 
 public:
 
-    //- Runtime type information
-    TypeName(cyclicSlipPolyPatch::typeName_());
+    // Public Types
+
+        //- The base direct mapper type
+        typedef DirectFieldMapperType mapper_type;
 
 
     // Constructors
 
-        //- Construct from components
-        cyclicSlipPointPatch
+        //- Construct with addressing and distribute map
+        DistributedFieldMapper
         (
-            const polyPatch& patch,
-            const pointBoundaryMesh& bm
+            const labelUList& directAddr,
+            const mapDistributeBase& distMap
         )
         :
-            cyclicPointPatch(patch, bm)
+            DirectFieldMapperType(directAddr),
+            distMap_(distMap)
         {}
 
 
     //- Destructor
-    virtual ~cyclicSlipPointPatch() = default;
+    virtual ~DistributedFieldMapper() = default;
 
 
     // Member Functions
 
-        //- Return point unit normals.
-        virtual const vectorField& pointNormals() const;
+        //- The mapper size is given by the direct addressing size (if valid)
+        //- or from the distributeMap construct size.
+        virtual label size() const
+        {
+            return
+            (
+                DirectFieldMapperType::hasDirectAddressing()
+              ? DirectFieldMapperType::size()
+              : distMap_.constructSize()
+            );
+        }
 
-        //- Accumulate the effect of constraint direction of this patch
-        virtual void applyConstraint
-        (
-            const label pointi,
-            pointConstraint&
-        ) const;
+        //- It is a distributed mapper
+        virtual bool distributed() const
+        {
+            return true;
+        }
+
+        //- Return the distribution map
+        virtual const mapDistributeBase& distributeMap() const
+        {
+            return distMap_;
+        }
 };
 
 
