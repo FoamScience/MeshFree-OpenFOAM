@@ -2,15 +2,14 @@
 Description
     Compatibility include
 
-    uindirectPrimitivePatch.H combined into uindirectPrimitivePatch.H
-    (MAY-2022)
+    UIndirectList.H combined into IndirectList.H (MAY-2022)
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Foam_uindirectPrimitivePatch_H
-#define Foam_uindirectPrimitivePatch_H
+#ifndef Foam_UIndirectList_H
+#define Foam_UIndirectList_H
 
-#include "indirectPrimitivePatch.H"
+#include "IndirectList.H"
 
 #endif
 
