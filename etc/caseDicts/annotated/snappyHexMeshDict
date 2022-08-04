@@ -230,6 +230,21 @@ castellatedMeshControls
             //  outside locations. Default is only after all refinement has
             //  been done.
             //leakLevel 10;
+
+            // Additional refinement for regions of high curvature. Expressed
+            // (bit similar to gapLevel) as:
+            // - number of cells per radius of curvature. (usually 1 is
+            //   good enough)
+            // - starting cell level? Not used at the moment.
+            // - maximum cell level. This can be smaller or larger than the
+            //   max 'surface' level
+            // - minumum curvature radius to ignore (expressed as a cell level).
+            //   This can be used to avoid detecting small sharp surface
+            //   features. Set to -1 to ignore.
+            //   (sometimes you want more refinement than sharp features since
+            //    these can be done with feature edge snapping (so can leave
+            //    level (0 0))
+            //curvatureLevel (10 0 10 -1);
         }
     }
 
