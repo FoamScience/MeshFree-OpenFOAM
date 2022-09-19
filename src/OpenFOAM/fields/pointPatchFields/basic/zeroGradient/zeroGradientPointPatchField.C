@@ -27,6 +27,15 @@ License
 
 #include "zeroGradientPointPatchField.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+template<class Type>
+const Foam::word& Foam::pointPatchField<Type>::zeroGradientType()
+{
+    return Foam::zeroGradientPointPatchField<Type>::typeName;
+}
+
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class Type>
