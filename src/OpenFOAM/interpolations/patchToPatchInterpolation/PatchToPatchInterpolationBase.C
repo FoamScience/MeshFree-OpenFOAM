@@ -27,12 +27,17 @@ License
 
 #include "PatchToPatchInterpolation.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-defineTypeNameAndDebug(PatchToPatchInterpolationName, 0);
+    defineTypeNameAndDebug(PatchToPatchInterpolationBase, 0);
 }
+
+
+Foam::scalar Foam::PatchToPatchInterpolationBase::projectionTol_ = 0.05;
+
+const Foam::scalar Foam::PatchToPatchInterpolationBase::directHitTol = 1e-5;
 
 
 // ************************************************************************* //
