@@ -5,8 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2017 OpenFOAM Foundation
-    Copyright (C) 2020-2022 OpenCFD Ltd.
+    Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,88 +23,52 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::masterOFstream
+Namespace
+    Foam::ensightOutput
 
 Description
-    Master-only drop-in replacement for OFstream.
-
-SourceFiles
-    masterOFstream.C
+    A collection of functions for writing ensight file content.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef Foam_masterOFstream_H
-#define Foam_masterOFstream_H
+#ifndef Foam_ensightOutputFwd_H
+#define Foam_ensightOutputFwd_H
 
-#include "StringStream.H"
+#include "DynamicList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// Forward Declarations
+class ensightFile;
+class ensightGeoFile;
+
+
 /*---------------------------------------------------------------------------*\
-                       Class masterOFstream Declaration
+                        Namespace ensightOutput
 \*---------------------------------------------------------------------------*/
 
-class masterOFstream
-:
-    public OStringStream
+namespace ensightOutput
 {
-    // Private Data
 
-        //- The backend file name
-        const fileName pathName_;
+//- The list type used for component-wise buffering.
+//  Always has value_type = \c float (what ensight uses internally)
+typedef DynamicList<float> floatBufferType;
 
-        //- Output file compression
-        const IOstreamOption::compressionType compression_;
+//- Static debugging option
+extern int debug;
 
-        //- Open file in append mode
-        const IOstreamOption::appendType append_;
-
-        //- Should file be written
-        const bool valid_;
-
-
-    // Private Member Functions
-
-        //- Open file with checking and write append contents
-        void checkWrite
-        (
-            const fileName& fName,
-            const char* str,
-            std::streamsize len
-        );
-
-        //- Open file with checking and write append contents
-        void checkWrite(const fileName& fName, const std::string& s);
-
-        //- Commit buffered information, including parallel gather as required
-        void commit();
-
-
-public:
-
-    // Constructors
-
-        //- Construct from pathname and set stream status
-        explicit masterOFstream
-        (
-            const fileName& pathname,
-            IOstreamOption streamOpt = IOstreamOption(),
-            IOstreamOption::appendType append = IOstreamOption::NON_APPEND,
-            const bool valid = true
-        );
-
-
-    //- Destructor - commits buffered information to file
-    ~masterOFstream();
-};
+//- Upper limit on number of items for bundled off-processor field transfers.
+//- The component-wise transfer uses float (4 bytes).
+//  Eg, 5M for 50 ranks of 100k cells each
+extern int maxChunk_;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace ensightOutput
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
