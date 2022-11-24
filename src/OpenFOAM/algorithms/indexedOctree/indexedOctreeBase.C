@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2011-2012 OpenFOAM Foundation
+    Copyright (C) 2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,22 +26,62 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "triFace.H"
+#include "indexedOctree.H"
+#include "treeBoundBox.H"
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-template<class Type>
-Type Foam::triFace::average
-(
-    const UList<point>&,
-    const Field<Type>& fld
-) const
+namespace Foam
 {
-    // a triangle, do a direct calculation
-    return
-    (
-        (1.0/3.0) * (fld[a()] + fld[b()] + fld[c()])
-    );
+    defineTypeNameAndDebug(indexedOctreeBase, 0);
+
+    scalar indexedOctreeBase::perturbTol_ = 10*SMALL;
 }
+
+
+// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
+
+void Foam::indexedOctreeBase::writeOBJ
+(
+    Ostream& os,
+    const treeBoundBox& bb,
+    label& vertIndex,
+    const bool writeLinesOnly
+)
+{
+    // Annotate with '#box' which can be grep'd for later
+    os  << "#box" << nl;
+
+    pointField pts(bb.points());
+
+    for (const point& p : pts)
+    {
+        os  << "v " << p.x() << ' ' << p.y() << ' ' << p.z() << nl;
+    }
+
+    if (writeLinesOnly)
+    {
+        for (const edge& e : treeBoundBox::edges)
+        {
+            os  << "l " << e[0] + vertIndex + 1
+                << ' ' << e[1] + vertIndex + 1 << nl;
+        }
+    }
+    else
+    {
+        for (const face& f : treeBoundBox::faces)
+        {
+            os  << 'f';
+            for (const label fpi : f)
+            {
+                os  << ' ' << fpi + vertIndex + 1;
+            }
+            os  << nl;
+        }
+    }
+
+    vertIndex += pts.size();
+}
+
 
 // ************************************************************************* //

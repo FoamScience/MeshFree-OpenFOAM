@@ -25,13 +25,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "indexedOctree.H"
+#include "dynamicIndexedOctree.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-defineTypeNameAndDebug(indexedOctreeName, 0);
+    defineTypeNameAndDebug(dynamicIndexedOctreeBase, 0);
 }
 
 
