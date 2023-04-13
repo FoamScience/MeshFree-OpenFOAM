@@ -50,7 +50,7 @@ namespace Foam
 typedef dimensioned<symmTensor> dimensionedSymmTensor;
 
 
-// global functions
+// Global Functions
 
 dimensionedSymmTensor sqr(const dimensionedVector&);
 dimensionedSymmTensor innerSqr(const dimensionedSymmTensor&);
@@ -65,7 +65,7 @@ dimensionedSymmTensor cof(const dimensionedSymmTensor&);
 dimensionedSymmTensor inv(const dimensionedSymmTensor&);
 
 
-// global operators
+// Global Operators
 
 //- Hodge Dual operator (tensor -> vector)
 dimensionedVector operator*(const dimensionedSymmTensor&);
