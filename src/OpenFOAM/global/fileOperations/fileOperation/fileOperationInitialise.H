@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2017-2018 OpenFOAM Foundation
+    Copyright (C) 2023 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -33,8 +34,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fileOperationInitialise_H
-#define fileOperationInitialise_H
+#ifndef Foam_fileOperations_fileOperationInitialise_H
+#define Foam_fileOperations_fileOperationInitialise_H
 
 #include "runTimeSelectionTables.H"
 
@@ -79,7 +80,7 @@ public:
 
     // Selectors
 
-        //- Select type
+        //- Select initialisation type
         static autoPtr<fileOperationInitialise> New
         (
             const word& type, int& argc, char**& argv
@@ -92,8 +93,39 @@ public:
 
     // Member Functions
 
-        //- Threading required?
+        //- Requires (MPI) threading?
         virtual bool needsThreading() const = 0;
+};
+
+
+/*---------------------------------------------------------------------------*\
+              Class fileOperationInitialise_unthreaded Declaration
+\*---------------------------------------------------------------------------*/
+
+//- A fileOperation initialiser for unthreaded file handlers.
+class fileOperationInitialise_unthreaded
+:
+    public fileOperationInitialise
+{
+public:
+
+    // Constructors
+
+        //- Construct from components
+        fileOperationInitialise_unthreaded(int& argc, char**& argv)
+        :
+            fileOperationInitialise(argc, argv)
+        {}
+
+
+    //- Destructor
+    virtual ~fileOperationInitialise_unthreaded() = default;
+
+
+    // Member Functions
+
+        //- No (MPI) threading required
+        virtual bool needsThreading() const { return false; }
 };
 
 

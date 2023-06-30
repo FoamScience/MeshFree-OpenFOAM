@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
+    Copyright (C) 2023 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,21 +23,21 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-InClass
-    Foam::timeVaryingUniformFixedValuePointPatchFields
+Typedef
+    Foam::dimensionedLabel
 
 Description
+    Dimensioned label obtained from generic dimensioned type.
 
 SourceFiles
-    timeVaryingUniformFixedValuePointPatchFields.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef timeVaryingUniformFixedValuePointPatchFields_H
-#define timeVaryingUniformFixedValuePointPatchFields_H
+#ifndef Foam_dimensionedLabel_H
+#define Foam_dimensionedLabel_H
 
-#include "timeVaryingUniformFixedValuePointPatchField.H"
-#include "fieldTypes.H"
+#include "dimensionedType.H"
+#include "label.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,7 +46,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-makePointPatchFieldTypedefs(timeVaryingUniformFixedValue);
+typedef dimensioned<label> dimensionedLabel;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

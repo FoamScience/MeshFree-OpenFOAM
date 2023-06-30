@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2022-2023 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,45 +24,79 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::EdgeMap
+    Foam::fileOperations::hostUncollatedFileOperation
 
 Description
-    Map from edge (expressed as its endpoints) to value.
-    For easier forward declaration it is currently implemented as a
-    separate class rather than a template alias.
+    Version of masterUncollated with host-based IO ranks
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef EdgeMap_H
-#define EdgeMap_H
+#ifndef Foam_fileOperations_hostUncollatedFileOperation_H
+#define Foam_fileOperations_hostUncollatedFileOperation_H
 
-#include "edge.H"
-#include "HashTable.H"
+#include "masterUncollatedFileOperation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+namespace fileOperations
+{
 
 /*---------------------------------------------------------------------------*\
-                           Class EdgeMap Declaration
+                 Class hostUncollatedFileOperation Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class T>
-class EdgeMap
+class hostUncollatedFileOperation
 :
-    public HashTable<T, edge, Hash<edge>>
+    public masterUncollatedFileOperation
 {
+    // Private Data
+
+        //- Communicator allocated/managed by us
+        mutable label managedComm_;
+
+
+    // Private Member Functions
+
+        //- Any initialisation steps after constructing
+        void init(bool verbose);
+
 public:
 
-    //- Inherit constructors from HashTable
-    using HashTable<T, edge, Hash<edge>>::HashTable;
+        //- Runtime type information
+        TypeName("hostUncollated");
 
+
+    // Constructors
+
+        //- Default construct
+        explicit hostUncollatedFileOperation(bool verbose = false);
+
+        //- Construct from communicator with specified io-ranks
+        explicit hostUncollatedFileOperation
+        (
+            const Tuple2<label, labelList>& commAndIORanks,
+            const bool distributedRoots,
+            bool verbose = false
+        );
+
+
+    //- Destructor
+    virtual ~hostUncollatedFileOperation();
+
+
+    // Member Functions
+
+        //- Transfer ownership of communicator to this fileOperation.
+        //- Use with caution
+        virtual void storeComm() const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace fileOperations
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
